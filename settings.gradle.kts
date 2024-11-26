@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "qriz"
 include(":app")
 include(":core:network")
+include(":core:datastore")
