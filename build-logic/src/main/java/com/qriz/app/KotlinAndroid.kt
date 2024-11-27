@@ -11,7 +11,6 @@ fun Project.configureKotlinAndroid() {
 
         defaultConfig {
             minSdk = 28
-
         }
 
         buildTypes {

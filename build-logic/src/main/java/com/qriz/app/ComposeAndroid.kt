@@ -26,6 +26,7 @@ fun Project.configureComposeAndroid() {
         "implementation"(findLibrary("androidx-ui-tooling-preview"))
         "implementation"(findLibrary("androidx-ui-tooling"))
         "implementation"(findLibrary("androidx-compose-navigation"))
+        "implementation"(findLibrary("androidx.lifecycle.runtime.compose"))
     }
 
     extensions.getByType<ComposeCompilerGradlePluginExtension>().apply {
