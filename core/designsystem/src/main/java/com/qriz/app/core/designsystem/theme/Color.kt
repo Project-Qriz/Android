@@ -1,4 +1,4 @@
-package com.qriz.app.ui.theme
+package com.qriz.app.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
