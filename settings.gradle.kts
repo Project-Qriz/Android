@@ -29,3 +29,4 @@ include(":core:designsystem")
 include(":core:data")
 
 include(":feature:main")
+include(":feature:splash")
