@@ -30,4 +30,5 @@ include(":core:data")
 
 include(":feature:main")
 include(":feature:splash")
+include(":feature:sign")
 include(":core:navigation")
