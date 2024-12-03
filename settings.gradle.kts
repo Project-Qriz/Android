@@ -30,3 +30,4 @@ include(":core:data")
 
 include(":feature:main")
 include(":feature:splash")
+include(":core:navigation")
