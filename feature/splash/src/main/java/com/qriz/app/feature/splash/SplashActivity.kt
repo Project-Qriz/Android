@@ -44,6 +44,7 @@ class SplashActivity : ComponentActivity() {
                                 Intent(this@SplashActivity, MainActivity::class.java)
                                 .putExtra("login", effect.login)
                             startActivity(intent)
+                            finish()
                         }
                     }
                 }
