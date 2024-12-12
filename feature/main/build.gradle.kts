@@ -8,4 +8,6 @@ android {
 
 dependencies {
     implementation(projects.feature.sign)
+    implementation(projects.feature.onboard)
+
 }

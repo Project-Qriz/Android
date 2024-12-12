@@ -11,4 +11,16 @@ sealed interface Route {
 
     @Serializable
     data object SignUp : Route
+
+    @Serializable
+    data class Guide(
+        val title: String,
+        val subTitle: String,
+        val image: Int,
+        val buttonText: String,
+        val route: String,
+    ) : Route
+
+    @Serializable
+    data object ConceptCheck : Route
 }

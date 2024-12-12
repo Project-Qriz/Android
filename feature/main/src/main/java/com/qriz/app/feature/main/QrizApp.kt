@@ -14,6 +14,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.qriz.app.core.navigation.route.Route
+import com.qriz.app.feature.onboard.navigation.navigateCheckGuide
+import com.qriz.app.feature.onboard.navigation.onboardNavGraph
 import com.qriz.app.feature.sign.navigation.navigateSignUp
 import com.qriz.app.feature.sign.navigation.signNavGraph
 
@@ -55,8 +57,14 @@ private fun QrizNavHost(
                 navController.navigateSignUp()
             },
             onSignUpComplete = {
-
+                navController.navigateCheckGuide()
             },
+        )
+
+        onboardNavGraph(
+            onNavigateFromGuide = { route ->
+                navController.navigate(route)
+            }
         )
     }
 }
