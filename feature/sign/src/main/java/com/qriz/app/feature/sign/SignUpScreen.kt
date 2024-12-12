@@ -50,6 +50,7 @@ const val SIGN_UP_PAGE = 5
 fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
     onSignUp: () -> Unit,
+    onShowSnackbar: (String) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -64,6 +65,10 @@ fun SignUpScreen(
             when(it) {
                 SignUpEffect.SignUpComplete -> {
                     onSignUp()
+                }
+
+                SignUpEffect.SendAuthEmail -> {
+                    onShowSnackbar("인증번호를 메일로 전송하였습니다.")
                 }
             }
         }

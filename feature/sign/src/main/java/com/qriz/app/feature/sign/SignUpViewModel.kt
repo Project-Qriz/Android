@@ -187,6 +187,7 @@ class SignUpViewModel @Inject constructor(
         viewModelScope.launch {
             cancelAuthTimer()
             userRepository.sendAuthenticationNumber(email)
+            _effect.tryEmit(SignUpEffect.SendAuthEmail)
             startAuthTimer()
         }
     }
