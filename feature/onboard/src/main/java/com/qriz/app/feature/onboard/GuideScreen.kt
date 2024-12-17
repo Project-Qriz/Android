@@ -67,6 +67,7 @@ fun GuideScreen(
             enable = true,
             onClick = onNext,
             modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 18.dp)
         )
     }
 }
