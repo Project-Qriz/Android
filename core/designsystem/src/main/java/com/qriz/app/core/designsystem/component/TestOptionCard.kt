@@ -31,6 +31,7 @@ fun TestOptionCard(
     state: TestOptionState,
     number: Int,
     content: String,
+    modifier: Modifier = Modifier,
 ) {
     val numberBackground = when (state) {
         TestOptionState.None -> {
@@ -69,7 +70,7 @@ fun TestOptionCard(
     }
 
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         color = backgroundColor,
         shape = RoundedCornerShape(10.dp),
         border = if(state == TestOptionState.None) {
