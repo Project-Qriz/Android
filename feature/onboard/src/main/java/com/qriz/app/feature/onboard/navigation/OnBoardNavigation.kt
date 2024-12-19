@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.qriz.app.core.navigation.route.Route
-import com.qriz.app.feature.onboard.ConceptCheckScreen
+import com.qriz.app.feature.onboard.ui.screen.survey.ConceptCheckScreen
 import com.qriz.app.feature.onboard.GuideScreen
 import com.qriz.app.feature.onboard.R
 
@@ -24,7 +24,9 @@ fun NavHostController.navigateCheckGuide() {
 }
 
 fun NavGraphBuilder.onboardNavGraph(
-    onNavigateFromGuide: (Route) -> Unit,
+    onBack: () -> Unit,
+    onShowSnackbar: (String) -> Unit,
+    onNavigate: (Route) -> Unit,
 ) {
     composable<Route.Guide> {
         val route = it.toRoute<Route.Guide>()
@@ -39,7 +41,7 @@ fun NavGraphBuilder.onboardNavGraph(
                     .find { guideType ->  guideType.route == route.route }
 
                 when(guideType) {
-                    GuideType.CONCEPT_CHECK -> { onNavigateFromGuide(Route.ConceptCheck) }
+                    GuideType.CONCEPT_CHECK -> { onNavigate(Route.ConceptCheck) }
                     GuideType.PREVIEW -> {}
                     GuideType.WELCOME -> {}
                     null -> {
@@ -53,8 +55,20 @@ fun NavGraphBuilder.onboardNavGraph(
     composable<Route.ConceptCheck> {
         ConceptCheckScreen(
             onComplete = {
-                
-            }
+                onNavigate(
+                    Route.Guide(
+                        title = """테스트를
+                            |진행해볼까요?""".trimMargin(),
+                        subTitle = """간단한 프리뷰 테스트로 실력을 점검하고
+                            |이후 맞춤형 개념과 데일리 테스트를 경험해 보세요!""".trimMargin(),
+                        image = R.drawable.img_onboard_test,
+                        route = GuideType.PREVIEW.route,
+                        buttonText = "간단한 테스트 시작",
+                    )
+                )
+            },
+            onBack = onBack,
+            onShowSnackbar = onShowSnackbar,
         )
     }
 }
