@@ -24,6 +24,7 @@ fun QrizTopBar(
     navigationType: NavigationType = NavigationType.None,
     background: Color = MaterialTheme.colorScheme.surface,
     onNavigationClick: () -> Unit,
+    actions: (@Composable () -> Unit)? = null,
 ) {
     Box(
         modifier = Modifier.fillMaxWidth()
@@ -67,6 +68,11 @@ fun QrizTopBar(
             modifier = Modifier.align(Alignment.Center)
         )
 
+        Box(
+            modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
+            actions?.invoke()
+        }
     }
 }
 

@@ -52,7 +52,7 @@ fun QrizTextFiled(
         singleLine = singleLine,
         textStyle = style.copy(
             platformStyle = PlatformTextStyle(
-                includeFontPadding = true
+                includeFontPadding = false
             ),
             lineHeightStyle = LineHeightStyle(
                 alignment = LineHeightStyle.Alignment.Center,
