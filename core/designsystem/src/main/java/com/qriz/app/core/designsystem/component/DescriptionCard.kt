@@ -11,8 +11,8 @@ import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.theme.QrizTheme
 
 @Composable
-fun TestQuestionCard(
-    question: String,
+fun DescriptionCard(
+    description: String,
     modifier: Modifier = Modifier,
 ) {
     QrizCard(
@@ -20,7 +20,7 @@ fun TestQuestionCard(
             .fillMaxWidth()
     ) {
         Text(
-            text = question,
+            text = description,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.fillMaxWidth().padding(24.dp),
         )
@@ -31,7 +31,7 @@ fun TestQuestionCard(
 @Composable
 fun TestQuestionCardPreview() {
     QrizTheme {
-        TestQuestionCard("다음 중 GROUP BY 절의 특징으로 올바르지 않은 것은?")
+        DescriptionCard("다음 중 GROUP BY 절의 특징으로 올바르지 않은 것은?")
     }
 }
 
