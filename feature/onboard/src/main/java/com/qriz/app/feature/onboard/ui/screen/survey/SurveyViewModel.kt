@@ -2,7 +2,7 @@ package com.qriz.app.feature.onboard.ui.screen.survey
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.qriz.app.core.data.repository.OnBoardingRepository
+import com.qriz.app.core.data.repository.OnBoardRepository
 import com.qriz.app.feature.onboard.SURVEY_ITEMS
 import com.qriz.app.feature.onboard.KNOWN_ALL
 import com.qriz.app.feature.onboard.KNOWN_NOTHING
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SurveyViewModel @Inject constructor(
-    private val onBoardingRepository: OnBoardingRepository
+    private val onBoardRepository: OnBoardRepository
 ) : ViewModel() {
     private val _state: MutableStateFlow<SurveyState> = MutableStateFlow(
         SurveyState(
@@ -93,7 +93,7 @@ class SurveyViewModel @Inject constructor(
 
         viewModelScope.launch {
             runCatching {
-                onBoardingRepository.submitSurvey(checked)
+                onBoardRepository.submitSurvey(checked)
             }.onSuccess {
                 _effect.tryEmit(SurveyEffect.Complete)
             }.onFailure { throwable ->
