@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -21,3 +22,14 @@ dependencyResolutionManagement {
 
 rootProject.name = "qriz"
 include(":app")
+
+include(":core:network")
+include(":core:datastore")
+include(":core:designsystem")
+include(":core:data")
+
+include(":feature:main")
+include(":feature:splash")
+include(":feature:sign")
+include(":core:navigation")
+include(":feature:onboard")
