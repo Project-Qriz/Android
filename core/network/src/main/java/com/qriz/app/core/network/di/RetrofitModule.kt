@@ -22,7 +22,7 @@ object RetrofitModule {
         json: Json,
         okHttpClient: OkHttpClient,
     ): Retrofit {
-        val baseUrl = ""
+        val baseUrl = "https://www.qriz.com"
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(okHttpClient)

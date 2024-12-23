@@ -82,7 +82,9 @@ private fun QrizNavHost(
         )
 
         onboardNavGraph(
-            onNavigateFromGuide = navController::navigate,
+            onBack = navController::popBackStack,
+            onNavigate = navController::navigate,
+            onShowSnackbar = onShowSnackbar,
         )
     }
 }

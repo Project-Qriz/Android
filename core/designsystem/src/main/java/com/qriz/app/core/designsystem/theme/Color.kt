@@ -3,7 +3,7 @@ package com.qriz.app.core.designsystem.theme
 import androidx.compose.ui.graphics.Color
 
 val Gray100 = Color(0xFFF0F4F7)
-val Gray200 = Color(0xFFCDD5E0)
+val Gray200 = Color(0xFFD8DFE9)
 val Gray300 = Color(0xFFAAB6C9)
 val Gray400 = Color(0xFF8F9AAA)
 val Gray500 = Color(0xFF747D8B)
@@ -27,6 +27,8 @@ val Mint300 = Color(0xFF99E8D0)
 val Mint400 = Color(0xFF81DEC4)
 val Mint500 = Color(0xFF6AD4B9)
 val Mint600 = Color(0xFF52CAAE) //tertiary
+val Mint700 = Color(0xFF42BA9E) //tertiary
+val Mint800 = Color(0xFF37AF93)
 
 val Red500 = Color(0xFFEF5D5D)
 

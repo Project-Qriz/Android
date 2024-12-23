@@ -1,5 +1,7 @@
 package com.qriz.app.core.data.di
 
+import com.qriz.app.core.data.repository.OnBoardRepository
+import com.qriz.app.core.data.repository.OnBoardRepositoryImpl
 import com.qriz.app.core.data.repository.UserRepository
 import com.qriz.app.core.data.repository.UserRepositoryImpl
 import dagger.Binds
@@ -16,4 +18,10 @@ internal interface RepositoryModule {
     fun bindsUserRepository(
         userRepositoryImpl: UserRepositoryImpl
     ): UserRepository
+
+    @Binds
+    @Singleton
+    fun bindsOnBoardRepository(
+       onBoardingRepository: OnBoardRepositoryImpl
+    ): OnBoardRepository
 }

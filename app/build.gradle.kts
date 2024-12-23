@@ -16,3 +16,8 @@ android {
         }
     }
 }
+
+dependencies {
+    implementation(projects.feature.main)
+    implementation(projects.feature.splash)
+}

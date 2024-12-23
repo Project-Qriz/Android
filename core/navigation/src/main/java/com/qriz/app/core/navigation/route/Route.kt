@@ -23,4 +23,7 @@ sealed interface Route {
 
     @Serializable
     data object ConceptCheck : Route
+
+    @Serializable
+    data object Preview : Route
 }

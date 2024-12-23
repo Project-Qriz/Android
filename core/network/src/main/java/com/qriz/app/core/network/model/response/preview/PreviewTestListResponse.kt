@@ -5,7 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PreviewTestListResponse(
-    val questions: List<QuestionResponseModel>
+    val questions: List<QuestionResponseModel>,
+    val totalTimeLimit: Int,
 )
 
 @Serializable
