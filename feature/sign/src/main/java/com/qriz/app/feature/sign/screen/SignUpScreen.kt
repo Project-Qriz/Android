@@ -1,14 +1,11 @@
-package com.qriz.app.feature.sign
+package com.qriz.app.feature.sign.screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -24,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -32,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.designsystem.component.NavigationType
-import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.component.SupportingText
@@ -41,6 +36,7 @@ import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Mint800
+import com.qriz.app.feature.sign.component.SignUpContent
 import com.qriz.app.feature.sign.model.AuthenticationState
 import com.qriz.app.feature.sign.model.SignUpEffect
 
@@ -62,7 +58,7 @@ fun SignUpScreen(
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect {
-            when(it) {
+            when (it) {
                 SignUpEffect.SignUpComplete -> {
                     onSignUp()
                 }
@@ -95,14 +91,15 @@ fun SignUpScreen(
             userScrollEnabled = false,
         ) { page ->
             when (page) {
-                0 -> SignUpNameContent(
+                0 -> SignUpNamePage(
                     name = state.name,
+                    validName = state.validName,
                     errorMessage = state.nameErrorMessage,
                     onNameChanged = viewModel::updateName,
                     onNext = viewModel::nextPage,
                 )
 
-                1 -> SignUpEmailContent(
+                1 -> SignUpEmailPage(
                     email = state.email,
                     errorMessage = state.emailErrorMessage,
                     emailVerified = state.emailVerified,
@@ -110,7 +107,7 @@ fun SignUpScreen(
                     onNext = viewModel::nextPage,
                 )
 
-                2 -> SignUpEmailAuthContent(
+                2 -> SignUpEmailAuthPage(
                     authenticationNumber = state.authenticationNumber,
                     authenticationState = state.authenticationState,
                     timer = state.timerText,
@@ -120,7 +117,7 @@ fun SignUpScreen(
                     onRetry = viewModel::sendAuthenticationNumberEmail
                 )
 
-                3 -> SignUpIdContent(
+                3 -> SignUpIdPage(
                     id = state.id,
                     onIdChanged = viewModel::updateId,
                     onCheckDuplicate = viewModel::checkDuplicateId,
@@ -129,7 +126,7 @@ fun SignUpScreen(
                     onNext = viewModel::nextPage,
                 )
 
-                4 -> SignUpPasswordContent(
+                4 -> SignUpPasswordPage(
                     password = state.password,
                     passwordCheck = state.passwordCheck,
                     passwordErrorMessage = state.passwordErrorMessage,
@@ -145,8 +142,9 @@ fun SignUpScreen(
 }
 
 @Composable
-private fun SignUpNameContent(
+private fun SignUpNamePage(
     name: String,
+    validName: Boolean,
     errorMessage: String,
     onNameChanged: (String) -> Unit,
     onNext: () -> Unit,
@@ -159,7 +157,7 @@ private fun SignUpNameContent(
     SignUpContent(
         title = "이름을 입력해주세요!",
         subTitle = "가입을 위해 실명을 입력해주세요.",
-        buttonEnabled = name.length >= 2,
+        buttonEnabled = validName,
         buttonText = "다음",
         onButtonClick = onNext,
     ) {
@@ -179,7 +177,7 @@ private fun SignUpNameContent(
 }
 
 @Composable
-private fun SignUpEmailContent(
+private fun SignUpEmailPage(
     email: String,
     errorMessage: String,
     emailVerified: Boolean,
@@ -214,7 +212,7 @@ private fun SignUpEmailContent(
 }
 
 @Composable
-private fun SignUpEmailAuthContent(
+private fun SignUpEmailAuthPage(
     authenticationNumber: String,
     authenticationState: AuthenticationState,
     timer: String,
@@ -265,7 +263,8 @@ private fun SignUpEmailAuthContent(
                     )
                 },
             )
-            Text(text = "인증번호 다시 받기",
+            Text(
+                text = "인증번호 다시 받기",
                 color = Gray400,
                 style = TextStyle.Default.copy(
                     fontSize = 12.sp,
@@ -273,13 +272,14 @@ private fun SignUpEmailAuthContent(
                 ),
                 modifier = Modifier
                     .padding(5.dp)
-                    .clickable { onRetry() })
+                    .clickable { onRetry() },
+            )
         }
     }
 }
 
 @Composable
-private fun SignUpIdContent(
+private fun SignUpIdPage(
     id: String,
     isAvailableId: Boolean,
     errorMessage: String,
@@ -346,7 +346,7 @@ private fun SignUpIdContent(
 }
 
 @Composable
-private fun SignUpPasswordContent(
+private fun SignUpPasswordPage(
     password: String,
     passwordCheck: String,
     passwordErrorMessage: String,
@@ -408,53 +408,6 @@ private fun SignUpPasswordContent(
                 horizontal = 16.dp,
                 vertical = 14.dp,
             )
-        )
-    }
-}
-
-@Composable
-private fun SignUpContent(
-    title: String,
-    subTitle: String,
-    buttonText: String,
-    buttonEnabled: Boolean,
-    onButtonClick: () -> Unit,
-    content: @Composable () -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                vertical = 24.dp,
-                horizontal = 18.dp,
-            )
-            .imePadding()
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.W600
-            ),
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
-
-        Text(
-            text = subTitle,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSecondary,
-            modifier = Modifier.padding(bottom = 32.dp),
-        )
-
-        content()
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        QrizButton(
-            enable = buttonEnabled,
-            text = buttonText,
-            onClick = onButtonClick,
-            modifier = Modifier.fillMaxWidth()
         )
     }
 }

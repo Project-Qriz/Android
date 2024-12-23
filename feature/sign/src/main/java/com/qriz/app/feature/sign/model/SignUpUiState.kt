@@ -32,15 +32,12 @@ data class SignUpUiState(
         else -> throw IllegalStateException("잘못된 페이지입니다.")
     }
 
-    val timerText: String = "${(timer / 60000)}:${
-        (timer % 60000 / 1000).toString().padStart(
-            2,
-            '0'
-        )
-    }"
+    val timerText: String = "${(timer / 60000)}:${(timer % 60000 / 1000).toString().padStart(2, '0')}"
 
     val canSignUp: Boolean = Pattern.compile("^[a-zA-Z0-9]{8,10}$").matcher(password).matches()
             && password == passwordCheck
+
+    val validName: Boolean = """[가-힣]{2,}""".toRegex().matches(name)
 }
 
 enum class AuthenticationState {
