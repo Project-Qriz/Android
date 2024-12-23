@@ -1,4 +1,4 @@
-package com.qriz.app.feature.sign
+package com.qriz.app.feature.sign.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

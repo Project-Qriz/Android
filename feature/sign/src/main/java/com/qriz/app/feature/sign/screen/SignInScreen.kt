@@ -1,13 +1,11 @@
-package com.qriz.app.feature.sign
+package com.qriz.app.feature.sign.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,24 +24,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.component.QrizTextFiled
+import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.R as DSR
 
 @Composable
 fun SignInScreen(
+    viewModel: SignInViewModel = hiltViewModel(),
     onClickSignUp: () -> Unit,
-    viewModel: SignInViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -85,6 +80,7 @@ fun SignInContent(
                 .height(124.dp)
 
         )
+
         QrizTextFiled(
             value = id,
             onValueChange = onIdChange,
@@ -166,6 +162,7 @@ fun SignInContent(
         ) {
             val color = Color(0xFFA8AFB6)
             val textStyle = MaterialTheme.typography.bodySmall.copy(color = color)
+
             Text(
                 "회원가입",
                 style = textStyle,
@@ -194,5 +191,24 @@ fun SignInContent(
                 modifier = Modifier.padding(5.dp)
             )
         }
+    }
+}
+
+@Preview(
+    showBackground = true,
+)
+@Composable
+private fun SignInScreenPreview() {
+    QrizTheme {
+        SignInContent(
+            id = "",
+            password = "",
+            showPassword = false,
+            onLogin = {},
+            onClickSignUp = {},
+            onIdChange = {},
+            onPasswordChange = {},
+            onChangeShowPassword = {},
+        )
     }
 }
