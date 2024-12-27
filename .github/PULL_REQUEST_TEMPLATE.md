@@ -22,5 +22,6 @@ Before | After
 
 ## Check List
 - [ ] PR 제목은 `[ISSUE-{N}] PR 제목`으로 작성
+- [ ] 관련 TestCode 작성 여부
 - [ ] CI 통과 확인
 - [ ] Approve 확인 후 Merge
