@@ -8,6 +8,6 @@ android {
 
 dependencies {
     implementation(projects.core.data.user.userApi)
-    implementation(projects.core.network)
+    implementation(projects.core.network.user)
     implementation(projects.core.datastore)
 }
