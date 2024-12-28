@@ -26,6 +26,7 @@ include(":app")
 include(":core:navigation")
 include(":core:datastore")
 include(":core:designsystem")
+include(":core:testing")
 
 include(":core:network:core")
 include(":core:network:common")

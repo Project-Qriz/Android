@@ -13,6 +13,12 @@ material = "1.12.0"
 kotlinxSerializationJson = "1.7.2"
 kotlinxDateTime = "0.6.1"
 
+# https://github.com/Kotlin/kotlinx.coroutines
+coroutines = "1.9.0"
+
+# https://mvnrepository.com/artifact/org.junit.vintage/junit-vintage-engine
+junitVintageEngine = "5.10.2"
+
 #https://github.com/google/dagger/releases
 hilt = "2.51.1"
 
@@ -48,7 +54,6 @@ turbine = "1.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -68,6 +73,15 @@ androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lif
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
+# test
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotest-runner = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+junit-vintage-engine = { group = "org.junit.vintage", name = "junit-vintage-engine", version.ref = "junitVintageEngine" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+
 # datastore
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
@@ -76,16 +90,6 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 # kotlinx-datetime
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDateTime" }
-
-# kotest
-kotest-runner = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
-kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
-
-# mockk
-mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
-
-# turbine
-turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 # hilt
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
@@ -116,4 +120,12 @@ retrofit = [
     "retrofit",
     "retrofit-kotlin-serialization",
     "okhttp3-logging-interceptor"
+]
+
+unit-test = [
+    "junit",
+    "junit-vintage-engine",
+    "coroutines-test",
+    "mockk",
+    "turbine",
 ]
