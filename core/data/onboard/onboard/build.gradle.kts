@@ -8,6 +8,6 @@ android {
 
 dependencies {
     implementation(projects.core.data.onboard.onboardApi)
-    implementation(projects.core.network.user)
+    implementation(projects.core.network.onboard)
     implementation(projects.core.datastore)
 }

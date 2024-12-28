@@ -3,7 +3,7 @@ package com.qriz.app.core.data.onboard.onboard.repository
 import com.qriz.app.core.data.onboard.onboard_api.model.Question
 import com.qriz.app.core.data.onboard.onboard_api.model.Test
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
-import com.qriz.app.core.network.api.OnBoardApi
+import com.qriz.app.core.network.onboard.api.OnBoardApi
 import javax.inject.Inject
 
 internal class OnBoardRepositoryImpl @Inject constructor(

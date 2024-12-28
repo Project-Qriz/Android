@@ -1,4 +1,4 @@
-package com.qriz.app.core.network.model.response.preview
+package com.qriz.app.core.network.onboard.model.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

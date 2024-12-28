@@ -1,4 +1,4 @@
-package com.qriz.app.core.network.user.model.request
+package com.qriz.app.core.network.onboard.model.request
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -1,8 +1,8 @@
-package com.qriz.app.core.network.api
+package com.qriz.app.core.network.onboard.api
 
-import com.qriz.app.core.network.model.NetworkResponse
-import com.qriz.app.core.network.model.request.user.SurveyRequest
-import com.qriz.app.core.network.model.response.preview.PreviewTestListResponse
+import com.qriz.app.core.network.common.NetworkResponse
+import com.qriz.app.core.network.onboard.model.request.SurveyRequest
+import com.qriz.app.core.network.onboard.model.response.PreviewTestListResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

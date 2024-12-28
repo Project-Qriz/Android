@@ -1,7 +1,6 @@
-package com.qriz.app.core.network.di
+package com.qriz.app.core.network.onboard.di
 
-import com.qriz.app.core.network.api.OnBoardApi
-import com.qriz.app.core.network.api.UserApi
+import com.qriz.app.core.network.onboard.api.OnBoardApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,13 +10,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-internal object ApiModule {
-
-    @Provides
-    @Singleton
-    fun bindsUserApi(
-        retrofit: Retrofit
-    ): UserApi = retrofit.create(UserApi::class.java)
+internal object OnBoardApiModule {
 
     @Provides
     @Singleton

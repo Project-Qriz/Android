@@ -30,6 +30,7 @@ include(":core:designsystem")
 include(":core:network:core")
 include(":core:network:common")
 include(":core:network:user")
+include(":core:network:onboard")
 
 include(":core:data:user:user-api")
 include(":core:data:user:user")
