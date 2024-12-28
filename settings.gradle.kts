@@ -23,13 +23,21 @@ dependencyResolutionManagement {
 rootProject.name = "qriz"
 include(":app")
 
-include(":core:network")
+include(":core:navigation")
 include(":core:datastore")
 include(":core:designsystem")
-include(":core:data")
+
+include(":core:network:core")
+include(":core:network:common")
+include(":core:network:user")
+include(":core:network:onboard")
+
+include(":core:data:user:user-api")
+include(":core:data:user:user")
+include(":core:data:onboard:onboard-api")
+include(":core:data:onboard:onboard")
 
 include(":feature:main")
 include(":feature:splash")
 include(":feature:sign")
-include(":core:navigation")
 include(":feature:onboard")

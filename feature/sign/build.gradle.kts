@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.data.user.userApi)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

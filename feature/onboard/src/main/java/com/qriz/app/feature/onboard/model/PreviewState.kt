@@ -1,6 +1,6 @@
 package com.qriz.app.feature.onboard.model
 
-import com.qriz.app.core.data.model.test.Question
+import com.qriz.app.core.data.onboard.onboard_api.model.Question
 
 data class PreviewState(
     val questions: List<Question> = emptyList(),

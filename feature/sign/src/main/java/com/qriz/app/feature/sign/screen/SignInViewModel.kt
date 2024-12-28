@@ -2,7 +2,7 @@ package com.qriz.app.feature.sign.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.qriz.app.core.data.repository.UserRepository
+import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import com.qriz.app.feature.sign.model.SignInUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

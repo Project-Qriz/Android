@@ -18,6 +18,9 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.network.core)
+    implementation(projects.core.data.user.user)
+    implementation(projects.core.data.onboard.onboard)
     implementation(projects.feature.main)
     implementation(projects.feature.splash)
 }

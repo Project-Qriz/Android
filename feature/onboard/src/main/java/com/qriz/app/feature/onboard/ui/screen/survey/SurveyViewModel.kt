@@ -2,10 +2,10 @@ package com.qriz.app.feature.onboard.ui.screen.survey
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.qriz.app.core.data.repository.OnBoardRepository
-import com.qriz.app.feature.onboard.SURVEY_ITEMS
+import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.feature.onboard.KNOWN_ALL
 import com.qriz.app.feature.onboard.KNOWN_NOTHING
+import com.qriz.app.feature.onboard.SURVEY_ITEMS
 import com.qriz.app.feature.onboard.model.SurveyEffect
 import com.qriz.app.feature.onboard.model.SurveyState
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -3,10 +3,10 @@ package com.qriz.app.feature.sign.screen
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.qriz.app.core.data.repository.UserRepository
 import com.qriz.app.feature.sign.model.AuthenticationState
 import com.qriz.app.feature.sign.model.SignUpEffect
 import com.qriz.app.feature.sign.model.SignUpUiState
+import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow

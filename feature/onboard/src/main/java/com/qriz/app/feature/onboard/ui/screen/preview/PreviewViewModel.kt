@@ -2,7 +2,7 @@ package com.qriz.app.feature.onboard.ui.screen.preview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.qriz.app.core.data.repository.OnBoardRepository
+import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.feature.onboard.model.PreviewEffect
 import com.qriz.app.feature.onboard.model.PreviewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -78,7 +78,7 @@ class PreviewViewModel @Inject constructor(
             var currentTime = state.value.remainTime
             val interval = 1000L
             while (isActive) {
-                if(currentTime == 0L) {
+                if (currentTime == 0L) {
                     break
                 }
 
