@@ -4,9 +4,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FindIdResponse(
+data class ApplyListResponse(
     @SerialName("applyId") val applyId: Long,
+    @SerialName("examName") val examName :String,
     @SerialName("period") val period: String,
-    @SerialName("date") val date: String,
-    @SerialName("testTime") val testTime: String
+    @SerialName("examDate") val date: String,
+    @SerialName("releaseDate") val releaseDate: String,
 )

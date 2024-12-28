@@ -4,9 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ProfileResponse(
-    @SerialName("applyId") val applyId: Long,
+data class ApplyResponse(
+    @SerialName("examName") val examName :String,
     @SerialName("period") val period: String,
-    @SerialName("date") val date: String,
-    @SerialName("testTime") val testTime: String,
+    @SerialName("examDate") val examDate: String,
+    @SerialName("releaseDate") val releaseDate: String,
 )
