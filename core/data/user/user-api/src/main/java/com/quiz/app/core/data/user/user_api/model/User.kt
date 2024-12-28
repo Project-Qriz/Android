@@ -1,4 +1,4 @@
-package com.qriz.app.core.data.model.user
+package com.quiz.app.core.data.user.user_api.model
 
 data class User(
     val id: Long,

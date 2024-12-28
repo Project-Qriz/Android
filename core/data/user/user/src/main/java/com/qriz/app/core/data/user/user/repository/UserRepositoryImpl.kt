@@ -1,11 +1,12 @@
-package com.qriz.app.core.data.repository
+package com.qriz.app.core.data.user.user.repository
 
 import com.qriz.app.core.data.mapper.toDataModel
-import com.qriz.app.core.data.model.user.User
 import com.qriz.app.core.network.api.UserApi
 import com.qriz.app.core.network.model.request.user.JoinRequest
 import com.qriz.app.core.network.model.request.user.LoginRequest
 import com.qriz.app.datastore.UserDataStore
+import com.quiz.app.core.data.user.user_api.model.User
+import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

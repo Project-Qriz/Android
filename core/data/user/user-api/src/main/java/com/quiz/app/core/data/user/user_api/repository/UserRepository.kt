@@ -1,6 +1,6 @@
-package com.qriz.app.core.data.repository
+package com.quiz.app.core.data.user.user_api.repository
 
-import com.qriz.app.core.data.model.user.User
+import com.quiz.app.core.data.user.user_api.model.User
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
