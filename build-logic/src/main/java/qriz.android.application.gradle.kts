@@ -1,4 +1,5 @@
 import com.qriz.app.configureHiltAndroid
+import com.qriz.app.configureKotestAndroid
 import com.qriz.app.configureKotlinAndroid
 
 plugins {
@@ -7,3 +8,4 @@ plugins {
 
 configureKotlinAndroid()
 configureHiltAndroid()
+configureKotestAndroid()
