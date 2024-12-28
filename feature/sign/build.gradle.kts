@@ -1,9 +1,11 @@
+import com.qriz.app.setNamespace
+
 plugins {
     id("qriz.android.feature")
 }
 
 android {
-    namespace = "com.qriz.app.feature.sign"
+    setNamespace("feature.sign")
 }
 
 dependencies {

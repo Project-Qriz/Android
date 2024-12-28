@@ -1,7 +1,7 @@
-package com.qriz.app.di
+package com.qriz.app.core.datastore.di
 
 import android.content.Context
-import com.qriz.app.datastore.UserDataStore
+import com.qriz.app.core.datastore.UserDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

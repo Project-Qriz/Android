@@ -1,9 +1,11 @@
+import com.qriz.app.setNamespace
+
 plugins {
     id("qriz.android.library")
 }
 
 android {
-    namespace = "com.qriz.app.core.data.user.user"
+    setNamespace("core.data.user.user")
 }
 
 dependencies {

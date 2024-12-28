@@ -1,8 +1,10 @@
+import com.qriz.app.setNamespace
+
 plugins {
     id("qriz.android.library")
 }
 android {
-    namespace = "com.qriz.app.core.network.common"
+    setNamespace("core.network.common")
 }
 
 dependencies {
