@@ -1,4 +1,4 @@
-name: Android CI
+name: Android PR CI
 
 on:
   push:
@@ -10,6 +10,21 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+
+    permissions:
+      checks: write
+
+      # needed unless run with comment_mode: off
+      pull-requests: write
+
+      # only needed for private repository
+      contents: read
+
+      # only needed for private repository
+      issues: read
+
+      # required by download step to access artifacts API
+      actions: read
 
     steps:
     - name: Checkout the code
@@ -26,7 +41,7 @@ jobs:
       run: chmod +x gradlew
       
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew assembleDebug
       
     - name: Run unit tests
       run: ./gradlew testDebugUnitTest --stacktrace
