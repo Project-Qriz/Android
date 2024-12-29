@@ -12,19 +12,22 @@ import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.getByType
 
 internal val Project.applicationExtension: CommonExtension<*, *, *, *, *, *>
-    get() = extensions.getByType<ApplicationExtension>()
+	get() = extensions.getByType<ApplicationExtension>()
 
 internal val Project.libraryExtension: CommonExtension<*, *, *, *, *, *>
-    get() = extensions.getByType<LibraryExtension>()
+	get() = extensions.getByType<LibraryExtension>()
 
 internal val Project.androidExtension: CommonExtension<*, *, *, *, *, *>
-    get() = runCatching { libraryExtension }
-        .recoverCatching { applicationExtension }
-        .onFailure { println("Could not find Library or Application extension from this project") }
-        .getOrThrow()
+	get() = runCatching { libraryExtension }
+		.recoverCatching { applicationExtension }
+		.onFailure { println("Could not find Library or Application extension from this project") }
+		.getOrThrow()
 
 internal val ExtensionContainer.libs: VersionCatalog
-    get() = getByType<VersionCatalogsExtension>().named("libs")
+	get() = getByType<VersionCatalogsExtension>().named("libs")
+
+internal val Project.libs: VersionCatalog
+	get() = extensions.libs
 
 internal fun Project.findLibrary(name: String): Provider<MinimalExternalModuleDependency> =
-    extensions.libs.findLibrary(name).get()
+	libs.findLibrary(name).get()

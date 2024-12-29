@@ -1,9 +1,11 @@
+import com.qriz.app.setNamespace
+
 plugins {
     id("qriz.android.library")
     alias(libs.plugins.kotlinx.serialization)
 }
 android {
-    namespace = "com.qriz.app.core.network.user"
+    setNamespace("core.network.user")
 }
 
 dependencies {

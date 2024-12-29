@@ -1,4 +1,4 @@
-package com.qriz.app.datastore
+package com.qriz.app.core.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -19,6 +19,8 @@ class UserDataStore(context: Context) {
         private const val USER_DATA_STORE_NAME = "user"
         private val REFRESH_TOKEN_KEY = stringPreferencesKey("refreshToken")
 
-        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(USER_DATA_STORE_NAME)
+        private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+            USER_DATA_STORE_NAME
+        )
     }
 }
