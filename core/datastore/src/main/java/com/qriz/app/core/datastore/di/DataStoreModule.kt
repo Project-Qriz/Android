@@ -1,7 +1,7 @@
 package com.qriz.app.core.datastore.di
 
 import android.content.Context
-import com.qriz.app.core.datastore.UserDataStore
+import com.qriz.app.datastore.TokenDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +15,7 @@ internal object DataStoreModule {
 
     @Provides
     @Singleton
-    fun providesUserDataStore(
+    fun providesTokenDataStore(
         @ApplicationContext context: Context
-    ): UserDataStore = UserDataStore(context)
+    ): TokenDataStore = TokenDataStore(context)
 }
