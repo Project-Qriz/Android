@@ -21,7 +21,6 @@ dependencies {
     implementation(projects.core.network.core)
     implementation(projects.core.data.user.user)
     implementation(projects.core.data.onboard.onboard)
-    testImplementation(projects.core.testing)
     implementation(projects.feature.main)
     implementation(projects.feature.splash)
 }
