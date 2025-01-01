@@ -8,24 +8,26 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.qriz.app.crypto.CryptographyHelper
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class TokenDataStore(context: Context) {
     private val dataStore: DataStore<Preferences> = context.dataStore
 
-    suspend fun getAccessToken(): String = dataStore.data.catch {
-            emit(emptyPreferences())
-        }.map { preferences ->
+    fun flowAccessToken(): Flow<String> = dataStore.data
+        .catch { emit(emptyPreferences()) }
+        .map { preferences ->
             val saved = preferences[ACCESS_TOKEN_KEY] ?: ""
             CryptographyHelper.decrypt(saved)
-        }.first()
+        }
 
-    suspend fun getRefreshToken(): String = dataStore.data.map { preferences ->
+    fun flowRefreshToken(): Flow<String> = dataStore.data
+        .catch { emit(emptyPreferences()) }
+        .map { preferences ->
         val saved = preferences[REFRESH_TOKEN_KEY] ?: ""
         CryptographyHelper.decrypt(saved)
-    }.first()
+    }
 
     suspend fun saveToken(accessToken: String, refreshToken: String) {
         val encryptedAccessToken = CryptographyHelper.encrypt(accessToken)
