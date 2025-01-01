@@ -1,4 +1,4 @@
-package com.qriz.app.datastore
+package com.qriz.app.core.datastore
 
 import android.content.Context
 import androidx.datastore.core.DataStore

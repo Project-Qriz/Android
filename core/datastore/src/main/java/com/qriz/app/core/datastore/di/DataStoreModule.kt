@@ -1,7 +1,7 @@
 package com.qriz.app.core.datastore.di
 
 import android.content.Context
-import com.qriz.app.datastore.TokenDataStore
+import com.qriz.app.core.datastore.TokenDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

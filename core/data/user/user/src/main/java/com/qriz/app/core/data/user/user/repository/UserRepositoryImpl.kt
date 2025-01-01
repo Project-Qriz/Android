@@ -4,7 +4,7 @@ import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.network.user.mapper.toDataModel
 import com.qriz.app.core.network.user.model.request.JoinRequest
 import com.qriz.app.core.network.user.model.request.LoginRequest
-import com.qriz.app.core.datastore.UserDataStore
+import com.qriz.app.core.datastore.TokenDataStore
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import kotlinx.coroutines.flow.Flow

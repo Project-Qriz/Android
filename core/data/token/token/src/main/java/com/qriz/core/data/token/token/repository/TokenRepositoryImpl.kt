@@ -1,6 +1,6 @@
 package com.qriz.core.data.token.token.repository
 
-import com.qriz.app.datastore.TokenDataStore
+import com.qriz.app.core.datastore.TokenDataStore
 import com.qriz.core.data.token.token_api.TokenRepository
 import javax.inject.Inject
 
