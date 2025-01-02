@@ -1,6 +1,5 @@
-package com.qriz.app.feature.main
+package com.qriz.app.feature.main.navigation
 
-import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 
