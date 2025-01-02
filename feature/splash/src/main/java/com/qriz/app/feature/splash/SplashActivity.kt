@@ -39,10 +39,10 @@ class SplashActivity : ComponentActivity() {
     }
 
     private fun moveToMain(isLogin: Boolean) {
-//        mainNavigator.navigate(
-//            currentActivity = this,
-//            shouldFinish = true,
-//            isLogin = isLogin
-//        )
+        mainNavigator.navigate(
+            currentActivity = this,
+            shouldFinish = true,
+            isLogin = isLogin
+        )
     }
 }
