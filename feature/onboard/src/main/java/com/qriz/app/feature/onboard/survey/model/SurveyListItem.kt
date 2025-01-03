@@ -1,4 +1,4 @@
-package com.qriz.app.feature.onboard.ui.screen.survey.model
+package com.qriz.app.feature.onboard.survey.model
 
 import androidx.compose.runtime.Immutable
 import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept

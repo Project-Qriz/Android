@@ -1,7 +1,7 @@
-package com.qriz.app.feature.onboard.ui.screen.survey.mapper
+package com.qriz.app.feature.onboard.survey.mapper
 
 import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
-import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem
+import com.qriz.app.feature.onboard.survey.model.SurveyListItem
 
 fun List<PreCheckConcept>.toSurveyListItem(
     isCheckedMap: Map<PreCheckConcept, Boolean>,

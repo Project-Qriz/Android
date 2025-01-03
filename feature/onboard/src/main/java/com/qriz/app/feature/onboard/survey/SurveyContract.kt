@@ -1,11 +1,11 @@
-package com.qriz.app.feature.onboard.ui.screen.survey
+package com.qriz.app.feature.onboard.survey
 
 import androidx.compose.runtime.Immutable
 import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
 import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
-import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem
+import com.qriz.app.feature.onboard.survey.model.SurveyListItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

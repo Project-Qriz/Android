@@ -1,4 +1,4 @@
-package com.qriz.app.feature.onboard.ui.screen.survey
+package com.qriz.app.feature.onboard.survey
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,11 +27,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.feature.onboard.ui.component.SurveyItemCard
-import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem
-import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem.KnowsAll
-import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem.KnowsNothing
-import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem.SurveyItem
+import com.qriz.app.feature.onboard.survey.component.SurveyItemCard
+import com.qriz.app.feature.onboard.survey.model.SurveyListItem
+import com.qriz.app.feature.onboard.survey.model.SurveyListItem.KnowsAll
+import com.qriz.app.feature.onboard.survey.model.SurveyListItem.KnowsNothing
+import com.qriz.app.feature.onboard.survey.model.SurveyListItem.SurveyItem
 
 @Composable
 fun ConceptCheckScreen(

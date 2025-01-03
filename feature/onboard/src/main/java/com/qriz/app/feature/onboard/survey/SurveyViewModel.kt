@@ -1,10 +1,10 @@
-package com.qriz.app.feature.onboard.ui.screen.survey
+package com.qriz.app.feature.onboard.survey
 
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.feature.base.BaseViewModel
-import com.qriz.app.feature.onboard.ui.screen.survey.mapper.toSurveyListItem
+import com.qriz.app.feature.onboard.survey.mapper.toSurveyListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow

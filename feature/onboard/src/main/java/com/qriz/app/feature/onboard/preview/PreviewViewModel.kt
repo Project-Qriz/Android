@@ -1,10 +1,10 @@
-package com.qriz.app.feature.onboard.ui.screen.preview
+package com.qriz.app.feature.onboard.preview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
-import com.qriz.app.feature.onboard.model.PreviewEffect
-import com.qriz.app.feature.onboard.model.PreviewState
+import com.qriz.app.feature.onboard.preview.model.PreviewEffect
+import com.qriz.app.feature.onboard.preview.model.PreviewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow

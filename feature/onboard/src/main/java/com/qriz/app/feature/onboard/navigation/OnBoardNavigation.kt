@@ -5,10 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.qriz.app.core.navigation.route.Route
-import com.qriz.app.feature.onboard.ui.screen.survey.ConceptCheckScreen
-import com.qriz.app.feature.onboard.ui.screen.guide.GuideScreen
+import com.qriz.app.feature.onboard.survey.ConceptCheckScreen
+import com.qriz.app.feature.onboard.guide.GuideScreen
 import com.qriz.app.feature.onboard.R
-import com.qriz.app.feature.onboard.ui.screen.preview.PreviewScreen
+import com.qriz.app.feature.onboard.preview.PreviewScreen
 
 fun NavHostController.navigateCheckGuide() {
     navigate(

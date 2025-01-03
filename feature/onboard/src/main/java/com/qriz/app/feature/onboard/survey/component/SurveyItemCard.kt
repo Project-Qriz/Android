@@ -1,4 +1,4 @@
-package com.qriz.app.feature.onboard.ui.component
+package com.qriz.app.feature.onboard.survey.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +23,7 @@ import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.onboard.R
-import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem
+import com.qriz.app.feature.onboard.survey.model.SurveyListItem
 
 @Composable
 fun SurveyItemCard(
