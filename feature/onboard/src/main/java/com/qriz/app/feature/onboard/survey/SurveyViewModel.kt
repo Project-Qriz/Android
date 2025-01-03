@@ -64,7 +64,8 @@ class SurveyViewModel @Inject constructor(
     }
 
     private fun onClickConcept(preCheckConcept: PreCheckConcept, isChecked: Boolean) {
-        updateIsChecked(preCheckConcept = preCheckConcept, value = isChecked)
+        if (isChecked) _isChecked.update { _isChecked.value + (preCheckConcept to true) }
+        else _isChecked.update { _isChecked.value - preCheckConcept }
     }
 
     private fun onClickCancel() {
@@ -86,10 +87,6 @@ class SurveyViewModel @Inject constructor(
                     )
                 }
             }
-    }
-
-    private fun updateIsChecked(preCheckConcept: PreCheckConcept, value: Boolean) {
-        _isChecked.update { _isChecked.value + (preCheckConcept to value) }
     }
 
 }
