@@ -15,21 +15,26 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
+import com.qriz.app.feature.onboard.R
+import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem
 
 @Composable
 fun SurveyItemCard(
-    content: String,
-    isChecked: Boolean,
+    surveyItem: SurveyListItem,
     modifier: Modifier = Modifier,
     onChecked: (Boolean) -> Unit,
 ) {
     Surface(
-        modifier = modifier.fillMaxWidth().clickable { onChecked(isChecked.not()) },
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onChecked(surveyItem.isChecked.not()) },
         shape = RoundedCornerShape(8.dp),
     ) {
         Row(
@@ -39,18 +44,23 @@ fun SurveyItemCard(
                 horizontal = 24.dp,
             ),
         ) {
+            val cardText = when(surveyItem){
+                is SurveyListItem.KnowsAll -> stringResource(R.string.know_all_about_concepts)
+                is SurveyListItem.KnowsNothing -> stringResource(R.string.know_nothing_about_concepts)
+                is SurveyListItem.SurveyItem -> surveyItem.concept.title
+            }
             Text(
-                text = content,
+                text = cardText,
                 style = MaterialTheme.typography.bodyMedium,
             )
             Checkbox(
-                checked = isChecked,
+                checked = surveyItem.isChecked,
                 colors = CheckboxDefaults.colors().copy(
                     uncheckedBoxColor = Gray200,
                     uncheckedBorderColor = Gray200,
                     uncheckedCheckmarkColor = White,
                 ),
-                onCheckedChange = { onChecked(isChecked.not()) }
+                onCheckedChange = { onChecked(surveyItem.isChecked.not()) }
             )
         }
     }
@@ -64,13 +74,25 @@ private fun ConceptCheckOptionCardPreview() {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             SurveyItemCard(
-                content = "Preview",
-                isChecked = false,
+                surveyItem = SurveyListItem.KnowsAll(false),
                 onChecked = {}
             )
             SurveyItemCard(
-                content = "Preview",
-                isChecked = true,
+                surveyItem = SurveyListItem.KnowsNothing(false),
+                onChecked = {}
+            )
+            SurveyItemCard(
+                surveyItem = SurveyListItem.SurveyItem(
+                    concept = PreCheckConcept.JOIN,
+                    isChecked = true
+                ),
+                onChecked = {}
+            )
+            SurveyItemCard(
+                surveyItem = SurveyListItem.SurveyItem(
+                    concept = PreCheckConcept.UNDERSTANDING_NULL_PROPERTIES,
+                    isChecked = true
+                ),
                 onChecked = {}
             )
         }

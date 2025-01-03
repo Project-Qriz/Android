@@ -24,46 +24,65 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.feature.onboard.SURVEY_ITEMS
-import com.qriz.app.feature.onboard.model.SurveyEffect
 import com.qriz.app.feature.onboard.ui.component.SurveyItemCard
+import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem
+import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem.KnowsAll
+import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem.KnowsNothing
+import com.qriz.app.feature.onboard.ui.screen.survey.model.SurveyListItem.SurveyItem
 
 @Composable
 fun ConceptCheckScreen(
-    onBack: () -> Unit,
-    onComplete: () -> Unit,
-    onShowSnackbar: (String) -> Unit,
+    moveToBack: () -> Unit,
+    moveToGuide: () -> Unit,
+    onShowSnackBar: (String) -> Unit,
     viewModel: SurveyViewModel = hiltViewModel(),
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect {
-            when(it) {
-                is SurveyEffect.Complete -> onComplete()
-                is SurveyEffect.Error -> { onShowSnackbar(it.message) }
+            when (it) {
+                is SurveyUiEffect.MoveToGuide -> moveToGuide()
+                SurveyUiEffect.MoveToBack -> moveToBack()
+                is SurveyUiEffect.ShowSnackBer -> onShowSnackBar(it.message)
             }
         }
     }
 
     ConceptCheckContent(
-        concepts = state.concepts,
-        checked = state.checked,
-        onCheckedConcept = viewModel::toggleConcept,
-        onSubmit = viewModel::submit,
-        onCancel = onBack,
+        surveyItems = state.surveyItems,
+        isPossibleSubmit = state.isPossibleSubmit,
+        onClickKnowsAll = { isChecked ->
+            viewModel.process(SurveyUiAction.ClickKnowsAll(isChecked))
+        },
+        onClickKnowsNothing = { isChecked ->
+            viewModel.process(SurveyUiAction.ClickKnowsNothing(isChecked))
+        },
+        onClickConcept = { preCheckConcept, isChecked ->
+            viewModel.process(
+                SurveyUiAction.ClickConcept(
+                    preCheckConcept = preCheckConcept,
+                    isChecked = isChecked
+                )
+            )
+        },
+        onClickSubmit = { viewModel.process(SurveyUiAction.ClickSubmit) },
+        onClickCancel = { viewModel.process(SurveyUiAction.ClickCancel) },
     )
 }
 
 @Composable
 private fun ConceptCheckContent(
-    concepts: List<String>,
-    checked: List<String>,
-    onCheckedConcept: (String, Boolean) -> Unit,
-    onSubmit: () -> Unit,
-    onCancel: () -> Unit,
+    surveyItems: List<SurveyListItem>,
+    isPossibleSubmit: Boolean,
+    onClickKnowsAll: (isChecked: Boolean) -> Unit,
+    onClickKnowsNothing: (isChecked: Boolean) -> Unit,
+    onClickConcept: (preCheckConcept: PreCheckConcept, isChecked: Boolean) -> Unit,
+    onClickSubmit: () -> Unit,
+    onClickCancel: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -71,7 +90,7 @@ private fun ConceptCheckContent(
         Box(
             modifier = Modifier
                 .height(48.dp)
-                .clickable { onCancel() },
+                .clickable { onClickCancel() },
             contentAlignment = Alignment.Center,
         ) {
             Text(
@@ -116,27 +135,47 @@ private fun ConceptCheckContent(
                 bottom = 18.dp
             )
         ) {
-            items(concepts) { concept ->
-                SurveyItemCard(
-                    content = concept,
-                    isChecked = checked.contains(concept),
-                ) { isChecked ->
-                    onCheckedConcept(
-                        concept,
-                        isChecked
-                    )
+            //TODO : 수정된 디자인 반영되어야함
+            items(
+                items = surveyItems,
+                key = { surveyItem -> surveyItem.getCategoryId() }
+            ) { surveyItem ->
+                when (surveyItem) {
+                    is KnowsNothing -> {
+                        SurveyItemCard(
+                            surveyItem = surveyItem,
+                            onChecked = { isChecked -> onClickKnowsNothing(isChecked) }
+                        )
+                    }
+
+                    is KnowsAll -> {
+                        SurveyItemCard(
+                            surveyItem = surveyItem,
+                            onChecked = { isChecked -> onClickKnowsAll(isChecked) }
+                        )
+                    }
+
+                    is SurveyItem -> {
+                        SurveyItemCard(
+                            surveyItem = surveyItem,
+                            onChecked = { isChecked ->
+                                onClickConcept(surveyItem.concept, isChecked)
+                            }
+                        )
+                    }
                 }
+
             }
         }
 
         QrizButton(
-            enable = checked.isNotEmpty(),
+            enable = isPossibleSubmit,
             text = "선택완료",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
                 .padding(horizontal = 18.dp),
-            onClick = onSubmit,
+            onClick = onClickSubmit,
         )
     }
 }
@@ -149,14 +188,13 @@ private fun ConceptCheckContent(
 fun ConceptCheckContentPreview() {
     QrizTheme {
         ConceptCheckContent(
-            concepts = SURVEY_ITEMS,
-            checked = listOf(
-                "선택지 3번",
-                "선택지 4번",
-            ),
-            onCheckedConcept = { _, _ -> /* none */ },
-            onSubmit = {},
-            onCancel = {},
+            surveyItems = emptyList(),
+            isPossibleSubmit = false,
+            onClickKnowsAll = {},
+            onClickKnowsNothing = {},
+            onClickConcept = { _, _ -> },
+            onClickSubmit = {},
+            onClickCancel = {},
         )
     }
 }

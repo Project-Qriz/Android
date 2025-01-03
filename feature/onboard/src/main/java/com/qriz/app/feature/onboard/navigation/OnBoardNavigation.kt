@@ -55,7 +55,7 @@ fun NavGraphBuilder.onboardNavGraph(
 
     composable<Route.ConceptCheck> {
         ConceptCheckScreen(
-            onComplete = {
+            moveToGuide = {
                 onNavigate(
                     Route.Guide(
                         title = """테스트를
@@ -68,8 +68,8 @@ fun NavGraphBuilder.onboardNavGraph(
                     )
                 )
             },
-            onBack = onBack,
-            onShowSnackbar = onShowSnackbar,
+            moveToBack = onBack,
+            onShowSnackBar = onShowSnackbar,
         )
     }
 
