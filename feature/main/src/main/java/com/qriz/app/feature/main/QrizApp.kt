@@ -77,7 +77,7 @@ private fun QrizNavHost(
     ) {
         signNavGraph(
             onShowSnackbar = onShowSnackbar,
-            onClickSignUp = navController::navigateCheckGuide, //TODO :테스트상 임시
+            onClickSignUp = navController::navigateSignUp,
             onSignUpComplete = navController::navigateCheckGuide,
         )
 
