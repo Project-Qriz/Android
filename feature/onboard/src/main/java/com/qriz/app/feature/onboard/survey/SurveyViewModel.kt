@@ -1,5 +1,6 @@
 package com.qriz.app.feature.onboard.survey
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
@@ -12,18 +13,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 //TODO : Timber 로그 찍어보자
 //TODO : String Resources 정리
 @HiltViewModel
 class SurveyViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val onBoardRepository: OnBoardRepository
 ) : BaseViewModel<SurveyUiState, SurveyUiEffect, SurveyUiAction>(SurveyUiState.Default) {
+    private val isTest = savedStateHandle.get<Boolean>(IS_TEST_FLAG) ?: false
 
     private val _isChecked = MutableStateFlow<Map<PreCheckConcept, Boolean>>(emptyMap())
 
     init {
-        process(SurveyUiAction.ObserveSurveyItems)
+        if (isTest.not()) process(SurveyUiAction.ObserveSurveyItems)
     }
 
     override fun process(action: SurveyUiAction) = viewModelScope.launch {
@@ -73,11 +75,12 @@ class SurveyViewModel @Inject constructor(
     }
 
     private fun onClickSubmit() {
-        val checked = _isChecked.value.filter { it.value }.keys
+        if (uiState.value.isPossibleSubmit.not()) return
+        val checked = _isChecked.value.filter { it.value }.keys.toList()
         submitSurvey(checked)
     }
 
-    private fun submitSurvey(checked: Collection<PreCheckConcept>) = viewModelScope.launch {
+    private fun submitSurvey(checked: List<PreCheckConcept>) = viewModelScope.launch {
         runCatching { onBoardRepository.submitSurvey(checked) }
             .onSuccess { sendEffect { SurveyUiEffect.MoveToGuide } }
             .onFailure { throwable ->
@@ -89,4 +92,7 @@ class SurveyViewModel @Inject constructor(
             }
     }
 
+    companion object {
+        internal const val IS_TEST_FLAG = "IS_TEST_FLAG"
+    }
 }
