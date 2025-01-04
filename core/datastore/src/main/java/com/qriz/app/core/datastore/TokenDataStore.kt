@@ -15,19 +15,17 @@ import kotlinx.coroutines.flow.map
 class TokenDataStore(context: Context) {
     private val dataStore: DataStore<Preferences> = context.dataStore
 
-    fun flowAccessToken(): Flow<String> = dataStore.data
-        .catch { emit(emptyPreferences()) }
-        .map { preferences ->
-            val saved = preferences[ACCESS_TOKEN_KEY] ?: ""
-            CryptographyHelper.decrypt(saved)
-        }
+    fun flowAccessToken(): Flow<String> =
+        dataStore.data.catch { emit(emptyPreferences()) }.map { preferences ->
+                val saved = preferences[ACCESS_TOKEN_KEY]
+                saved?.let { CryptographyHelper.decrypt(it) } ?: ""
+            }
 
-    fun flowRefreshToken(): Flow<String> = dataStore.data
-        .catch { emit(emptyPreferences()) }
-        .map { preferences ->
-        val saved = preferences[REFRESH_TOKEN_KEY] ?: ""
-        CryptographyHelper.decrypt(saved)
-    }
+    fun flowRefreshToken(): Flow<String> =
+        dataStore.data.catch { emit(emptyPreferences()) }.map { preferences ->
+                val saved = preferences[REFRESH_TOKEN_KEY]
+                saved?.let { CryptographyHelper.decrypt(it) } ?: ""
+            }
 
     suspend fun saveToken(accessToken: String, refreshToken: String) {
         val encryptedAccessToken = CryptographyHelper.encrypt(accessToken)
@@ -38,6 +36,7 @@ class TokenDataStore(context: Context) {
             preferences[REFRESH_TOKEN_KEY] = encryptedRefreshToken
         }
     }
+
     suspend fun clearToken() {
         dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN_KEY] = ""
