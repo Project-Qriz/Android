@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.theme.QrizTheme
+import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.onboard.survey.component.SurveyItemCard
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem.KnowsAll
@@ -42,13 +42,11 @@ fun ConceptCheckScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.effect.collect {
-            when (it) {
-                is SurveyUiEffect.MoveToGuide -> moveToGuide()
-                SurveyUiEffect.MoveToBack -> moveToBack()
-                is SurveyUiEffect.ShowSnackBer -> onShowSnackBar(it.message)
-            }
+    viewModel.collectSideEffect {
+        when (it) {
+            is SurveyUiEffect.MoveToGuide -> moveToGuide()
+            SurveyUiEffect.MoveToBack -> moveToBack()
+            is SurveyUiEffect.ShowSnackBer -> onShowSnackBar(it.message)
         }
     }
 
