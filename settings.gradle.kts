@@ -38,6 +38,7 @@ include(":core:data:user:user")
 include(":core:data:onboard:onboard-api")
 include(":core:data:onboard:onboard")
 
+include(":feature:base")
 include(":feature:main")
 include(":feature:splash")
 include(":feature:sign")

@@ -1,4 +1,4 @@
-package com.qriz.app.feature.onboard.ui.screen.guide
+package com.qriz.app.feature.onboard.guide
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image

@@ -1,4 +1,4 @@
-package com.qriz.app.feature.onboard.ui.screen.preview
+package com.qriz.app.feature.onboard.preview
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,7 +34,7 @@ import com.qriz.app.core.designsystem.component.TestPage
 import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.feature.onboard.model.PreviewEffect
+import com.qriz.app.feature.onboard.preview.model.PreviewEffect
 
 @Composable
 fun PreviewScreen(

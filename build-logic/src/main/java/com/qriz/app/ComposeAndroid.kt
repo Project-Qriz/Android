@@ -26,6 +26,7 @@ fun Project.configureComposeAndroid() {
         "implementation"(findLibrary("androidx-ui-tooling-preview"))
         "implementation"(findLibrary("androidx-ui-tooling"))
         "implementation"(findLibrary("androidx-compose-navigation"))
+        "implementation"(findLibrary("kotlinx-collections-immutable"))
         "implementation"(findLibrary("androidx.lifecycle.runtime.compose"))
     }
 

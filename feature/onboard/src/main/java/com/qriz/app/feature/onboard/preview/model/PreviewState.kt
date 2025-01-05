@@ -1,4 +1,4 @@
-package com.qriz.app.feature.onboard.model
+package com.qriz.app.feature.onboard.preview.model
 
 import com.qriz.app.core.data.onboard.onboard_api.model.Question
 
