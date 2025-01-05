@@ -20,8 +20,12 @@ abstract class BaseViewModel<S : UiState, E : UiEffect, A : UiAction>(
     private val _effect: Channel<E> = Channel()
     val effect = _effect.receiveAsFlow()
 
-    protected fun updateState(reducer: S.() -> S) {
-        val newState = _uiState.value.reducer()
+    protected inline fun updateState(crossinline reducer: S.() -> S) {
+        val newState = uiState.value.reducer()
+        setState(newState)
+    }
+
+    protected fun setState(newState: S) {
         _uiState.update { newState }
     }
 
