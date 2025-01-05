@@ -25,8 +25,8 @@ abstract class BaseViewModel<S : UiState, E : UiEffect, A : UiAction>(
         _uiState.update { newState }
     }
 
-    protected fun sendEffect(effect: () -> E) = viewModelScope.launch {
-        _effect.send(effect())
+    protected fun sendEffect(effect: E) = viewModelScope.launch {
+        _effect.send(effect)
     }
 
     abstract fun process(action: A): Job

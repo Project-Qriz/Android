@@ -71,7 +71,7 @@ class SurveyViewModel @Inject constructor(
     }
 
     private fun onClickCancel() {
-        sendEffect { SurveyUiEffect.MoveToBack }
+        sendEffect(SurveyUiEffect.MoveToBack)
     }
 
     private fun onClickSubmit() {
@@ -82,13 +82,13 @@ class SurveyViewModel @Inject constructor(
 
     private fun submitSurvey(checked: List<PreCheckConcept>) = viewModelScope.launch {
         runCatching { onBoardRepository.submitSurvey(checked) }
-            .onSuccess { sendEffect { SurveyUiEffect.MoveToGuide } }
+            .onSuccess { sendEffect(SurveyUiEffect.MoveToGuide) }
             .onFailure { throwable ->
-                sendEffect {
+                sendEffect(
                     SurveyUiEffect.ShowSnackBer(
                         throwable.message ?: "알 수 없는 에러가 발생했습니다."
                     )
-                }
+                )
             }
     }
 
