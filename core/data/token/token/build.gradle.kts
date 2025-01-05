@@ -1,5 +1,6 @@
 plugins {
     id("qriz.android.library")
+    id("qriz.android.library.testable")
 }
 
 android {
