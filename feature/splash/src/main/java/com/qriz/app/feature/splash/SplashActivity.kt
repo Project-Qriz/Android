@@ -5,9 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.navigation.route.MainNavigator
+import com.qriz.app.feature.base.extention.collectSideEffect
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -23,11 +23,9 @@ class SplashActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            LaunchedEffect(Unit) {
-                viewModel.effect.collect { effect ->
-                    when (effect) {
-                        is SplashUiEffect.MoveToMain -> moveToMain(effect.isLoggedIn)
-                    }
+            viewModel.collectSideEffect {
+                when (it) {
+                    is SplashUiEffect.MoveToMain -> moveToMain(it.isLoggedIn)
                 }
             }
 
