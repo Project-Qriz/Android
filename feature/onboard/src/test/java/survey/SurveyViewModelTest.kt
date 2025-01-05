@@ -6,10 +6,12 @@ import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.feature.onboard.survey.SurveyUiAction
+import com.qriz.app.feature.onboard.survey.SurveyUiEffect
 import com.qriz.app.feature.onboard.survey.SurveyViewModel
 import com.qriz.app.feature.onboard.survey.SurveyViewModel.Companion.IS_TEST_FLAG
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem
 import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.TestScope
@@ -198,53 +200,109 @@ class SurveyViewModelTest {
     fun `Action_ClickSubmit process 아무것도 선택하지 않음 - submitSurvey 호출되지 않음`() = runTest {
         with(surveyViewModel()) {
             // given
+            coEvery { fakeOnBoardRepository.submitSurvey(emptyList()) } returns Unit
+            // when
             process(SurveyUiAction.ObserveSurveyItems)
             process(SurveyUiAction.ClickSubmit)
-            // when & then
+            // then
             coVerify(exactly = 0) { fakeOnBoardRepository.submitSurvey(emptyList()) }
         }
     }
 
     @Test
-    fun `Action_ClickSubmit가 process 전혀 모름 선택 - submitSurvey 호출`() = runTest {
+    fun `Action_ClickSubmit process 전혀 모름 선택 - submitSurvey 호출, Effect_MoveToGuide 발생`() = runTest {
         with(surveyViewModel()) {
             // given
+            coEvery { fakeOnBoardRepository.submitSurvey(emptyList()) } returns Unit
+            // when
             process(SurveyUiAction.ObserveSurveyItems)
             process(SurveyUiAction.ClickKnowsNothing(true))
             process(SurveyUiAction.ClickSubmit)
-            // when & then
+            // then
             coVerify { fakeOnBoardRepository.submitSurvey(emptyList()) }
-        }
-    }
-
-    @Test
-    fun `Action_ClickSubmit가 process 선택된 개념이 1개 이상 - submitSurvey 호출`() = runTest {
-        with(surveyViewModel()) {
-            // given
-            process(SurveyUiAction.ObserveSurveyItems)
-            for (concept in fakeSelectedConcepts) {
-                process(
-                    SurveyUiAction.ClickConcept(
-                        preCheckConcept = concept,
-                        isChecked = true
-                    )
-                )
+            effect.test {
+                (awaitItem() is SurveyUiEffect.MoveToGuide) shouldBe true
             }
-            process(SurveyUiAction.ClickSubmit)
-            // when & then
-            coVerify { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) }
         }
     }
 
     @Test
-    fun `Action_ClickSubmit가 process 전부 알고있음 선택 - submitSurvey 호출`() = runTest {
+    fun `Action_ClickSubmit process 선택된 개념이 1개 이상 - submitSurvey 호출, Effect_MoveToGuide 발생`() =
+        runTest {
+            with(surveyViewModel()) {
+                // given
+                coEvery { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) } returns Unit
+                // when
+                process(SurveyUiAction.ObserveSurveyItems)
+                for (concept in fakeSelectedConcepts) {
+                    process(
+                        SurveyUiAction.ClickConcept(
+                            preCheckConcept = concept,
+                            isChecked = true
+                        )
+                    )
+                }
+                process(SurveyUiAction.ClickSubmit)
+                // then
+                coVerify { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) }
+                effect.test {
+                    (awaitItem() is SurveyUiEffect.MoveToGuide) shouldBe true
+                }
+            }
+        }
+
+    @Test
+    fun `Action_ClickSubmit process 실패 - Effect_ShowSnackBer 발생`() =
+        runTest {
+            with(surveyViewModel()) {
+                // given
+                coEvery { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) } throws Exception()
+                // when
+                process(SurveyUiAction.ObserveSurveyItems)
+                for (concept in fakeSelectedConcepts) {
+                    process(
+                        SurveyUiAction.ClickConcept(
+                            preCheckConcept = concept,
+                            isChecked = true
+                        )
+                    )
+                }
+                process(SurveyUiAction.ClickSubmit)
+                // then
+                coVerify { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) }
+                effect.test {
+                    (awaitItem() is SurveyUiEffect.ShowSnackBer) shouldBe true
+                }
+            }
+        }
+
+    @Test
+    fun `Action_ClickSubmit process 전부 알고있음 선택 - submitSurvey 호출, Effect_MoveToGuide 발생`() =
+        runTest {
+            with(surveyViewModel()) {
+                // given
+                coEvery { fakeOnBoardRepository.submitSurvey(PreCheckConcept.entries.toList()) } returns Unit
+                //when
+                process(SurveyUiAction.ObserveSurveyItems)
+                process(SurveyUiAction.ClickKnowsAll(true))
+                process(SurveyUiAction.ClickSubmit)
+                //then
+                coVerify { fakeOnBoardRepository.submitSurvey(PreCheckConcept.entries.toList()) }
+                effect.test {
+                    (awaitItem() is SurveyUiEffect.MoveToGuide) shouldBe true
+                }
+            }
+        }
+
+    @Test
+    fun `Action_ClickCancel process - Effect_MoveToBack 발생`() = runTest {
         with(surveyViewModel()) {
             // given
-            process(SurveyUiAction.ObserveSurveyItems)
-            process(SurveyUiAction.ClickKnowsAll(true))
-            process(SurveyUiAction.ClickSubmit)
+            process(SurveyUiAction.ClickCancel)
             // when & then
-            coVerify { fakeOnBoardRepository.submitSurvey(PreCheckConcept.entries.toList()) }
+            effect.test {
+                (awaitItem() is SurveyUiEffect.MoveToBack) shouldBe true
+            }
         }
     }
 
