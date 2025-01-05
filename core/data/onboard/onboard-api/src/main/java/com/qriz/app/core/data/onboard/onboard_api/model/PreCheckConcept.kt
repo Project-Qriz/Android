@@ -1,6 +1,5 @@
 package com.qriz.app.core.data.onboard.onboard_api.model
 
-//TODO :서버 전달 방식 Enum으로 통일된다면 각 항목 이름 수정 필요
 enum class PreCheckConcept(val title: String) {
     UNDERSTANDING_THE_DATA_MODEL("데이터 모델의 이해"),
     ENTITY("엔터티"),
