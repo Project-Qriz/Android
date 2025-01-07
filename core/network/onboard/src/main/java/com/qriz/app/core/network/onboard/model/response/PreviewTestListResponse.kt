@@ -17,16 +17,4 @@ data class QuestionResponseModel(
     @SerialName("option3") val option3: String,
     @SerialName("option4") val option4: String,
     @SerialName("timeLimit") val timeLimit: Int,
-    //@SerialName("skill") val skill: List<SkillResponseModel>,
-)
-
-//TODO : API 문서상 정의되지 않은 내용 (확인 후 삭제)
-@Serializable
-data class SkillResponseModel(
-    @SerialName("id") val id: Long,
-    @SerialName("title") val title: String,
-    @SerialName("type") val type: String,
-    @SerialName("keyConcepts") val keyConcepts: String,
-    @SerialName("frequency") val frequency: Int,
-    @SerialName("description") val description: String,
 )
