@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -72,12 +73,14 @@ fun QrizTopBar(
             NavigationType.CANCEL -> {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
                         .align(Alignment.CenterStart)
+                        .padding(start = 10.dp)
                         .clickable { onNavigationClick() },
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
+                        modifier = Modifier
+                            .padding(10.dp),
                         text = stringResource(R.string.cancel),
                         style = QrizTheme.typography.headline2,
                         textAlign = TextAlign.Center
