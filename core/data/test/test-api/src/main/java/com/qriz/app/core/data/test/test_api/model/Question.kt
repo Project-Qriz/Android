@@ -1,5 +1,7 @@
 package com.qriz.app.core.data.test.test_api.model
 
+import androidx.compose.runtime.Immutable
+
 /**
  * [Test]에 속한 개별 문제
  * @property id 문제의 고유 식별자
@@ -7,6 +9,7 @@ package com.qriz.app.core.data.test.test_api.model
  * @property options 문제에 대한 선택지[Option] 목록
  * @property timeLimit 해당 문제의 시간 제한 (단위: 초)
  */
+@Immutable
 data class Question(
     val id: Long,
     val question: String,
