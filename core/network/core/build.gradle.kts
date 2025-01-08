@@ -11,6 +11,7 @@ android {
 
 dependencies {
     implementation(projects.core.data.token.tokenApi)
+    testImplementation(projects.core.network.user)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.retrofit)

@@ -100,6 +100,7 @@ hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-com
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-kotlin-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
 okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp3" }
+okhttp3-mock-webserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp3" }
 
 # gradle-plugin
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -119,7 +120,8 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 retrofit = [
     "retrofit",
     "retrofit-kotlin-serialization",
-    "okhttp3-logging-interceptor"
+    "okhttp3-logging-interceptor",
+    "okhttp3-mock-webserver"
 ]
 
 unit-test = [
