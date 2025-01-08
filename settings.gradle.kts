@@ -39,6 +39,7 @@ include(":core:data:onboard:onboard-api")
 include(":core:data:onboard:onboard")
 include(":core:data:token:token-api")
 
+include(":feature:base")
 include(":feature:main")
 include(":feature:splash")
 include(":feature:sign")
