@@ -61,16 +61,16 @@ fun TestPage(
                     else -> TestOptionState.None
                 }
             }
-            val clickableModifier =
-                if (isResultPage) Modifier
-                else Modifier.clickable { onSelected?.let { onSelected(option) } }
             TestOptionCard(
                 state = state,
                 number = index + 1,
                 option = option,
                 modifier = Modifier
                     .padding(bottom = 8.dp)
-                    .then(clickableModifier)
+                    .clickable(
+                        enabled = isResultPage.not(),
+                        onClick = { onSelected?.let { onSelected(option) } }
+                    )
             )
         }
     }
