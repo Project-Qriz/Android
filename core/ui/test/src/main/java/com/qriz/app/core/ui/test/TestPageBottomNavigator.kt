@@ -1,6 +1,7 @@
 package com.qriz.app.core.ui.test
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -16,16 +17,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.theme.Gray400
+import com.qriz.app.core.designsystem.theme.Gray700
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 
 @Composable
 fun TestPageBottomNavigator(
-    currentPage: Int,
-    totalQuestionsCount: Int,
+    currentIndex: Int,
+    lastIndex: Int,
     canTurnNextPage: Boolean,
-    onNextPage: () -> Unit,
-    onPreviousPage: () -> Unit,
+    onClickNextPage: () -> Unit,
+    onClickSubmit: () -> Unit,
+    onClickPreviousPage: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -36,20 +39,27 @@ fun TestPageBottomNavigator(
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        //TODO : 버튼 색상 수정 필요
-        QrizButton(
-            enable = currentPage > 0,
-            text = stringResource(R.string.previous),
-            modifier = Modifier.width(90.dp),
-            onClick = onPreviousPage,
-        )
+        if (currentIndex > 0) {
+            QrizButton(
+                text = stringResource(R.string.previous),
+                modifier = Modifier.width(90.dp),
+                onClick = onClickPreviousPage,
+                forcedColor = Gray700
+            )
+        } else {
+            Spacer(Modifier.width(90.dp))
+        }
+
         Text(
             text = buildAnnotatedString {
                 withStyle(
                     QrizTheme.typography.headline2.toSpanStyle()
                         .copy(color = Gray800)
                 ) {
-                    append("$currentPage")
+                    append(
+                        "${currentIndex + 1}"
+                            .padStart(2, '0')
+                    )
                 }
 
                 withStyle(
@@ -60,29 +70,92 @@ fun TestPageBottomNavigator(
                 withStyle(
                     QrizTheme.typography.body1.toSpanStyle()
                         .copy(color = Gray400)
-                ) { append("$totalQuestionsCount") }
+                ) {
+                    append(
+                        "${lastIndex + 1}"
+                            .padStart(2, '0')
+                    )
+                }
             },
             textAlign = TextAlign.Center,
-            style = QrizTheme.typography.body1,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f)
         )
-        QrizButton(
-            enable = canTurnNextPage,
-            text = stringResource(R.string.next),
-            modifier = Modifier.width(90.dp),
-            onClick = onNextPage,
+
+        if (canTurnNextPage) {
+            val isLastPage = currentIndex >= lastIndex
+            val nextButtonText =
+                if (isLastPage) stringResource(R.string.submit)
+                else stringResource(R.string.next)
+
+            QrizButton(
+                text = nextButtonText,
+                modifier = Modifier.width(90.dp),
+                onClick = if (isLastPage) onClickSubmit else onClickNextPage,
+                forcedColor = Gray700
+            )
+        } else {
+            Spacer(Modifier.width(90.dp))
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TestPageBottomNavigatorFirstPagePreview() {
+    QrizTheme {
+        TestPageBottomNavigator(
+            currentIndex = 0,
+            lastIndex = 19,
+            canTurnNextPage = false,
+            onClickNextPage = {},
+            onClickPreviousPage = {},
+            onClickSubmit = {}
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun TestPageBottomNavigatorSelectedFirstPagePreview() {
+    QrizTheme {
+        TestPageBottomNavigator(
+            currentIndex = 0,
+            lastIndex = 19,
+            canTurnNextPage = true,
+            onClickNextPage = {},
+            onClickPreviousPage = {},
+            onClickSubmit = {}
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun TestPageBottomNavigatorPreview() {
-    TestPageBottomNavigator(
-        currentPage = 1,
-        totalQuestionsCount = 10,
-        canTurnNextPage = true,
-        onNextPage = {},
-        onPreviousPage = {}
-    )
+fun TestPageBottomNavigatorSelectedMiddlePagePreview() {
+    QrizTheme {
+        TestPageBottomNavigator(
+            currentIndex = 5,
+            lastIndex = 19,
+            canTurnNextPage = true,
+            onClickNextPage = {},
+            onClickPreviousPage = {},
+            onClickSubmit = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TestPageBottomNavigatorSelectedLastPagePreview() {
+    QrizTheme {
+        TestPageBottomNavigator(
+            currentIndex = 19,
+            lastIndex = 19,
+            canTurnNextPage = true,
+            onClickNextPage = {},
+            onClickPreviousPage = {},
+            onClickSubmit = {}
+        )
+    }
 }
