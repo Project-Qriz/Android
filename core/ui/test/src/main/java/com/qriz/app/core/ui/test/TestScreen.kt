@@ -26,7 +26,7 @@ fun TestScreen(
     questions: ImmutableList<Question>,
     selectedOptions: ImmutableMap<Long, Option>,
     testTimeType: TestTimeType,
-    currentPage: Int,
+    currentIndex: Int,
     remainTimeText: String,
     progressPercent: Float,
     canTurnNextPage: Boolean,
@@ -37,8 +37,8 @@ fun TestScreen(
 ) {
     val pagerState = rememberPagerState { questions.size }
 
-    LaunchedEffect(currentPage) {
-        pagerState.animateScrollToPage(currentPage)
+    LaunchedEffect(currentIndex) {
+        pagerState.animateScrollToPage(currentIndex)
     }
 
     Column {
@@ -54,8 +54,8 @@ fun TestScreen(
             modifier = Modifier.weight(1f),
             userScrollEnabled = false,
             verticalAlignment = Alignment.Top,
-        ) { page ->
-            val question = questions[page]
+        ) { index ->
+            val question = questions[index]
             val scrollState = rememberScrollState()
             TestPage(
                 question = question.question,
@@ -78,11 +78,11 @@ fun TestScreen(
         }
 
         TestPageBottomNavigator(
-            currentPage = currentPage,
+            currentIndex = currentIndex,
+            lastIndex = questions.lastIndex,
             canTurnNextPage = canTurnNextPage,
             onNextPage = onNextPage,
-            onPreviousPage = onPreviousPage,
-            totalQuestionsCount = questions.size
+            onPreviousPage = onPreviousPage
         )
     }
 }
@@ -122,7 +122,7 @@ private fun TestScreenPreview() {
                 1L to Option("트랜잭션의 격리 수준을 낮춤")
             ),
             testTimeType = TestTimeType.TOTAL,
-            currentPage = 0,
+            currentIndex = 0,
             progressPercent = 0.5f,
             remainTimeText = "25:00",
             canTurnNextPage = true,
