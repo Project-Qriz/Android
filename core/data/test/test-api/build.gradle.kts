@@ -5,9 +5,11 @@ plugins {
 }
 
 android {
-    setNamespace("core.data.onboard.onboard_api")
+    setNamespace("core.data.test.test_api")
 }
 
 dependencies {
-    api(projects.core.data.test.testApi)
+    compileOnly(
+        libs.compose.stable.marker,
+    )
 }

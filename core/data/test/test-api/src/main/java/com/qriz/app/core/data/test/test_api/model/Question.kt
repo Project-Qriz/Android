@@ -1,4 +1,4 @@
-package com.qriz.app.core.data.onboard.onboard_api.model
+package com.qriz.app.core.data.test.test_api.model
 
 /**
  * [Test]에 속한 개별 문제

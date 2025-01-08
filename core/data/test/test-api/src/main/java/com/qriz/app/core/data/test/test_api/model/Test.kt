@@ -1,4 +1,4 @@
-package com.qriz.app.core.data.onboard.onboard_api.model
+package com.qriz.app.core.data.test.test_api.model
 
 /**
  * 전체 테스트 내용을 담고 있는 모델

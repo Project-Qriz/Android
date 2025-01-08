@@ -37,6 +37,7 @@ include(":core:data:user:user-api")
 include(":core:data:user:user")
 include(":core:data:onboard:onboard-api")
 include(":core:data:onboard:onboard")
+include(":core:data:test:test-api")
 
 include(":feature:base")
 include(":feature:main")
