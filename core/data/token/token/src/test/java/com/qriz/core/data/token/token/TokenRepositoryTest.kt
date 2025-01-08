@@ -1,42 +1,25 @@
 package com.qriz.core.data.token.token
 
 import com.qriz.app.core.datastore.TokenDataStore
+import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.core.data.token.token.repository.TokenRepositoryImpl
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.TestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.AfterEach
+import org.junit.Rule
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class TokenRepositoryTest {
 
-    private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
+    @get:Rule
+    val testDispatcher = MainDispatcherRule()
 
     private val dataStore = mockk<TokenDataStore>()
 
     private val repository = TokenRepositoryImpl(dataStore)
-
-    @BeforeEach
-    fun init() {
-        Dispatchers.setMain(testDispatcher)
-    }
-
-    @AfterEach
-    fun clear() {
-        Dispatchers.resetMain()
-    }
 
     @Test
     fun `저장된 토큰이 존재할 때 토큰을 반환한다`() = runTest {
