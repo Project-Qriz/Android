@@ -13,9 +13,9 @@ import javax.inject.Inject
 
 internal class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
-    userDataStore: UserDataStore,
+    tokenDataStore: TokenDataStore,
 ) : UserRepository {
-    override val flowLogin: Flow<Boolean> = userDataStore.flowRefreshToken().map { it.isNotEmpty() }
+    override val flowLogin: Flow<Boolean> = tokenDataStore.flowRefreshToken().map { it.isNotEmpty() }
 
     override suspend fun login(id: String, password: String): User {
         val response = userApi.login(
