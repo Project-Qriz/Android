@@ -6,11 +6,10 @@ import com.qriz.app.core.network.user.model.request.LoginRequest
 import com.qriz.app.core.network.user.model.response.JoinResponse
 import com.qriz.app.core.network.user.model.response.LoginResponse
 import retrofit2.http.Body
-import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface UserApi {
-    @GET("/api/login")
+    @POST("/api/login")
     suspend fun login(
         @Body request: LoginRequest
     ): NetworkResponse<LoginResponse>

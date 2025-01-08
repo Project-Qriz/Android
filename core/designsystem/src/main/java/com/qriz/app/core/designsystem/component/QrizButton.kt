@@ -32,15 +32,18 @@ fun QrizButton(
     }
 
     Box(
-        modifier = modifier.background(
-            color = containerColor,
-            shape = RoundedCornerShape(10.dp)
-        ).padding(
-            vertical = 12.dp
-        ).clickable(
-            enabled = enable,
-            onClick = onClick,
-        ),
+        modifier = modifier
+            .background(
+                color = containerColor,
+                shape = RoundedCornerShape(10.dp)
+            )
+            .clickable(
+                enabled = enable,
+                onClick = onClick,
+            )
+            .padding(
+                vertical = 12.dp
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Text(
