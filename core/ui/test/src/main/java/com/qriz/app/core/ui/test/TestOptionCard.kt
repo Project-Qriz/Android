@@ -1,4 +1,4 @@
-package com.qriz.app.core.designsystem.component
+package com.qriz.app.core.ui.test
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Gray100
 import com.qriz.app.core.designsystem.theme.QrizTheme
@@ -30,7 +31,7 @@ import com.qriz.app.core.designsystem.theme.White
 fun TestOptionCard(
     state: TestOptionState,
     number: Int,
-    content: String,
+    option: Option,
     modifier: Modifier = Modifier,
 ) {
     val numberBackground = when (state) {
@@ -57,13 +58,13 @@ fun TestOptionCard(
         }
     }
 
-    val backgroundColor = when(state) {
+    val backgroundColor = when (state) {
         TestOptionState.None -> MaterialTheme.colorScheme.surface
         TestOptionState.SelectedOrCorrect -> MaterialTheme.colorScheme.primaryContainer
         TestOptionState.SelectedAndIncorrect -> Color(0x33EF5D5D)
     }
 
-    val textColor = when(state) {
+    val textColor = when (state) {
         TestOptionState.None -> Black
         TestOptionState.SelectedOrCorrect,
         TestOptionState.SelectedAndIncorrect -> White
@@ -73,7 +74,7 @@ fun TestOptionCard(
         modifier = modifier.fillMaxWidth(),
         color = backgroundColor,
         shape = RoundedCornerShape(10.dp),
-        border = if(state == TestOptionState.None) {
+        border = if (state == TestOptionState.None) {
             BorderStroke(
                 color = Gray100,
                 width = 1.dp,
@@ -83,10 +84,12 @@ fun TestOptionCard(
         }
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(
-                horizontal = 18.dp,
-                vertical = 12.dp,
-            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 18.dp,
+                    vertical = 12.dp,
+                ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
@@ -103,7 +106,7 @@ fun TestOptionCard(
             }
 
             Text(
-                text = content,
+                text = option.description,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .weight(1f)
@@ -126,23 +129,24 @@ private fun TestOptionCardPreview() {
             TestOptionCard(
                 state = TestOptionState.None,
                 number = 1,
-                content = "선택지 1번"
+                option = Option("선택지 1번")
             )
             TestOptionCard(
                 state = TestOptionState.SelectedOrCorrect,
                 number = 2,
-                content = "선택지 2번"
+                option = Option("선택지 2번")
             )
-
             TestOptionCard(
                 state = TestOptionState.SelectedAndIncorrect,
                 number = 3,
-                content = "선택지 3번"
+                option = Option("선택지 3번")
             )
         }
     }
 }
 
 enum class TestOptionState {
-    None, SelectedOrCorrect, SelectedAndIncorrect;
+    None,
+    SelectedOrCorrect,
+    SelectedAndIncorrect
 }

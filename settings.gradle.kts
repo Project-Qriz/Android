@@ -39,6 +39,8 @@ include(":core:data:onboard:onboard-api")
 include(":core:data:onboard:onboard")
 include(":core:data:test:test-api")
 
+include(":core:ui:test")
+
 include(":feature:base")
 include(":feature:main")
 include(":feature:splash")

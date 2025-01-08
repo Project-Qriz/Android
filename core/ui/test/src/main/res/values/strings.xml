@@ -1,0 +1,7 @@
+<resources>
+    <string name="total_remaining_time">전체 남은 시간</string>
+    <string name="each_question_remaining_time">문제별 남은 시간</string>
+    <string name="slash">/</string>
+    <string name="previous">이전</string>
+    <string name="next">다음</string>
+</resources>
