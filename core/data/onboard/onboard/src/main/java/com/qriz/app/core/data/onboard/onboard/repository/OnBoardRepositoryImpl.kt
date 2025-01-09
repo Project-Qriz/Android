@@ -74,7 +74,7 @@ internal class OnBoardRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun submitPreviewTest(answer: Map<Long, Option>) {
+    override suspend fun submitPreviewTest(answer: Map<Long, Option>) {
         //TODO : API 호출
     }
 }
