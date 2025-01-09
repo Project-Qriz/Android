@@ -1,4 +1,4 @@
-package com.qriz.app.feature.sign.screen
+package com.qriz.app.feature.sign.signIn
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

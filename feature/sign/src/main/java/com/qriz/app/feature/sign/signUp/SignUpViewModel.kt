@@ -1,12 +1,10 @@
-package com.qriz.app.feature.sign.screen
+package com.qriz.app.feature.sign.signUp
 
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.qriz.app.feature.sign.model.AuthenticationState
-import com.qriz.app.feature.sign.model.SignUpEffect
-import com.qriz.app.feature.sign.model.SignUpUiState
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
+import com.qriz.app.feature.sign.signUp.SignUpUiState.AuthenticationState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
@@ -28,34 +26,15 @@ import javax.inject.Inject
 class SignUpViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
-    private val _state: MutableStateFlow<SignUpUiState> = MutableStateFlow(
-        SignUpUiState(
-            name = "",
-            email = "",
-            authenticationNumber = "",
-            authenticationState = AuthenticationState.None,
-            id = "",
-            password = "",
-            passwordCheck = "",
-            emailErrorMessage = "",
-            authenticationNumberErrorMessage = "",
-            idErrorMessage = "",
-            passwordErrorMessage = "",
-            nameErrorMessage = "",
-            passwordCheckErrorMessage = "",
-            isAvailableId = false,
-            page = 0,
-            timer = AUTHENTICATION_LIMIT_MILS,
-        )
-    )
+    private val _state: MutableStateFlow<SignUpUiState> = MutableStateFlow(SignUpUiState.Default)
 
     val state: StateFlow<SignUpUiState> = _state.asStateFlow()
 
-    private val _effect: MutableSharedFlow<SignUpEffect> = MutableSharedFlow(
+    private val _effect: MutableSharedFlow<SignUpUiEffect> = MutableSharedFlow(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
-    val effect: SharedFlow<SignUpEffect> = _effect.asSharedFlow()
+    val effect: SharedFlow<SignUpUiEffect> = _effect.asSharedFlow()
 
     private val timer: Flow<Long>
         get() = flow {
@@ -187,7 +166,7 @@ class SignUpViewModel @Inject constructor(
         viewModelScope.launch {
             cancelAuthTimer()
             userRepository.sendAuthenticationNumber(email)
-            _effect.tryEmit(SignUpEffect.SendAuthEmail)
+            _effect.tryEmit(SignUpUiEffect.SendAuthEmail)
             startAuthTimer()
         }
     }
@@ -204,7 +183,7 @@ class SignUpViewModel @Inject constructor(
 //            )
 //        }
 
-        _effect.tryEmit(SignUpEffect.SignUpComplete)
+        _effect.tryEmit(SignUpUiEffect.SignUpUiComplete)
     }
 
     private fun verifyEmail(email: String): Boolean =

@@ -1,9 +1,8 @@
-package com.qriz.app.feature.sign.screen
+package com.qriz.app.feature.sign.signIn
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
-import com.qriz.app.feature.sign.model.SignInUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,15 +15,7 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor(
     private val userRepository: UserRepository,
 ) : ViewModel() {
-    private val _state: MutableStateFlow<SignInUiState> = MutableStateFlow(
-        SignInUiState(
-            id = "",
-            password = "",
-            showPassword = false,
-            idErrorMessage = "",
-            passwordErrorMessage = ""
-        )
-    )
+    private val _state: MutableStateFlow<SignInUiState> = MutableStateFlow(SignInUiState.Default)
     val state: StateFlow<SignInUiState> = _state.asStateFlow()
 
     fun updateId(id: String) {

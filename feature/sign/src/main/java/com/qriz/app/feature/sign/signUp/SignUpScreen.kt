@@ -1,4 +1,4 @@
-package com.qriz.app.feature.sign.screen
+package com.qriz.app.feature.sign.signUp
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -14,6 +14,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import com.qriz.app.feature.sign.signUp.SignUpUiState.AuthenticationState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,9 +37,7 @@ import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Mint800
-import com.qriz.app.feature.sign.component.SignUpContent
-import com.qriz.app.feature.sign.model.AuthenticationState
-import com.qriz.app.feature.sign.model.SignUpEffect
+import com.qriz.app.feature.sign.signUp.component.SignUpContent
 
 const val SIGN_UP_PAGE = 5
 
@@ -59,11 +58,11 @@ fun SignUpScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect {
             when (it) {
-                SignUpEffect.SignUpComplete -> {
+                SignUpUiEffect.SignUpUiComplete -> {
                     onSignUp()
                 }
 
-                SignUpEffect.SendAuthEmail -> {
+                SignUpUiEffect.SendAuthEmail -> {
                     onShowSnackbar("인증번호를 메일로 전송하였습니다.")
                 }
             }

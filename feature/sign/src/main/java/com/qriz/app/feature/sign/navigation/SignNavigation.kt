@@ -4,8 +4,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.qriz.app.core.navigation.route.Route
-import com.qriz.app.feature.sign.screen.SignInScreen
-import com.qriz.app.feature.sign.screen.SignUpScreen
+import com.qriz.app.feature.sign.signIn.SignInScreen
+import com.qriz.app.feature.sign.signUp.SignUpScreen
 
 fun NavHostController.navigateSignIn() {
     navigate(Route.SignIn)
