@@ -1,5 +1,6 @@
 package com.qriz.app.feature.onboard.preview
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
@@ -16,19 +17,20 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class PreviewViewModel @Inject constructor(
+open class PreviewViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val onBoardRepository: OnBoardRepository
 ) : BaseViewModel<PreviewUiState, PreviewUiEffect, PreviewUiAction>(PreviewUiState.Default) {
     private val isTest = savedStateHandle.get<Boolean>(IS_TEST_FLAG) ?: false
 
-    private var timerJob: Job? = null
+    @VisibleForTesting
+    var timerJob: Job? = null
 
     init {
         if (isTest.not()) process(PreviewUiAction.LoadPreviewTest)
     }
 
-    override fun process(action: PreviewUiAction): Job = viewModelScope.launch {
+    final override fun process(action: PreviewUiAction): Job = viewModelScope.launch {
         when (action) {
             PreviewUiAction.LoadPreviewTest -> getPreviewTest()
             is PreviewUiAction.SelectOption -> onSelectOption(
@@ -39,7 +41,7 @@ class PreviewViewModel @Inject constructor(
             PreviewUiAction.ClickNextPage -> onClickNextPage()
             PreviewUiAction.ClickPreviousPage -> onClickPreviousPage()
             PreviewUiAction.ClickSubmit -> onClickSubmit()
-            PreviewUiAction.ClickCancel -> onClickBack()
+            PreviewUiAction.ClickCancel -> onClickCancel()
         }
     }
 
@@ -60,7 +62,7 @@ class PreviewViewModel @Inject constructor(
         updateState { copy(currentIndex = uiState.value.currentIndex - 1) }
     }
 
-    private fun onClickBack() {
+    private fun onClickCancel() {
         sendEffect(PreviewUiEffect.MoveToBack)
     }
 
@@ -86,7 +88,7 @@ class PreviewViewModel @Inject constructor(
                 //TODO : 추후 재시도 UI 나오면 실패 상태로 변경(재시도 UI 노출)
                 sendEffect(
                     PreviewUiEffect.ShowSnackBer(
-                        defaultResId = R.string.failed_to_get_test,
+                        defaultResId = R.string.failed_get_test,
                         message = it.message
                     )
                 )
@@ -94,15 +96,24 @@ class PreviewViewModel @Inject constructor(
             .also { updateState { copy(isLoading = false) } }
     }
 
-    private fun submitTest(answer: Map<Long, Option>) = viewModelScope.launch {
+    private fun submitTest(selectedOptions: Map<Long, Option>) = viewModelScope.launch {
         if (uiState.value.isLoading) return@launch
+        val isExistUnresolvedProblem = selectedOptions.size < uiState.value.questions.size
+        if (isExistUnresolvedProblem) {
+            sendEffect(
+                PreviewUiEffect.ShowSnackBer(
+                    defaultResId = R.string.failed_submit_test_problems_remain,
+                )
+            )
+            return@launch
+        }
         updateState { copy(isLoading = true) }
-        runCatching { onBoardRepository.submitPreviewTest(answer) }
+        runCatching { onBoardRepository.submitPreviewTest(selectedOptions) }
             .onSuccess { sendEffect(PreviewUiEffect.MoveToGuide) }
             .onFailure {
                 sendEffect(
                     PreviewUiEffect.ShowSnackBer(
-                        defaultResId = R.string.failed_to_submit_test,
+                        defaultResId = R.string.failed_submit_test,
                         message = it.message
                     )
                 )
@@ -115,7 +126,10 @@ class PreviewViewModel @Inject constructor(
             var currentTime = uiState.value.remainTimeMs
             val interval = 1000L
             while (isActive) {
-                if (currentTime == 0L) break
+                if (currentTime <= 0L) {
+                    submitTest(getForcedAnswer())
+                    break
+                }
 
                 delay(interval)
                 currentTime -= interval
@@ -124,8 +138,14 @@ class PreviewViewModel @Inject constructor(
         }
     }
 
+    private fun getForcedAnswer() =
+        with(uiState.value) {
+            questions.associate { it.id to Option("") } + selectedOptions
+        }
+
+
     companion object {
         internal const val IS_TEST_FLAG = "IS_TEST_FLAG"
-        private fun Int.toMilliSecond() = this.times(1000).toLong()
+        fun Int.toMilliSecond() = this.times(1000).toLong()
     }
 }
