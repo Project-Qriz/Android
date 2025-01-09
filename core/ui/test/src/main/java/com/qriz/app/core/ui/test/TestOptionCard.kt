@@ -100,14 +100,14 @@ fun TestOptionCard(
             ) {
                 Text(
                     text = number.toString(),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = QrizTheme.typography.headline2,
                     color = textColor,
                 )
             }
 
             Text(
                 text = option.description,
-                style = MaterialTheme.typography.bodyMedium,
+                style = QrizTheme.typography.body2,
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 16.dp)
