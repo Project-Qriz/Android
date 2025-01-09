@@ -1,6 +1,8 @@
 package com.qriz.app.core.ui.test
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -14,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Question
+import com.qriz.app.core.designsystem.component.QrizLoading
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
@@ -30,10 +33,12 @@ fun TestScreen(
     remainTimeText: String,
     progressPercent: Float,
     canTurnNextPage: Boolean,
-    onOptionSelect: (Long, Option) -> Unit,
-    onNextPage: () -> Unit,
-    onPreviousPage: () -> Unit,
-    onCancel: () -> Unit,
+    isLoading: Boolean,
+    onSelectOption: (Long, Option) -> Unit,
+    onClickNextPage: () -> Unit,
+    onClickSubmit: () -> Unit,
+    onClickPreviousPage: () -> Unit,
+    onClickCancel: () -> Unit,
 ) {
     val pagerState = rememberPagerState { questions.size }
 
@@ -46,43 +51,51 @@ fun TestScreen(
             remainTimeText = remainTimeText,
             progressPercent = progressPercent,
             testTimeType = testTimeType,
-            onCancel = onCancel,
+            onCancel = onClickCancel,
         )
 
-        HorizontalPager(
-            state = pagerState,
+        Box(
             modifier = Modifier.weight(1f),
-            userScrollEnabled = false,
-            verticalAlignment = Alignment.Top,
-        ) { index ->
-            val question = questions[index]
-            val scrollState = rememberScrollState()
-            TestPage(
-                question = question.question,
-                options = question.options.toImmutableList(),
-                selectedOption = selectedOptions[question.id],
-                modifier = Modifier
-                    .verticalScroll(scrollState)
-                    .padding(
-                        vertical = 24.dp,
-                        horizontal = 18.dp
-                    ),
-                onSelected = { selected ->
-                    onOptionSelect(
-                        question.id,
-                        selected
-                    )
-                },
-                isResultPage = false,
-            )
+        ) {
+            if (isLoading) QrizLoading()
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+                userScrollEnabled = false,
+                verticalAlignment = Alignment.Top,
+            ) { index ->
+                val question = questions[index]
+                val scrollState = rememberScrollState()
+                TestPage(
+                    question = question.question,
+                    options = question.options.toImmutableList(),
+                    selectedOption = selectedOptions[question.id],
+                    modifier = Modifier
+                        .verticalScroll(scrollState)
+                        .padding(
+                            vertical = 24.dp,
+                            horizontal = 18.dp
+                        ),
+                    onSelected = { selected ->
+                        onSelectOption(
+                            question.id,
+                            selected
+                        )
+                    },
+                    isResultPage = false,
+                )
+            }
         }
+
 
         TestPageBottomNavigator(
             currentIndex = currentIndex,
             lastIndex = questions.lastIndex,
             canTurnNextPage = canTurnNextPage,
-            onNextPage = onNextPage,
-            onPreviousPage = onPreviousPage
+            onClickNextPage = onClickNextPage,
+            onClickSubmit = onClickSubmit,
+            onClickPreviousPage = onClickPreviousPage
         )
     }
 }
@@ -123,13 +136,15 @@ private fun TestScreenPreview() {
             ),
             testTimeType = TestTimeType.TOTAL,
             currentIndex = 0,
-            progressPercent = 0.5f,
             remainTimeText = "25:00",
+            progressPercent = 0.5f,
             canTurnNextPage = true,
-            onOptionSelect = { _, _ -> },
-            onNextPage = {},
-            onPreviousPage = {},
-            onCancel = {},
+            isLoading = true,
+            onSelectOption = { _, _ -> },
+            onClickNextPage = {},
+            onClickPreviousPage = {},
+            onClickCancel = {},
+            onClickSubmit = {},
         )
     }
 }

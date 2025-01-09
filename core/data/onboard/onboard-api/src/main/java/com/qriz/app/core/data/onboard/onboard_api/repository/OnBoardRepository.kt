@@ -9,5 +9,5 @@ interface OnBoardRepository {
 
     suspend fun getPreviewTest(): Test
 
-    fun submitPreview(answer: Map<Long, Option>)
+    fun submitPreviewTest(answer: Map<Long, Option>)
 }

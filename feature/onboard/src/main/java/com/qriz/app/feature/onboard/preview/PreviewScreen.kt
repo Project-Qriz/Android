@@ -3,6 +3,7 @@ package com.qriz.app.feature.onboard.preview
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.qriz.app.core.ui.test.TestScreen
 import com.qriz.app.core.ui.test.TestTimeType
@@ -13,29 +14,36 @@ fun PreviewScreen(
     viewModel: PreviewViewModel = hiltViewModel(),
     moveToBack: () -> Unit,
     moveToGuide: () -> Unit,
+    onShowSnackBar: (String) -> Unit,
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     viewModel.collectSideEffect {
         when (it) {
             PreviewUiEffect.MoveToGuide -> moveToGuide()
             PreviewUiEffect.MoveToBack -> moveToBack()
+            is PreviewUiEffect.ShowSnackBer -> onShowSnackBar(
+                it.message ?: context.getString(it.defaultResId)
+            )
         }
     }
 
     TestScreen(
-        questions = state.questions,
-        selectedOptions = state.selectedOptions,
+        questions = uiState.questions,
+        selectedOptions = uiState.selectedOptions,
         testTimeType = TestTimeType.TOTAL,
-        progressPercent = state.progressPercent,
-        remainTimeText = state.remainTimeText,
-        currentPage = state.currentPage,
-        canTurnNextPage = state.canTurnNextPage,
-        onOptionSelect = { id, answer ->
+        progressPercent = uiState.progressPercent,
+        remainTimeText = uiState.remainTimeText,
+        currentIndex = uiState.currentIndex,
+        canTurnNextPage = uiState.canTurnNextPage,
+        isLoading = uiState.isLoading,
+        onSelectOption = { id, answer ->
             viewModel.process(PreviewUiAction.SelectOption(questionID = id, option = answer))
         },
-        onNextPage = { viewModel.process(PreviewUiAction.ClickNextPage) },
-        onPreviousPage = { viewModel.process(PreviewUiAction.ClickPreviousPage) },
-        onCancel = { viewModel.process(PreviewUiAction.ClickCancel) },
+        onClickNextPage = { viewModel.process(PreviewUiAction.ClickNextPage) },
+        onClickSubmit = { viewModel.process(PreviewUiAction.ClickSubmit) },
+        onClickPreviousPage = { viewModel.process(PreviewUiAction.ClickPreviousPage) },
+        onClickCancel = { viewModel.process(PreviewUiAction.ClickCancel) },
     )
 }

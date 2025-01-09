@@ -10,6 +10,7 @@ import com.qriz.app.feature.onboard.guide.GuideScreen
 import com.qriz.app.feature.onboard.R
 import com.qriz.app.feature.onboard.preview.PreviewScreen
 
+//TODO : Text 리소스 혹은 상수 처리
 fun NavHostController.navigateCheckGuide() {
     navigate(
         Route.Guide(
@@ -44,7 +45,7 @@ fun NavGraphBuilder.onboardNavGraph(
                 when(guideType) {
                     GuideType.CONCEPT_CHECK -> { onNavigate(Route.ConceptCheck) }
                     GuideType.PREVIEW -> { onNavigate(Route.Preview) }
-                    GuideType.WELCOME -> {}
+                    GuideType.WELCOME -> {} //TODO : 연결 필요
                     null -> {
                         //TODO: Snackbar 띄우기
                     }
@@ -75,8 +76,8 @@ fun NavGraphBuilder.onboardNavGraph(
 
     composable<Route.Preview> {
         PreviewScreen(
-            onBack = onBack,
-            onSubmit = {
+            moveToBack = onBack,
+            moveToGuide = {
                 onNavigate(
                     //환영 페이지 데이터 변경하기
                     Route.Guide(
@@ -90,6 +91,7 @@ fun NavGraphBuilder.onboardNavGraph(
                     )
                 )
             },
+            onShowSnackBar = onShowSnackbar,
         )
     }
 }
