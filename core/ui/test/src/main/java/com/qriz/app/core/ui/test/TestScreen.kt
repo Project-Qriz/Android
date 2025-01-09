@@ -69,6 +69,7 @@ fun TestScreen(
                 val scrollState = rememberScrollState()
                 TestPage(
                     question = question.question,
+                    questionNum = index + 1,
                     options = question.options.toImmutableList(),
                     selectedOption = selectedOptions[question.id],
                     modifier = Modifier

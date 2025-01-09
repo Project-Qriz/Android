@@ -5,13 +5,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.data.test.test_api.model.Option
+import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -20,6 +22,7 @@ import kotlinx.collections.immutable.persistentListOf
 fun TestPage(
     modifier: Modifier = Modifier,
     question: String,
+    questionNum: Int,
     options: ImmutableList<Option>,
     isResultPage: Boolean,
     selectedOption: Option?,
@@ -31,8 +34,22 @@ fun TestPage(
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
-            text = question,
-            style = MaterialTheme.typography.titleMedium,
+            text = buildAnnotatedString {
+                withStyle(
+                    QrizTheme.typography.heading2.toSpanStyle()
+                        .copy(color = Gray800)
+                ) {
+                    append(
+                        "$questionNum"
+                            .padStart(2, '0') + ".  "
+                    )
+                }
+
+                withStyle(
+                    QrizTheme.typography.headline2.toSpanStyle()
+                        .copy(color = Gray800)
+                ) { append(question) }
+            },
             modifier = Modifier.padding(bottom = 10.dp)
         )
 
@@ -91,10 +108,11 @@ private fun TestPagePreview() {
                     Option("WHERE 절 다음에 위치한다"),
                     Option("ORDER BY 절 다음에 위치한다"),
                 ),
-                selectedOption = Option("집계 함수와 함께 자주 사용된다"),
                 isResultPage = false,
+                selectedOption = Option("집계 함수와 함께 자주 사용된다"),
                 description = "다음 중 GROUP BY 절의 특징으로 올바르지 않은 것은?asfasf",
-                onSelected = {}
+                onSelected = {},
+                questionNum = 1
             )
         }
     }
@@ -115,11 +133,12 @@ private fun TestResultPagePreview() {
                     Option("WHERE 절 다음에 위치한다"),
                     Option("ORDER BY 절 다음에 위치한다"),
                 ),
+                isResultPage = true,
                 selectedOption = Option("집계 함수와 함께 자주 사용된다"),
                 correctOption = Option("WHERE 절 다음에 위치한다"),
-                isResultPage = true,
                 description = "다음 중 GROUP BY 절의 특징으로 올바르지 않은 것은?asafasfasf",
-                onSelected = {}
+                onSelected = {},
+                questionNum = 1
             )
         }
     }
