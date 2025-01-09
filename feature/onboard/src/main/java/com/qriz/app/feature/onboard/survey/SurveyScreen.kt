@@ -29,6 +29,8 @@ import com.qriz.app.feature.onboard.survey.model.SurveyListItem
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem.KnowsAll
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem.KnowsNothing
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem.SurveyItem
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun ConceptCheckScreen(
@@ -71,7 +73,7 @@ fun ConceptCheckScreen(
 
 @Composable
 private fun ConceptCheckContent(
-    surveyItems: List<SurveyListItem>,
+    surveyItems: ImmutableList<SurveyListItem>,
     isPossibleSubmit: Boolean,
     onClickKnowsAll: (isChecked: Boolean) -> Unit,
     onClickKnowsNothing: (isChecked: Boolean) -> Unit,
@@ -176,7 +178,7 @@ private fun ConceptCheckContent(
 fun ConceptCheckContentPreview() {
     QrizTheme {
         ConceptCheckContent(
-            surveyItems = emptyList(),
+            surveyItems = persistentListOf(),
             isPossibleSubmit = false,
             onClickKnowsAll = {},
             onClickKnowsNothing = {},
