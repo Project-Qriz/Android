@@ -1,4 +1,4 @@
-package com.qriz.app.feature.sign.signUp
+package com.qriz.app.feature.sign.signup
 
 import android.util.Patterns
 import androidx.annotation.StringRes
@@ -7,12 +7,12 @@ import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
 import com.qriz.app.feature.sign.R
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.EMAIL
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.EMAIL_AUTH
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.ID
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.NAME
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.PW
-import com.qriz.app.feature.sign.signUp.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.EMAIL
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.EMAIL_AUTH
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.ID
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.NAME
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.PW
+import com.qriz.app.feature.sign.signup.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
 import java.util.regex.Pattern
 
 @Immutable

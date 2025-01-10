@@ -1,4 +1,4 @@
-package com.qriz.app.feature.sign.signUp
+package com.qriz.app.feature.sign.signup
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -20,17 +20,17 @@ import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.feature.base.extention.collectSideEffect
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.EMAIL
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.EMAIL_AUTH
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.ID
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.NAME
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.PW
-import com.qriz.app.feature.sign.signUp.component.SignUpEmailAuthPage
-import com.qriz.app.feature.sign.signUp.component.SignUpEmailPage
-import com.qriz.app.feature.sign.signUp.component.SignUpIdPage
-import com.qriz.app.feature.sign.signUp.component.SignUpNamePage
-import com.qriz.app.feature.sign.signUp.component.SignUpPasswordPage
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.EMAIL
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.EMAIL_AUTH
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.ID
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.NAME
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.PW
+import com.qriz.app.feature.sign.signup.component.SignUpEmailAuthPage
+import com.qriz.app.feature.sign.signup.component.SignUpEmailPage
+import com.qriz.app.feature.sign.signup.component.SignUpIdPage
+import com.qriz.app.feature.sign.signup.component.SignUpNamePage
+import com.qriz.app.feature.sign.signup.component.SignUpPasswordPage
 
 @Composable
 fun SignUpScreen(

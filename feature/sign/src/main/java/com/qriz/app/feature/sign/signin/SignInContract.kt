@@ -1,4 +1,4 @@
-package com.qriz.app.feature.sign.signIn
+package com.qriz.app.feature.sign.signin
 
 import androidx.compose.runtime.Immutable
 import com.qriz.app.feature.base.UiAction

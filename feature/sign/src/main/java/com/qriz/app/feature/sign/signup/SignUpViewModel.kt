@@ -1,11 +1,11 @@
-package com.qriz.app.feature.sign.signUp
+package com.qriz.app.feature.sign.signup
 
 import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.sign.R
-import com.qriz.app.feature.sign.signUp.SignUpUiState.AuthenticationState
-import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage
+import com.qriz.app.feature.sign.signup.SignUpUiState.AuthenticationState
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job

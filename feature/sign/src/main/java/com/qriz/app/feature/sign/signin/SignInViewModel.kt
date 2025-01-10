@@ -1,4 +1,4 @@
-package com.qriz.app.feature.sign.signIn
+package com.qriz.app.feature.sign.signin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

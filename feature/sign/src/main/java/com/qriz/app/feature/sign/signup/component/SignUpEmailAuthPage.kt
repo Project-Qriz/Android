@@ -1,4 +1,4 @@
-package com.qriz.app.feature.sign.signUp.component
+package com.qriz.app.feature.sign.signup.component
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -20,7 +20,7 @@ import com.qriz.app.core.designsystem.component.SupportingText
 import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Mint800
 import com.qriz.app.feature.sign.R
-import com.qriz.app.feature.sign.signUp.SignUpUiState.AuthenticationState
+import com.qriz.app.feature.sign.signup.SignUpUiState.AuthenticationState
 
 @Composable
 fun SignUpEmailAuthPage(

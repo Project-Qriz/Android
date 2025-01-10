@@ -1,4 +1,4 @@
-package com.qriz.app.feature.sign.signUp.component
+package com.qriz.app.feature.sign.signup.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
