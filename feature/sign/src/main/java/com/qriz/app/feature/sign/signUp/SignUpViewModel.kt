@@ -1,23 +1,16 @@
 package com.qriz.app.feature.sign.signUp
 
 import android.util.Patterns
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.quiz.app.core.data.user.user_api.repository.UserRepository
+import com.qriz.app.feature.base.BaseViewModel
+import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signUp.SignUpUiState.AuthenticationState
+import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -25,16 +18,11 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     private val userRepository: UserRepository
-) : ViewModel() {
-    private val _state: MutableStateFlow<SignUpUiState> = MutableStateFlow(SignUpUiState.Default)
+) : BaseViewModel<SignUpUiState, SignUpUiEffect, SignUpUiAction>(SignUpUiState.Default) {
 
-    val state: StateFlow<SignUpUiState> = _state.asStateFlow()
-
-    private val _effect: MutableSharedFlow<SignUpUiEffect> = MutableSharedFlow(
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
-    val effect: SharedFlow<SignUpUiEffect> = _effect.asSharedFlow()
+    override fun process(action: SignUpUiAction): Job {
+        TODO("Not yet implemented")
+    }
 
     private val timer: Flow<Long>
         get() = flow {
@@ -54,10 +42,10 @@ class SignUpViewModel @Inject constructor(
     private val passwordPattern = Pattern.compile("^[a-zA-Z0-9]{8,10}$")
 
     fun updateName(name: String) {
-        val nameErrorMessage = if (name.length > 2) "" else state.value.nameErrorMessage
+        val nameErrorMessage = if (name.length > 2) "" else uiState.value.nameErrorMessage
 
-        _state.update {
-            it.copy(
+        updateState {
+            copy(
                 name = name,
                 nameErrorMessage = nameErrorMessage,
             )
@@ -65,10 +53,10 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun updateEmail(email: String) {
-        val emailErrorMessage = if (verifyEmail(email)) "" else state.value.emailErrorMessage
+        val emailErrorMessage = if (verifyEmail(email)) "" else uiState.value.emailErrorMessage
 
-        _state.update {
-            it.copy(
+        updateState {
+            copy(
                 email = email,
                 emailErrorMessage = emailErrorMessage,
             )
@@ -76,11 +64,7 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun updateAuthenticationNumber(authenticationNumber: String) {
-        _state.update {
-            it.copy(
-                authenticationNumber = authenticationNumber,
-            )
-        }
+        updateState { copy(authenticationNumber = authenticationNumber) }
 
         if (authenticationNumber.length == AUTHENTICATION_NUMBER_LENGTH) {
             verifyAuthenticationNumber()
@@ -88,8 +72,8 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun updateId(id: String) {
-        _state.update {
-            it.copy(
+        updateState {
+            copy(
                 id = id,
                 isAvailableId = false,
             )
@@ -103,15 +87,15 @@ class SignUpViewModel @Inject constructor(
             "사용할 수 없는 비밀번호 입니다."
         }
 
-        val passwordCheck = state.value.passwordCheck
+        val passwordCheck = uiState.value.passwordCheck
         val passwordCheckErrorMessage = if (password == passwordCheck) {
             ""
         } else {
             "비밀번호가 맞지 않아요"
         }
 
-        _state.update {
-            it.copy(
+        updateState {
+            copy(
                 password = password,
                 passwordErrorMessage = errorMessage,
                 passwordCheckErrorMessage = passwordCheckErrorMessage,
@@ -120,15 +104,15 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun updatePasswordCheck(passwordCheck: String) {
-        val password = state.value.password
+        val password = uiState.value.password
         val errorMessage = if (password == passwordCheck) {
             ""
         } else {
             "비밀번호가 맞지 않아요"
         }
 
-        _state.update {
-            it.copy(
+        updateState {
+            copy(
                 passwordCheck = passwordCheck,
                 passwordCheckErrorMessage = errorMessage,
             )
@@ -136,44 +120,44 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun nextPage() {
-        val currentState = state.value
-        if (currentState.name.length < 2) {
-            _state.update { it.copy(nameErrorMessage = "이름은 두글자 이상입니다") }
+        val currentUiState = uiState.value
+        if (currentUiState.name.length < 2) {
+            updateState { copy(nameErrorMessage = "이름은 두글자 이상입니다") }
             return
         }
 
-        if (currentState.page == EMAIL_PAGE) {
+        if (currentUiState.page == EMAIL_PAGE) {
             sendAuthenticationNumberEmail()
         }
 
-        if (currentState.page == AUTHENTICATION_PAGE) {
+        if (currentUiState.page == AUTHENTICATION_PAGE) {
             cancelAuthTimer()
         }
 
-        _state.update { it.copy(page = it.page + 1) }
+        updateState { copy(page = currentUiState.page + 1) }
     }
 
     fun previousPage() {
-        val currentState = state.value
-        if (currentState.page == NAME_PAGE) return
+        val currentUiState = uiState.value
+        if (currentUiState.page == NAME_PAGE) return
 
-        _state.update { it.copy(page = it.page - 1) }
+        updateState { copy(page = uiState.value.page - 1) }
     }
 
     fun sendAuthenticationNumberEmail() {
-        val email = state.value.email
+        val email = uiState.value.email
 
         viewModelScope.launch {
             cancelAuthTimer()
             userRepository.sendAuthenticationNumber(email)
-            _effect.tryEmit(SignUpUiEffect.SendAuthEmail)
+            sendEffect(SignUpUiEffect.ShowSnackBer(R.string.email_auth_sent))
             startAuthTimer()
         }
     }
 
     fun signUp() {
         //TODO: 추후 실제 연결
-//        val state = state.value
+//        val uiState = state.value
 //        viewModelScope.launch {
 //            userRepository.signUp(
 //                loginId = state.id,
@@ -183,27 +167,27 @@ class SignUpViewModel @Inject constructor(
 //            )
 //        }
 
-        _effect.tryEmit(SignUpUiEffect.SignUpUiComplete)
+        sendEffect(SignUpUiEffect.SignUpUiComplete)
     }
 
     private fun verifyEmail(email: String): Boolean =
         Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
     private fun verifyAuthenticationNumber() {
-        val authenticationNumber = state.value.authenticationNumber
+        val authenticationNumber = uiState.value.authenticationNumber
 
         viewModelScope.launch {
             runCatching {
                 userRepository.verifyAuthenticationNumber(authenticationNumber)
             }.onSuccess {
-                _state.update {
-                    it.copy(
+                updateState {
+                    copy(
                         authenticationState = AuthenticationState.Verified
                     )
                 }
             }.onFailure {
-                _state.update {
-                    it.copy(
+                updateState {
+                    copy(
                         authenticationState = AuthenticationState.Unverified,
                         authenticationNumberErrorMessage = "인증번호가 다르게 입력되었어요"
                     )
@@ -213,30 +197,26 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun checkDuplicateId() {
-        val id = state.value.id
+        val id = uiState.value.id
 
         if (id.isEmpty()) {
-            _state.update {
-                it.copy(
-                    idErrorMessage = "아이디를 입력해주세요"
-                )
-            }
+            updateState { copy(idErrorMessage = "아이디를 입력해주세요") }
             return
         }
 
         viewModelScope.launch {
             runCatching {
-                userRepository.checkDuplicateId(state.value.id)
+                userRepository.checkDuplicateId(uiState.value.id)
             }.onSuccess { isAvailable ->
-                _state.update {
-                    it.copy(
+                updateState {
+                    copy(
                         isAvailableId = isAvailable,
                         idErrorMessage = ""
                     )
                 }
             }.onFailure { t ->
-                _state.update {
-                    it.copy(
+                updateState {
+                    copy(
                         idErrorMessage = t.message ?: "알 수 없는 오류가 발생했습니다."
                     )
                 }
@@ -247,7 +227,7 @@ class SignUpViewModel @Inject constructor(
     private fun startAuthTimer() {
         timerJob = viewModelScope.launch {
             timer.collect { seconds ->
-                _state.update { it.copy(timer = seconds) }
+                updateState { copy(timer = seconds) }
             }
         }
     }
@@ -255,8 +235,8 @@ class SignUpViewModel @Inject constructor(
     private fun cancelAuthTimer() {
         timerJob?.cancel()
         timerJob = null
-        _state.update {
-            it.copy(timer = AUTHENTICATION_LIMIT_MILS)
+        updateState {
+            copy(timer = AUTHENTICATION_LIMIT_MILS)
         }
     }
 

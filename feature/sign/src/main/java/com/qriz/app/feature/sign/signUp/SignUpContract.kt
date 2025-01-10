@@ -1,10 +1,12 @@
 package com.qriz.app.feature.sign.signUp
 
 import android.util.Patterns
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
+import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signUp.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
 import java.util.regex.Pattern
 
@@ -29,10 +31,10 @@ data class SignUpUiState(
 ) : UiState {
     val emailVerified: Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
-    val topBarTitle: String = when (page) {
-        0 -> "이름 입력"
-        1, 2 -> "이메일 인증"
-        3, 4 -> "회원가입"
+    val topBarTitleResId: Int = when (page) {
+        0 -> R.string.screen_title_enter_name
+        1, 2 -> R.string.screen_title_email_auth
+        3, 4 -> R.string.screen_title_sign_up
         else -> throw IllegalStateException("잘못된 페이지입니다.")
     }
 
@@ -74,5 +76,8 @@ sealed interface SignUpUiAction : UiAction
 
 sealed interface SignUpUiEffect : UiEffect {
     data object SignUpUiComplete : SignUpUiEffect
-    data object SendAuthEmail : SignUpUiEffect
+    data class ShowSnackBer(
+        @StringRes val defaultResId: Int,
+        val message: String? = null
+    ) : SignUpUiEffect
 }
