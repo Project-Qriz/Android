@@ -1,5 +1,6 @@
 package com.qriz.app.feature.sign.signUp
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.HorizontalPager
@@ -49,6 +50,10 @@ fun SignUpScreen(
 
     LaunchedEffect(state.page) {
         pagerState.animateScrollToPage(state.page)
+    }
+
+    BackHandler {
+        if (state.page == 0) onBack() else viewModel.previousPage()
     }
 
     Column {
