@@ -24,15 +24,15 @@ import com.qriz.app.feature.sign.signUp.SignUpUiState.AuthenticationState
 
 @Composable
 fun SignUpEmailAuthPage(
-    authenticationNumber: String,
-    authenticationState: AuthenticationState,
+    emailAuthNumber: String,
+    emailAuthState: AuthenticationState,
     timer: String,
     errorMessage: String,
-    onAuthenticationNumberChanged: (String) -> Unit,
-    onRetry: () -> Unit,
-    onNext: () -> Unit,
+    onChangeEmailAuthNum: (String) -> Unit,
+    onClickEmailAuthNumSend: () -> Unit,
+    onClickNextPage: () -> Unit,
 ) {
-    val supportingText = if (authenticationState == AuthenticationState.Verified) {
+    val supportingText = if (emailAuthState == AuthenticationState.Verified) {
         SupportingText(
             message = stringResource(R.string.sign_up_auth_page_supporting_verified),
             color = Mint800
@@ -44,20 +44,20 @@ fun SignUpEmailAuthPage(
         )
     }
 
-    SignUpContent(
+    SignUpBasePage(
         title = stringResource(R.string.sign_up_auth_page_title),
         subTitle = stringResource(R.string.sign_up_auth_page_sub_title),
-        buttonEnabled = authenticationState == AuthenticationState.Verified,
+        buttonEnabled = emailAuthState == AuthenticationState.Verified,
         buttonText = stringResource(R.string.sign_up_auth_page_button_text),
-        onButtonClick = onNext,
+        onButtonClick = onClickNextPage,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             QrizTextFiled(
-                value = authenticationNumber,
+                value = emailAuthNumber,
                 supportingText = supportingText,
-                onValueChange = onAuthenticationNumberChanged,
+                onValueChange = onChangeEmailAuthNum,
                 hint = stringResource(R.string.sign_up_auth_page_hint),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -83,7 +83,7 @@ fun SignUpEmailAuthPage(
                 ),
                 modifier = Modifier
                     .padding(5.dp)
-                    .clickable { onRetry() },
+                    .clickable { onClickEmailAuthNumSend() },
             )
         }
     }

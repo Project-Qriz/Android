@@ -23,9 +23,9 @@ fun SignUpIdPage(
     id: String,
     isAvailableId: Boolean,
     errorMessage: String,
-    onIdChanged: (String) -> Unit,
-    onCheckDuplicate: () -> Unit,
-    onNext: () -> Unit,
+    onChangeUserId: (String) -> Unit,
+    onClickIdDuplicateCheck: () -> Unit,
+    onClickNextPage: () -> Unit,
 ) {
     val supportingText = if (errorMessage.isNotEmpty()) {
         SupportingText(
@@ -39,19 +39,19 @@ fun SignUpIdPage(
         )
     }
 
-    SignUpContent(
+    SignUpBasePage(
         title = stringResource(R.string.sign_up_id_page_title),
         subTitle = stringResource(R.string.sign_up_id_page_sub_title),
         buttonText = stringResource(R.string.sign_up_id_page_button_text),
         buttonEnabled = isAvailableId,
-        onButtonClick = onNext,
+        onButtonClick = onClickNextPage,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
             QrizTextFiled(
                 value = id,
-                onValueChange = onIdChanged,
+                onValueChange = onChangeUserId,
                 supportingText = supportingText,
                 singleLine = true,
                 hint = stringResource(R.string.sign_up_id_page_hint),
@@ -63,7 +63,7 @@ fun SignUpIdPage(
                 )
             )
             OutlinedButton(
-                onClick = onCheckDuplicate,
+                onClick = onClickIdDuplicateCheck,
                 border = BorderStroke(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.primary

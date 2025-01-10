@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizButton
 
 @Composable
-internal fun SignUpContent(
+internal fun SignUpBasePage(
     title: String,
     subTitle: String,
     buttonText: String,

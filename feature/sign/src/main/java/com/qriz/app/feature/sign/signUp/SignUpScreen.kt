@@ -20,13 +20,17 @@ import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.feature.base.extention.collectSideEffect
+import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage
+import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.EMAIL
+import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.EMAIL_AUTH
+import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.ID
+import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.NAME
+import com.qriz.app.feature.sign.signUp.SignUpUiState.SignUpPage.PW
 import com.qriz.app.feature.sign.signUp.component.SignUpEmailAuthPage
 import com.qriz.app.feature.sign.signUp.component.SignUpEmailPage
 import com.qriz.app.feature.sign.signUp.component.SignUpIdPage
 import com.qriz.app.feature.sign.signUp.component.SignUpNamePage
 import com.qriz.app.feature.sign.signUp.component.SignUpPasswordPage
-
-const val SIGN_UP_PAGE = 5
 
 @Composable
 fun SignUpScreen(
@@ -46,27 +50,60 @@ fun SignUpScreen(
         }
     }
 
-    val pagerState = rememberPagerState { SIGN_UP_PAGE }
-
-    LaunchedEffect(state.page) {
-        pagerState.animateScrollToPage(state.page)
+    BackHandler {
+        if (state.page == NAME) onBack()
+        else viewModel.process(SignUpUiAction.ClickPreviousPage)
     }
 
-    BackHandler {
-        if (state.page == 0) onBack() else viewModel.previousPage()
+    SignUpContent(
+        uiState = state,
+        onClickPreviousPage = {
+            if (state.page == NAME) onBack()
+            else viewModel.process(SignUpUiAction.ClickPreviousPage)
+        },
+        onClickNextPage = { viewModel.process(SignUpUiAction.ClickNextPage) },
+        onClickEmailAuthNumSend = { viewModel.process(SignUpUiAction.ClickEmailAuthNumSend) },
+        onClickIdDuplicateCheck = { viewModel.process(SignUpUiAction.ClickIdDuplicateCheck) },
+        onClickSignUp = { viewModel.process(SignUpUiAction.ClickSignUp) },
+        onChangeUserName = { viewModel.process(SignUpUiAction.ChangeUserName(it)) },
+        onChangeUserId = { viewModel.process(SignUpUiAction.ChangeUserId(it)) },
+        onChangeUserPw = { viewModel.process(SignUpUiAction.ChangeUserPw(it)) },
+        onChangeUserPwCheck = { viewModel.process(SignUpUiAction.ChangeUserPwCheck(it)) },
+        onChangeEmail = { viewModel.process(SignUpUiAction.ChangeEmail(it)) },
+        onChangeEmailAuthNum = { viewModel.process(SignUpUiAction.ChangeEmailAuthNum(it)) },
+    )
+}
+
+@Composable
+fun SignUpContent(
+    uiState: SignUpUiState,
+    onClickPreviousPage: () -> Unit,
+    onClickNextPage: () -> Unit,
+    onClickEmailAuthNumSend: () -> Unit,
+    onClickIdDuplicateCheck: () -> Unit,
+    onClickSignUp: () -> Unit,
+    onChangeUserName: (String) -> Unit,
+    onChangeUserId: (String) -> Unit,
+    onChangeUserPw: (String) -> Unit,
+    onChangeUserPwCheck: (String) -> Unit,
+    onChangeEmail: (String) -> Unit,
+    onChangeEmailAuthNum: (String) -> Unit,
+) {
+    val pagerState = rememberPagerState { SignUpPage.entries.size }
+    val currentPage = uiState.page
+
+    LaunchedEffect(currentPage) {
+        pagerState.animateScrollToPage(currentPage.index)
     }
 
     Column {
         QrizTopBar(
-            title = stringResource(state.topBarTitleResId),
-            navigationType = NavigationType.BACK,
-            onNavigationClick = if (state.page == 0) onBack else viewModel::previousPage
+            title = stringResource(uiState.topBarTitleResId),
+            navigationType = NavigationType.Back,
+            onNavigationClick = onClickPreviousPage
         )
         LinearProgressIndicator(
-            progress = {
-                val percent = (pagerState.currentPage + 1).toFloat() / SIGN_UP_PAGE.toFloat()
-                percent
-            },
+            progress = { currentPage.percent },
             trackColor = Gray200,
             color = Blue600,
             strokeCap = StrokeCap.Round,
@@ -77,50 +114,50 @@ fun SignUpScreen(
             userScrollEnabled = false,
         ) { page ->
             when (page) {
-                0 -> SignUpNamePage(
-                    name = state.name,
-                    validName = state.validName,
-                    errorMessage = state.nameErrorMessage,
-                    onNameChanged = viewModel::updateName,
-                    onNext = viewModel::nextPage,
+                NAME.index -> SignUpNamePage(
+                    name = uiState.name,
+                    validName = uiState.validName,
+                    errorMessage = stringResource(uiState.nameErrorMessageResId),
+                    onChangeUserName = onChangeUserName,
+                    onClickNextPage = onClickNextPage,
                 )
 
-                1 -> SignUpEmailPage(
-                    email = state.email,
-                    errorMessage = state.emailErrorMessage,
-                    emailVerified = state.emailVerified,
-                    onEmailChanged = viewModel::updateEmail,
-                    onNext = viewModel::nextPage,
+                EMAIL.index -> SignUpEmailPage(
+                    email = uiState.email,
+                    errorMessage = stringResource(uiState.emailErrorMessageResId),
+                    emailVerified = uiState.emailVerified,
+                    onChangeEmail = onChangeEmail,
+                    onClickNextPage = onClickNextPage,
                 )
 
-                2 -> SignUpEmailAuthPage(
-                    authenticationNumber = state.authenticationNumber,
-                    authenticationState = state.authenticationState,
-                    timer = state.timerText,
-                    errorMessage = state.authenticationNumberErrorMessage,
-                    onAuthenticationNumberChanged = viewModel::updateAuthenticationNumber,
-                    onNext = viewModel::nextPage,
-                    onRetry = viewModel::sendAuthenticationNumberEmail
+                EMAIL_AUTH.index -> SignUpEmailAuthPage(
+                    emailAuthNumber = uiState.emailAuthNumber,
+                    emailAuthState = uiState.emailAuthState,
+                    timer = uiState.timerText,
+                    errorMessage = stringResource(uiState.emailAuthNumberErrorMessageResId),
+                    onChangeEmailAuthNum = onChangeEmailAuthNum,
+                    onClickNextPage = onClickNextPage,
+                    onClickEmailAuthNumSend = onClickEmailAuthNumSend
                 )
 
-                3 -> SignUpIdPage(
-                    id = state.id,
-                    onIdChanged = viewModel::updateId,
-                    onCheckDuplicate = viewModel::checkDuplicateId,
-                    isAvailableId = state.isAvailableId,
-                    errorMessage = state.idErrorMessage,
-                    onNext = viewModel::nextPage,
+                ID.index -> SignUpIdPage(
+                    id = uiState.id,
+                    onChangeUserId = onChangeUserId,
+                    onClickIdDuplicateCheck = onClickIdDuplicateCheck,
+                    isAvailableId = uiState.isAvailableId,
+                    errorMessage = stringResource(uiState.idErrorMessageResId),
+                    onClickNextPage = onClickNextPage,
                 )
 
-                4 -> SignUpPasswordPage(
-                    password = state.password,
-                    passwordCheck = state.passwordCheck,
-                    passwordErrorMessage = state.passwordErrorMessage,
-                    passwordCheckErrorMessage = state.passwordCheckErrorMessage,
-                    canSignUp = state.canSignUp,
-                    onChangePassword = viewModel::updatePassword,
-                    onChangePasswordCheck = viewModel::updatePasswordCheck,
-                    onSignUp = viewModel::signUp,
+                PW.index -> SignUpPasswordPage(
+                    password = uiState.pw,
+                    passwordCheck = uiState.pwCheck,
+                    passwordErrorMessage = stringResource(uiState.pwErrorMessageResId),
+                    passwordCheckErrorMessage = stringResource(uiState.pwCheckErrorMessageResId),
+                    canSignUp = uiState.canSignUp,
+                    onChangeUserPw = onChangeUserPw,
+                    onChangeUserPwCheck = onChangeUserPwCheck,
+                    onClickSignUp = onClickSignUp,
                 )
             }
         }

@@ -16,25 +16,25 @@ fun SignUpEmailPage(
     email: String,
     errorMessage: String,
     emailVerified: Boolean,
-    onEmailChanged: (String) -> Unit,
-    onNext: () -> Unit,
+    onChangeEmail: (String) -> Unit,
+    onClickNextPage: () -> Unit,
 ) {
     val supportingText: SupportingText? = if (errorMessage.isNotEmpty()) SupportingText(
         message = errorMessage,
         color = MaterialTheme.colorScheme.error
     ) else null
 
-    SignUpContent(
+    SignUpBasePage(
         title = stringResource(R.string.sign_up_email_page_title),
         subTitle = stringResource(R.string.sign_up_email_page_sub_title),
         buttonEnabled = emailVerified,
         buttonText = stringResource(R.string.sign_up_email_page_button_text),
-        onButtonClick = onNext,
+        onButtonClick = onClickNextPage,
     ) {
         QrizTextFiled(
             value = email,
             supportingText = supportingText,
-            onValueChange = onEmailChanged,
+            onValueChange = onChangeEmail,
             singleLine = true,
             hint = stringResource(R.string.sign_up_email_page_hint),
             modifier = Modifier.fillMaxWidth(),

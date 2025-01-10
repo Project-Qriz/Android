@@ -16,25 +16,25 @@ fun SignUpNamePage(
     name: String,
     validName: Boolean,
     errorMessage: String,
-    onNameChanged: (String) -> Unit,
-    onNext: () -> Unit,
+    onChangeUserName: (String) -> Unit,
+    onClickNextPage: () -> Unit,
 ) {
     val supportingText: SupportingText? = if (errorMessage.isNotEmpty()) SupportingText(
         message = errorMessage,
         color = MaterialTheme.colorScheme.error
     ) else null
 
-    SignUpContent(
+    SignUpBasePage(
         title = stringResource(R.string.sign_up_name_page_title),
         subTitle = stringResource(R.string.sign_up_name_page_sub_title),
         buttonEnabled = validName,
         buttonText = stringResource(R.string.sign_up_name_page_button_text),
-        onButtonClick = onNext,
+        onButtonClick = onClickNextPage,
     ) {
         QrizTextFiled(
             value = name,
             supportingText = supportingText,
-            onValueChange = onNameChanged,
+            onValueChange = onChangeUserName,
             singleLine = true,
             hint = stringResource(R.string.sign_up_name_page_hint),
             modifier = Modifier.fillMaxWidth(),

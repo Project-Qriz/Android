@@ -19,9 +19,9 @@ fun SignUpPasswordPage(
     passwordErrorMessage: String,
     passwordCheckErrorMessage: String,
     canSignUp: Boolean,
-    onChangePassword: (String) -> Unit,
-    onChangePasswordCheck: (String) -> Unit,
-    onSignUp: () -> Unit,
+    onChangeUserPw: (String) -> Unit,
+    onChangeUserPwCheck: (String) -> Unit,
+    onClickSignUp: () -> Unit,
 ) {
     val passwordSupportingText = if (passwordErrorMessage.isNotEmpty()) {
         SupportingText(
@@ -41,16 +41,16 @@ fun SignUpPasswordPage(
         null
     }
 
-    SignUpContent(
+    SignUpBasePage(
         title = stringResource(R.string.sign_up_password_page_title),
         subTitle = stringResource(R.string.sign_up_password_page_sub_title),
         buttonText = stringResource(R.string.sign_up_password_page_button_text),
         buttonEnabled = canSignUp,
-        onButtonClick = onSignUp,
+        onButtonClick = onClickSignUp,
     ) {
         QrizTextFiled(
             value = password,
-            onValueChange = onChangePassword,
+            onValueChange = onChangeUserPw,
             supportingText = passwordSupportingText,
             singleLine = true,
             hint = stringResource(R.string.sign_up_password_page_hint),
@@ -65,7 +65,7 @@ fun SignUpPasswordPage(
 
         QrizTextFiled(
             value = passwordCheck,
-            onValueChange = onChangePasswordCheck,
+            onValueChange = onChangeUserPwCheck,
             supportingText = passwordCheckSupportingText,
             singleLine = true,
             hint = stringResource(R.string.sign_up_password_page_hint_check),
