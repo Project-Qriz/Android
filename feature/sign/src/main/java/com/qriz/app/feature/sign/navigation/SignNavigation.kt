@@ -16,6 +16,7 @@ fun NavHostController.navigateSignUp() {
 }
 
 fun NavGraphBuilder.signNavGraph(
+    onBack: () -> Unit,
     onClickSignUp: () -> Unit,
     onSignUpComplete: () -> Unit,
     onShowSnackbar: (String) -> Unit,
@@ -26,6 +27,7 @@ fun NavGraphBuilder.signNavGraph(
 
     composable<Route.SignUp> {
         SignUpScreen(
+            onBack = onBack,
             onSignUp = onSignUpComplete,
             onShowSnackbar = onShowSnackbar,
         )

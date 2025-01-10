@@ -1,6 +1,5 @@
 package com.qriz.app.feature.sign.signUp
 
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.HorizontalPager
@@ -32,6 +31,7 @@ const val SIGN_UP_PAGE = 5
 fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
     onSignUp: () -> Unit,
+    onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -54,9 +54,8 @@ fun SignUpScreen(
     Column {
         QrizTopBar(
             title = stringResource(state.topBarTitleResId),
-            //TODO : 수정된 UI에는 그냥 NavigationType.Back임으로 반영되어야함
-            navigationType = if (state.page == 0) NavigationType.NONE else NavigationType.BACK,
-            onNavigationClick = viewModel::previousPage
+            navigationType = NavigationType.BACK,
+            onNavigationClick = if (state.page == 0) onBack else viewModel::previousPage
         )
         LinearProgressIndicator(
             progress = {
