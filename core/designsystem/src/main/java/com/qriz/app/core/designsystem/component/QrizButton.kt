@@ -22,10 +22,10 @@ fun QrizButton(
     enable: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    forcedColor: Color? = null,
+    color: Color? = null,
 ) {
     val containerColor =
-        if (enable) forcedColor ?: MaterialTheme.colorScheme.primary
+        if (enable) color ?: MaterialTheme.colorScheme.primary
         else MaterialTheme.colorScheme.secondary
 
     val textColor =
@@ -75,7 +75,7 @@ fun QrizButtonForcedColorPreview() {
             enable = true,
             text = "Enabled",
             onClick = {},
-            forcedColor = Gray700
+            color = Gray700
         )
     }
 }
