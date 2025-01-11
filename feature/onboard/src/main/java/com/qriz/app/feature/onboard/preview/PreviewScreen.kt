@@ -23,7 +23,7 @@ fun PreviewScreen(
         when (it) {
             PreviewUiEffect.MoveToGuide -> moveToGuide()
             PreviewUiEffect.MoveToBack -> moveToBack()
-            is PreviewUiEffect.ShowSnackBer -> onShowSnackBar(
+            is PreviewUiEffect.ShowSnackBar -> onShowSnackBar(
                 it.message ?: context.getString(it.defaultResId)
             )
         }

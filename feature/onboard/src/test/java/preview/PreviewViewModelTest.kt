@@ -62,7 +62,7 @@ class PreviewViewModelTest {
     }
 
     @Test
-    fun `Action_LoadPreviewTest process 실패 - Effect_ShowSnackBer 발생`() = runTest {
+    fun `Action_LoadPreviewTest process 실패 - Effect_ShowSnackBar 발생`() = runTest {
         with(previewViewModel()) {
             // given
             coEvery { fakeOnBoardRepository.getPreviewTest() } throws Exception()
@@ -70,7 +70,7 @@ class PreviewViewModelTest {
             process(PreviewUiAction.LoadPreviewTest)
             //then
             uiState.test { awaitItem().isLoading shouldBe false }
-            effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBer) shouldBe true }
+            effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBar) shouldBe true }
         }
     }
 
@@ -156,7 +156,7 @@ class PreviewViewModelTest {
     }
 
     @Test
-    fun `Action_ClickSubmit process 실패 - 로딩 해제, Effect_ShowSnackBer 발생`() = runTest {
+    fun `Action_ClickSubmit process 실패 - 로딩 해제, Effect_ShowSnackBar 발생`() = runTest {
         with(previewViewModel()) {
             // given
             coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } throws Exception()
@@ -166,7 +166,7 @@ class PreviewViewModelTest {
 
             // then
             uiState.test { awaitItem().isLoading shouldBe false }
-            effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBer) shouldBe true }
+            effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBar) shouldBe true }
         }
     }
 
@@ -190,7 +190,7 @@ class PreviewViewModelTest {
     }
 
     @Test
-    fun `Action_ClickSubmit process 풀리지 않은 문제가 있음 - API호출되지 않음, Effect_ShowSnackBer 발생`() =
+    fun `Action_ClickSubmit process 풀리지 않은 문제가 있음 - API호출되지 않음, Effect_ShowSnackBar 발생`() =
         runTest {
             with(previewViewModel()) {
                 // given
@@ -212,7 +212,7 @@ class PreviewViewModelTest {
                 process(PreviewUiAction.ClickSubmit)
                 //then
                 coVerify(exactly = 0) { fakeOnBoardRepository.submitPreviewTest(any()) }
-                effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBer) shouldBe true }
+                effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBar) shouldBe true }
             }
         }
 

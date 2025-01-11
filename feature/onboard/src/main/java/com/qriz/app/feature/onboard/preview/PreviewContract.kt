@@ -66,7 +66,7 @@ sealed interface PreviewUiAction : UiAction {
 sealed interface PreviewUiEffect : UiEffect {
     data object MoveToGuide : PreviewUiEffect
     data object MoveToBack : PreviewUiEffect
-    data class ShowSnackBer(
+    data class ShowSnackBar(
         @StringRes val defaultResId: Int,
         val message: String? = null
     ) : PreviewUiEffect

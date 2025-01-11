@@ -87,7 +87,7 @@ open class PreviewViewModel @Inject constructor(
             .onFailure {
                 //TODO : 추후 재시도 UI 나오면 실패 상태로 변경(재시도 UI 노출)
                 sendEffect(
-                    PreviewUiEffect.ShowSnackBer(
+                    PreviewUiEffect.ShowSnackBar(
                         defaultResId = R.string.failed_get_test,
                         message = it.message
                     )
@@ -101,7 +101,7 @@ open class PreviewViewModel @Inject constructor(
         val isExistUnresolvedProblem = selectedOptions.size < uiState.value.questions.size
         if (isExistUnresolvedProblem) {
             sendEffect(
-                PreviewUiEffect.ShowSnackBer(
+                PreviewUiEffect.ShowSnackBar(
                     defaultResId = R.string.failed_submit_test_problems_remain,
                 )
             )
@@ -112,7 +112,7 @@ open class PreviewViewModel @Inject constructor(
             .onSuccess { sendEffect(PreviewUiEffect.MoveToGuide) }
             .onFailure {
                 sendEffect(
-                    PreviewUiEffect.ShowSnackBer(
+                    PreviewUiEffect.ShowSnackBar(
                         defaultResId = R.string.failed_submit_test,
                         message = it.message
                     )
