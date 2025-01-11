@@ -9,7 +9,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.core.data.user.userApi)
+    implementation(projects.core.data.token.tokenApi)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

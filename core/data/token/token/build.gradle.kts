@@ -1,10 +1,11 @@
+import com.qriz.app.setNamespace
+
 plugins {
-    id("qriz.android.library")
     id("qriz.android.library.testable")
 }
 
 android {
-    namespace = "com.qriz.core.data.token.token"
+    setNamespace("core.data.token.token")
 }
 
 dependencies {

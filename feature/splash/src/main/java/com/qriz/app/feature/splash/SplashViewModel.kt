@@ -3,7 +3,7 @@ package com.qriz.app.feature.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.feature.splash.model.SplashEffect
-import com.quiz.app.core.data.user.user_api.repository.UserRepository
+import com.qriz.core.data.token.token_api.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharedFlow
@@ -15,14 +15,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    userRepository: UserRepository,
+    tokenRepository: TokenRepository,
 ) : ViewModel() {
 
     @OptIn(FlowPreview::class)
-    val effect: SharedFlow<SplashEffect> = userRepository.flowLogin
+    val effect: SharedFlow<SplashEffect> = tokenRepository.flowTokenExist
         .debounce(2000)
-        .map {
-            SplashEffect.CheckLogin(it)
+        .map { isTokenExist ->
+            SplashEffect.CheckLogin(isTokenExist)
         }.shareIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,

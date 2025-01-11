@@ -7,29 +7,36 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.qriz.app.crypto.CryptographyHelper
+import com.qriz.app.core.datastore.crypto.CryptographyUtil
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TokenDataStore(context: Context) {
+@Singleton
+class TokenDataStore @Inject constructor(
+    @ApplicationContext context: Context,
+    private val cryptographyUtil: CryptographyUtil,
+) {
     private val dataStore: DataStore<Preferences> = context.dataStore
 
     fun flowAccessToken(): Flow<String> =
         dataStore.data.catch { emit(emptyPreferences()) }.map { preferences ->
                 val saved = preferences[ACCESS_TOKEN_KEY]
-                saved?.let { CryptographyHelper.decrypt(it) } ?: ""
+                saved?.let { cryptographyUtil.decrypt(it) } ?: ""
             }
 
     fun flowRefreshToken(): Flow<String> =
         dataStore.data.catch { emit(emptyPreferences()) }.map { preferences ->
                 val saved = preferences[REFRESH_TOKEN_KEY]
-                saved?.let { CryptographyHelper.decrypt(it) } ?: ""
+                saved?.let { cryptographyUtil.decrypt(it) } ?: ""
             }
 
     suspend fun saveToken(accessToken: String, refreshToken: String) {
-        val encryptedAccessToken = CryptographyHelper.encrypt(accessToken)
-        val encryptedRefreshToken = CryptographyHelper.encrypt(refreshToken)
+        val encryptedAccessToken = cryptographyUtil.encrypt(accessToken)
+        val encryptedRefreshToken = cryptographyUtil.encrypt(refreshToken)
 
         dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN_KEY] = encryptedAccessToken

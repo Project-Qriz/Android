@@ -122,8 +122,6 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 retrofit = [
     "retrofit",
     "retrofit-kotlin-serialization",
-    "okhttp3-logging-interceptor",
-    "okhttp3-mock-webserver"
 ]
 
 unit-test = [

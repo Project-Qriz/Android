@@ -2,6 +2,7 @@ package com.qriz.app.core.datastore.di
 
 import android.content.Context
 import com.qriz.app.core.datastore.TokenDataStore
+import com.qriz.app.core.datastore.crypto.CryptographyUtil
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,9 +14,4 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 internal object DataStoreModule {
 
-    @Provides
-    @Singleton
-    fun providesTokenDataStore(
-        @ApplicationContext context: Context
-    ): TokenDataStore = TokenDataStore(context)
 }

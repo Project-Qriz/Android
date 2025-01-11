@@ -1,7 +1,9 @@
+import com.qriz.app.setNamespace
+
 plugins {
     id("qriz.android.library")
 }
 
 android {
-    namespace = "com.qriz.core.data.token.token_api"
+    setNamespace("core.data.token.token_api")
 }

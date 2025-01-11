@@ -1,4 +1,4 @@
-package com.qriz.app.crypto
+package com.qriz.app.core.datastore.crypto
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
@@ -8,15 +8,11 @@ import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
+import javax.inject.Inject
+import javax.inject.Singleton
 
-internal object CryptographyHelper {
-    private const val ANDROID_KEYSTORE = "AndroidKeyStore"
-    private const val ALIAS = "token"
-    private const val ENGINE = KeyProperties.KEY_ALGORITHM_AES
-    private const val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
-    private const val PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7
-    private const val CIPHER_TRANSFORMATION = "$ENGINE/$BLOCK_MODE/$PADDING"
-    private const val DELIMITER = "|"
+@Singleton
+class CryptographyUtil @Inject constructor() {
     private val keystore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
 
     private val key: SecretKey = keystore.getKey(ALIAS, null) as? SecretKey ?: createKey()
@@ -62,4 +58,14 @@ internal object CryptographyHelper {
 
     private fun String.decode(): ByteArray =
         Base64.decode(this, Base64.NO_WRAP)
+
+    companion object {
+        private const val ANDROID_KEYSTORE = "AndroidKeyStore"
+        private const val ALIAS = "token"
+        private const val ENGINE = KeyProperties.KEY_ALGORITHM_AES
+        private const val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
+        private const val PADDING = KeyProperties.ENCRYPTION_PADDING_PKCS7
+        private const val CIPHER_TRANSFORMATION = "$ENGINE/$BLOCK_MODE/$PADDING"
+        private const val DELIMITER = "|"
+    }
 }
