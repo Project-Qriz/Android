@@ -46,8 +46,8 @@ class TokenDataStore @Inject constructor(
 
     suspend fun clearToken() {
         dataStore.edit { preferences ->
-            preferences[ACCESS_TOKEN_KEY] = ""
-            preferences[REFRESH_TOKEN_KEY] = ""
+            preferences.remove(ACCESS_TOKEN_KEY)
+            preferences.remove(REFRESH_TOKEN_KEY)
         }
     }
 

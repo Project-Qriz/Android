@@ -2,6 +2,7 @@ package com.qriz.app.core.network.core.interceptor
 
 import com.qriz.app.core.network.core.const.REFRESH_TOKEN_HEADER_KEY
 import com.qriz.core.data.token.token_api.TokenRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
 import okhttp3.Request
@@ -13,8 +14,8 @@ class TokenAuthenticator @Inject constructor(
     private val tokenRepository: TokenRepository
 ): Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
-        val token = runBlocking { tokenRepository.getAccessToken() }
-        return if (token != null) {
+        val isTokenExist = runBlocking { tokenRepository.flowTokenExist.first() }
+        return if (isTokenExist) {
             val refreshToken = runBlocking { tokenRepository.getRefreshToken() }
             refreshToken?.let {
                 response.request

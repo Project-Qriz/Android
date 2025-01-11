@@ -11,6 +11,7 @@ import com.qriz.core.data.token.token_api.TokenRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -145,6 +146,7 @@ class RetrofitTest {
                 .setBody(successResponseBody)
         )
 
+        coEvery { mockTokenRepository.flowTokenExist } returns flow { emit(true) }
         coEvery { mockTokenRepository.getAccessToken() } returns accessToken
         coEvery { mockTokenRepository.getRefreshToken() } returns refreshToken
 
