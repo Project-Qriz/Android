@@ -99,7 +99,7 @@ fun SignUpContent(
     Column {
         QrizTopBar(
             title = stringResource(uiState.topBarTitleResId),
-            navigationType = NavigationType.Back,
+            navigationType = NavigationType.BACK,
             onNavigationClick = onClickPreviousPage
         )
         LinearProgressIndicator(
