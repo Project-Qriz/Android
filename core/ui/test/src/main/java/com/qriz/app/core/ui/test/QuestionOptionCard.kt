@@ -21,17 +21,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Gray100
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
 
 @Composable
-fun TestOptionCard(
+fun QuestionOptionCard(
     state: TestOptionState,
     number: Int,
-    option: Option,
+    optionDescription: String,
     modifier: Modifier = Modifier,
 ) {
     val numberBackground = when (state) {
@@ -106,7 +105,7 @@ fun TestOptionCard(
             }
 
             Text(
-                text = option.description,
+                text = optionDescription,
                 style = QrizTheme.typography.body2,
                 modifier = Modifier
                     .weight(1f)
@@ -126,20 +125,20 @@ private fun TestOptionCardPreview() {
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            TestOptionCard(
+            QuestionOptionCard(
                 state = TestOptionState.None,
                 number = 1,
-                option = Option("선택지 1번")
+                optionDescription = "선택지 1번"
             )
-            TestOptionCard(
+            QuestionOptionCard(
                 state = TestOptionState.SelectedOrCorrect,
                 number = 2,
-                option = Option("선택지 2번")
+                optionDescription = "선택지 2번"
             )
-            TestOptionCard(
+            QuestionOptionCard(
                 state = TestOptionState.SelectedAndIncorrect,
                 number = 3,
-                option = Option("선택지 3번")
+                optionDescription = "선택지 3번"
             )
         }
     }

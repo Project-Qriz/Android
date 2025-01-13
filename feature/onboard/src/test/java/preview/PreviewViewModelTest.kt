@@ -6,12 +6,17 @@ import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Question
 import com.qriz.app.core.testing.MainDispatcherRule
+import com.qriz.app.core.ui.test.mapper.toGeneralOptionItem
+import com.qriz.app.core.ui.test.mapper.toQuestionTestItem
+import com.qriz.app.core.ui.test.model.GeneralOptionItem
+import com.qriz.app.core.ui.test.model.SelectedOrCorrectOptionItem
 import com.qriz.app.feature.onboard.preview.PreviewUiAction
 import com.qriz.app.feature.onboard.preview.PreviewUiEffect
 import com.qriz.app.feature.onboard.preview.PreviewUiState
 import com.qriz.app.feature.onboard.preview.PreviewViewModel
 import com.qriz.app.feature.onboard.preview.PreviewViewModel.Companion.IS_TEST_FLAG
 import com.qriz.app.feature.onboard.preview.PreviewViewModel.Companion.toMilliSecond
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
@@ -40,18 +45,19 @@ class PreviewViewModelTest {
     )
 
     @Test
-    fun `Action_LoadPreviewTest process 성공 - 상태 업데이트, 타이머 시작`() = runTest {
+    fun `Action_ObservePreviewTestItem process 성공 - 상태 업데이트, 타이머 시작`() = runTest {
         with(previewViewModel()) {
             // given
             coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
 
             // when
-            process(PreviewUiAction.LoadPreviewTest)
+            process(PreviewUiAction.ObservePreviewTestItem)
 
             // then
             uiState.test {
                 with(awaitItem()) {
-                    questions shouldBe fakeTest.questions.toImmutableList()
+                    questions shouldBe fakeTest.questions.toQuestionTestItem(emptyMap())
+                        .toImmutableList()
                     remainTimeMs shouldBe fakeTest.totalTimeLimit.toMilliSecond()
                     totalTimeLimitMs shouldBe fakeTest.totalTimeLimit.toMilliSecond()
                     isLoading shouldBe false
@@ -62,20 +68,21 @@ class PreviewViewModelTest {
     }
 
     @Test
-    fun `Action_LoadPreviewTest process 실패 - Effect_ShowSnackBar 발생`() = runTest {
+    fun `Action_ObservePreviewTestItem process 실패 - Effect_ShowSnackBar 발생, 타이머 시작되지 않음`() = runTest {
         with(previewViewModel()) {
             // given
             coEvery { fakeOnBoardRepository.getPreviewTest() } throws Exception()
             // when
-            process(PreviewUiAction.LoadPreviewTest)
+            process(PreviewUiAction.ObservePreviewTestItem)
             //then
             uiState.test { awaitItem().isLoading shouldBe false }
             effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBar) shouldBe true }
+            timerJob.shouldBeNull()
         }
     }
 
     @Test
-    fun `Action_LoadPreviewTest process 로딩 상태 - API호출되지 않음`() = runTest {
+    fun `Action_ObservePreviewTestItem process 로딩 상태 - API호출되지 않음`() = runTest {
         // given
         coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
         val previewViewModel = object : PreviewViewModel(
@@ -88,7 +95,7 @@ class PreviewViewModelTest {
         }
         with(previewViewModel) {
             // when
-            process(PreviewUiAction.LoadPreviewTest)
+            process(PreviewUiAction.ObservePreviewTestItem)
             //then
             coVerify(exactly = 0) { fakeOnBoardRepository.getPreviewTest() }
         }
@@ -98,18 +105,40 @@ class PreviewViewModelTest {
     fun `Action_SelectOption process - 해당 질문의 선택된 옵션이 업데이트 됨`() = runTest {
         with(previewViewModel()) {
             // given
+            coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
             val selectedQuestion = fakeTest.questions.first()
-            val selectedOption = selectedQuestion.options.first()
+            val selectedOption1 = selectedQuestion.options.first().toGeneralOptionItem()
+            process(PreviewUiAction.ObservePreviewTestItem)
             process(
                 PreviewUiAction.SelectOption(
                     questionID = selectedQuestion.id,
-                    option = selectedOption
+                    option = selectedOption1
                 )
             )
 
             // when & then
             uiState.test {
-                awaitItem().selectedOptions[selectedQuestion.id] shouldBe selectedOption
+                val targetQuestion = awaitItem().questions.first { it.id == selectedQuestion.id }
+                (targetQuestion.options.first() is SelectedOrCorrectOptionItem) shouldBe true
+                targetQuestion.options.count { it is SelectedOrCorrectOptionItem } shouldBe 1
+                targetQuestion.options.count { it is GeneralOptionItem } shouldBe targetQuestion.options.size - 1
+            }
+
+            // given
+            val selectedOption2 = selectedQuestion.options.last().toGeneralOptionItem()
+            process(
+                PreviewUiAction.SelectOption(
+                    questionID = selectedQuestion.id,
+                    option = selectedOption2
+                )
+            )
+
+            // when & then
+            uiState.test {
+                val targetQuestion = awaitItem().questions.first { it.id == selectedQuestion.id }
+                (targetQuestion.options.last() is SelectedOrCorrectOptionItem) shouldBe true
+                targetQuestion.options.count { it is SelectedOrCorrectOptionItem } shouldBe 1
+                targetQuestion.options.count { it is GeneralOptionItem } shouldBe targetQuestion.options.size - 1
             }
         }
     }
@@ -195,13 +224,13 @@ class PreviewViewModelTest {
             with(previewViewModel()) {
                 // given
                 coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
-                process(PreviewUiAction.LoadPreviewTest)
+                process(PreviewUiAction.ObservePreviewTestItem)
 
                 fakeTest.questions.dropLast(1).forEach { selectedQuestion ->
                     process(
                         PreviewUiAction.SelectOption(
                             questionID = selectedQuestion.id,
-                            option = selectedQuestion.options.first()
+                            option = selectedQuestion.options.first().toGeneralOptionItem()
                         )
                     )
                 }
@@ -232,7 +261,7 @@ class PreviewViewModelTest {
         with(previewViewModel()) {
             // given
             coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
-            process(PreviewUiAction.LoadPreviewTest)
+            process(PreviewUiAction.ObservePreviewTestItem)
             (1..5).forEach { seconds ->
                 // when
                 advanceTimeBy(1010)
@@ -252,13 +281,13 @@ class PreviewViewModelTest {
         with(previewViewModel()) {
             // given
             coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
-            process(PreviewUiAction.LoadPreviewTest)
+            process(PreviewUiAction.ObservePreviewTestItem)
 
             fakeTest.questions.dropLast(1).forEach { selectedQuestion ->
                 process(
                     PreviewUiAction.SelectOption(
                         questionID = selectedQuestion.id,
-                        option = selectedQuestion.options.first()
+                        option = selectedQuestion.options.first().toGeneralOptionItem()
                     )
                 )
             }

@@ -9,7 +9,4 @@ android {
 }
 
 dependencies {
-    compileOnly(
-        libs.compose.stable.marker,
-    )
 }

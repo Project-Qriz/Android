@@ -11,7 +11,7 @@ import com.qriz.app.core.designsystem.component.QrizCard
 import com.qriz.app.core.designsystem.theme.QrizTheme
 
 @Composable
-fun TestDescriptionCard(
+fun QuestionDescriptionCard(
     description: String,
     modifier: Modifier = Modifier,
 ) {
@@ -33,7 +33,7 @@ fun TestDescriptionCard(
 @Composable
 fun TestDescriptionCardPreview() {
     QrizTheme {
-        TestDescriptionCard("다음 중 GROUP BY 절의 특징으로 올바르지 않은 것은?")
+        QuestionDescriptionCard("다음 중 GROUP BY 절의 특징으로 올바르지 않은 것은?")
     }
 }
 

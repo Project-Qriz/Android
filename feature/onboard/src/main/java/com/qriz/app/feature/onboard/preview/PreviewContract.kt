@@ -2,29 +2,22 @@ package com.qriz.app.feature.onboard.preview
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
-import com.qriz.app.core.data.test.test_api.model.Option
-import com.qriz.app.core.data.test.test_api.model.Question
+import com.qriz.app.core.ui.test.model.OptionItem
+import com.qriz.app.core.ui.test.model.QuestionTestItem
 import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
 
 @Immutable
 data class PreviewUiState(
     val isLoading: Boolean,
-    val questions: ImmutableList<Question>,
-    val selectedOptions: ImmutableMap<Long, Option>,
+    val questions: ImmutableList<QuestionTestItem>,
     val remainTimeMs: Long,
     val totalTimeLimitMs: Long,
     val currentIndex: Int,
 ) : UiState {
-    val canTurnNextPage: Boolean =
-        questions.isNotEmpty()
-                && selectedOptions.containsKey(questions[currentIndex].id)
-
     val progressPercent: Float = when {
         (totalTimeLimitMs == 0L) -> 0f
         else -> remainTimeMs.toFloat() / totalTimeLimitMs.toFloat()
@@ -42,7 +35,6 @@ data class PreviewUiState(
         val Default = PreviewUiState(
             isLoading = false,
             questions = persistentListOf(),
-            selectedOptions = persistentMapOf(),
             remainTimeMs = 0,
             totalTimeLimitMs = 0,
             currentIndex = 0,
@@ -51,10 +43,10 @@ data class PreviewUiState(
 }
 
 sealed interface PreviewUiAction : UiAction {
-    data object LoadPreviewTest : PreviewUiAction
+    data object ObservePreviewTestItem : PreviewUiAction
     data class SelectOption(
         val questionID: Long,
-        val option: Option
+        val option: OptionItem
     ) : PreviewUiAction
 
     data object ClickNextPage : PreviewUiAction

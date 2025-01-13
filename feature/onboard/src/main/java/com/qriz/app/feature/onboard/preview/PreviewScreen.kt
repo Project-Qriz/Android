@@ -31,15 +31,13 @@ fun PreviewScreen(
 
     TestScreen(
         questions = uiState.questions,
-        selectedOptions = uiState.selectedOptions,
         testTimeType = TestTimeType.TOTAL,
         progressPercent = uiState.progressPercent,
         remainTimeText = uiState.remainTimeText,
         currentIndex = uiState.currentIndex,
-        canTurnNextPage = uiState.canTurnNextPage,
         isLoading = uiState.isLoading,
-        onSelectOption = { id, answer ->
-            viewModel.process(PreviewUiAction.SelectOption(questionID = id, option = answer))
+        onSelectOption = { id, option ->
+            viewModel.process(PreviewUiAction.SelectOption(questionID = id, option = option))
         },
         onClickNextPage = { viewModel.process(PreviewUiAction.ClickNextPage) },
         onClickSubmit = { viewModel.process(PreviewUiAction.ClickSubmit) },
