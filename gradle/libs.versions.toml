@@ -53,6 +53,9 @@ mockk = "1.13.11"
 # https://github.com/cashapp/turbine
 turbine = "1.1.0"
 
+# https://github.com/skydoves/compose-stable-marker
+compose-stable-marker = "1.0.4"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -107,6 +110,9 @@ okhttp3-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 compose-compiler-gradle-plugin = { group = "org.jetbrains.kotlin", name = "compose-compiler-gradle-plugin", version.ref = "kotlin" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+
+# compose-stable-marker
+compose-stable-marker = { group = "com.github.skydoves", name = "compose-stable-marker", version.ref = "compose-stable-marker" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

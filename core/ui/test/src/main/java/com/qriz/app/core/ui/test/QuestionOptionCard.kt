@@ -1,4 +1,4 @@
-package com.qriz.app.core.designsystem.component
+package com.qriz.app.core.ui.test
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -27,10 +27,10 @@ import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
 
 @Composable
-fun TestOptionCard(
+fun QuestionOptionCard(
     state: TestOptionState,
     number: Int,
-    content: String,
+    optionDescription: String,
     modifier: Modifier = Modifier,
 ) {
     val numberBackground = when (state) {
@@ -57,13 +57,13 @@ fun TestOptionCard(
         }
     }
 
-    val backgroundColor = when(state) {
+    val backgroundColor = when (state) {
         TestOptionState.None -> MaterialTheme.colorScheme.surface
         TestOptionState.SelectedOrCorrect -> MaterialTheme.colorScheme.primaryContainer
         TestOptionState.SelectedAndIncorrect -> Color(0x33EF5D5D)
     }
 
-    val textColor = when(state) {
+    val textColor = when (state) {
         TestOptionState.None -> Black
         TestOptionState.SelectedOrCorrect,
         TestOptionState.SelectedAndIncorrect -> White
@@ -73,7 +73,7 @@ fun TestOptionCard(
         modifier = modifier.fillMaxWidth(),
         color = backgroundColor,
         shape = RoundedCornerShape(10.dp),
-        border = if(state == TestOptionState.None) {
+        border = if (state == TestOptionState.None) {
             BorderStroke(
                 color = Gray100,
                 width = 1.dp,
@@ -83,10 +83,12 @@ fun TestOptionCard(
         }
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(
-                horizontal = 18.dp,
-                vertical = 12.dp,
-            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 18.dp,
+                    vertical = 12.dp,
+                ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
@@ -97,14 +99,14 @@ fun TestOptionCard(
             ) {
                 Text(
                     text = number.toString(),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = QrizTheme.typography.headline2,
                     color = textColor,
                 )
             }
 
             Text(
-                text = content,
-                style = MaterialTheme.typography.bodyMedium,
+                text = optionDescription,
+                style = QrizTheme.typography.body2,
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 16.dp)
@@ -123,26 +125,27 @@ private fun TestOptionCardPreview() {
         Column(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            TestOptionCard(
+            QuestionOptionCard(
                 state = TestOptionState.None,
                 number = 1,
-                content = "선택지 1번"
+                optionDescription = "선택지 1번"
             )
-            TestOptionCard(
+            QuestionOptionCard(
                 state = TestOptionState.SelectedOrCorrect,
                 number = 2,
-                content = "선택지 2번"
+                optionDescription = "선택지 2번"
             )
-
-            TestOptionCard(
+            QuestionOptionCard(
                 state = TestOptionState.SelectedAndIncorrect,
                 number = 3,
-                content = "선택지 3번"
+                optionDescription = "선택지 3번"
             )
         }
     }
 }
 
 enum class TestOptionState {
-    None, SelectedOrCorrect, SelectedAndIncorrect;
+    None,
+    SelectedOrCorrect,
+    SelectedAndIncorrect
 }

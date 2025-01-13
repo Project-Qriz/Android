@@ -10,4 +10,5 @@ android {
 
 dependencies {
     implementation(projects.core.data.onboard.onboardApi)
+    implementation(projects.core.ui.test)
 }

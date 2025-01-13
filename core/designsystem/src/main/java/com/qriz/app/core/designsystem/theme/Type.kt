@@ -48,16 +48,16 @@ val Typography = QrizTypography(
         lineHeight = 24.sp,
     ),
     headline2 = BoldStyle.copy(
-        fontSize = 17.sp,
+        fontSize = 16.sp,
         lineHeight = 23.sp,
     ),
 
     subhead = BoldStyle.copy(
-        fontSize = 16.sp,
+        fontSize = 14.sp,
         lineHeight = 22.sp,
     ),
     subheadLong = BoldStyle.copy(
-        fontSize = 16.sp,
+        fontSize = 14.sp,
         lineHeight = 28.sp,
     ),
 
