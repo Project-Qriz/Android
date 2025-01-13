@@ -1,6 +1,5 @@
 package com.qriz.app.feature.sign.signup
 
-import android.util.Patterns
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.qriz.app.feature.base.UiAction
@@ -13,7 +12,6 @@ import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.ID
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.NAME
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.PW
 import com.qriz.app.feature.sign.signup.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
-import java.util.regex.Pattern
 
 @Immutable
 data class SignUpUiState(
@@ -34,7 +32,8 @@ data class SignUpUiState(
     val page: SignUpPage,
     val timer: Long,
 ) : UiState {
-    val emailVerified: Boolean = Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val emailVerified: Boolean
+        get() = EMAIL_REGEX.matches(email)
 
     val topBarTitleResId: Int = when (page) {
         NAME -> R.string.screen_title_enter_name
@@ -45,10 +44,12 @@ data class SignUpUiState(
     val timerText: String =
         "${(timer / 60000)}:${(timer % 60000 / 1000).toString().padStart(2, '0')}"
 
-    val canSignUp: Boolean = Pattern.compile("^[a-zA-Z0-9]{8,10}$").matcher(pw).matches()
-            && pw == pwCheck
+    val canSignUp: Boolean
+        get() = PW_REGEX.matches(pw)
+                && pw == pwCheck
 
-    val validName: Boolean = """[가-힣]{2,}""".toRegex().matches(name)
+    val validName: Boolean
+        get() = USER_NAME_REGEX.matches(name)
 
     enum class AuthenticationState {
         None, Verified, Unverified;
@@ -88,6 +89,38 @@ data class SignUpUiState(
             page = NAME,
             timer = AUTHENTICATION_LIMIT_MILS,
         )
+
+        //TODO : 아이디부분 10자 짧은 것같아 서버 수정 대기중
+        /**
+         * 1. 이메일 아이디 부분 : 영문 대소문자와 숫자만 허용, 최소 2자 최대 10자까지 가능
+         * 2. 도메인 이름 부분 : 영문 대소문자와 숫자만 허용, 최소 2자 최대 6자까지 가능
+         * 3. 최상위 도메인 부분 : 영문 대소문자만 허용, 최소 2자 최대 3자까지 가능 (예: com, net, org)
+         */
+        private val EMAIL_REGEX =
+            ("[a-zA-Z0-9+._%\\-]{1,256}@"
+                    + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}"
+                    + "(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+").toRegex()
+
+        /**
+         * 1. 길이 6자 이상 20자 이하
+         * 2. 영문과 숫자를 반드시 둘 다 포함
+         * 3. 공백 불포함
+         * 4. 특수문자 불포함
+         */
+        private val ID_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,20}\$".toRegex()
+
+        /**
+         * 1. 길이 : 최소 8 ~ 16 자
+         * 2. 대문자 포함 : 최소 한 개의 대문자를 포함
+         * 3. 소문자 포함 : 최소 한 개의 소문자를 포함
+         * 4. 숫자 포함 : 하나 이상의 숫자 포함
+         * 5. 특수 문자 포함 : 하나 이상의 특수 문자 포함
+         */
+        private val PW_REGEX =
+            "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=*!])(?=\\S+$).{8,16}$".toRegex()
+
+        /** 한글/영문 1~20자 이내 */
+        private val USER_NAME_REGEX = "^[a-zA-Z가-힣]{1,20}\$".toRegex()
     }
 }
 
