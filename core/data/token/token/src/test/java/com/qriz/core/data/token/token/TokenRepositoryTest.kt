@@ -17,7 +17,7 @@ class TokenRepositoryTest {
     @get:Rule
     val testDispatcher = MainDispatcherRule()
 
-    private val dataStore = mockk<TokenDataStore>()
+    private val dataStore = mockk<TokenDataStore>(relaxed = true)
 
     private val repository = TokenRepositoryImpl(dataStore)
 
