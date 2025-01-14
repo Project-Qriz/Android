@@ -4,19 +4,13 @@ import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.network.user.mapper.toDataModel
 import com.qriz.app.core.network.user.model.request.JoinRequest
 import com.qriz.app.core.network.user.model.request.LoginRequest
-import com.qriz.app.core.datastore.UserDataStore
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 internal class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
-    userDataStore: UserDataStore,
 ) : UserRepository {
-    override val flowLogin: Flow<Boolean> = userDataStore.flowRefreshToken().map { it.isNotEmpty() }
-
     override suspend fun login(id: String, password: String): User {
         val response = userApi.login(
             LoginRequest(

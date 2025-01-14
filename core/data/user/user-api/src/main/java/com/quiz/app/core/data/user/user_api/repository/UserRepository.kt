@@ -1,11 +1,8 @@
 package com.quiz.app.core.data.user.user_api.repository
 
 import com.quiz.app.core.data.user.user_api.model.User
-import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    val flowLogin: Flow<Boolean>
-
     suspend fun login(
         id: String,
         password: String,

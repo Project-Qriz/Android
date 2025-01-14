@@ -1,5 +1,7 @@
-package com.qriz.app.core.network.core
+package com.qriz.app.core.network.core.di
 
+import com.qriz.app.core.network.core.interceptor.AuthInterceptor
+import com.qriz.app.core.network.core.interceptor.TokenAuthenticator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,13 +35,17 @@ object RetrofitModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(
+        authenticator: TokenAuthenticator,
+        authInterceptor: AuthInterceptor,
+    ): OkHttpClient {
         val builder = OkHttpClient.Builder()
 
         val logging = HttpLoggingInterceptor()
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
         builder.addInterceptor(logging)
-
+        builder.addInterceptor(authInterceptor)
+        builder.authenticator(authenticator)
         return builder.build()
     }
 
@@ -48,6 +54,5 @@ object RetrofitModule {
     fun providesJson() = Json {
         ignoreUnknownKeys = true
         prettyPrint = true
-
     }
 }
