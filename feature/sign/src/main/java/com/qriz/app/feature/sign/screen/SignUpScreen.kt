@@ -73,7 +73,7 @@ fun SignUpScreen(
     Column {
         QrizTopBar(
             title = state.topBarTitle,
-            navigationType = if (state.page == 0) NavigationType.None else NavigationType.Back,
+            navigationType = if (state.page == 0) NavigationType.NONE else NavigationType.BACK,
             onNavigationClick = viewModel::previousPage
         )
         LinearProgressIndicator(

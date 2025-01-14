@@ -1,13 +1,10 @@
 package com.qriz.app.feature.onboard.survey
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,16 +12,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
+import com.qriz.app.core.designsystem.component.NavigationType
 import com.qriz.app.core.designsystem.component.QrizButton
+import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.onboard.survey.component.SurveyItemCard
@@ -32,6 +29,8 @@ import com.qriz.app.feature.onboard.survey.model.SurveyListItem
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem.KnowsAll
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem.KnowsNothing
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem.SurveyItem
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun ConceptCheckScreen(
@@ -74,7 +73,7 @@ fun ConceptCheckScreen(
 
 @Composable
 private fun ConceptCheckContent(
-    surveyItems: List<SurveyListItem>,
+    surveyItems: ImmutableList<SurveyListItem>,
     isPossibleSubmit: Boolean,
     onClickKnowsAll: (isChecked: Boolean) -> Unit,
     onClickKnowsNothing: (isChecked: Boolean) -> Unit,
@@ -85,18 +84,11 @@ private fun ConceptCheckContent(
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
-        Box(
-            modifier = Modifier
-                .height(48.dp)
-                .clickable { onClickCancel() },
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "취소",
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 18.dp)
-            )
-        }
+        QrizTopBar(
+            navigationType = NavigationType.CANCEL,
+            onNavigationClick = onClickCancel,
+            background = MaterialTheme.colorScheme.background,
+        )
 
         Text(
             text = """아는 개념을 체크해주세요!""",
@@ -186,7 +178,7 @@ private fun ConceptCheckContent(
 fun ConceptCheckContentPreview() {
     QrizTheme {
         ConceptCheckContent(
-            surveyItems = emptyList(),
+            surveyItems = persistentListOf(),
             isPossibleSubmit = false,
             onClickKnowsAll = {},
             onClickKnowsNothing = {},

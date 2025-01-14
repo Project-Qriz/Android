@@ -1,4 +1,11 @@
 <resources>
+    <!--Survey-->
     <string name="know_nothing_about_concepts">모든 개념을 처음 봐요 \uD83D\uDE05</string>
     <string name="know_all_about_concepts">전부 아는 개념이에요! \uD83D\uDE06</string>
+
+    <!--Preview-->
+    <string name="failed_get_test">시험 목록을 가져오지 못했습니다.</string>
+    <string name="failed_submit_test">시험 제출을 실패했습니다.</string>
+    <string name="failed_submit_test_problems_remain">해결되지 않은 문제가 있습니다!</string>
+
 </resources>
