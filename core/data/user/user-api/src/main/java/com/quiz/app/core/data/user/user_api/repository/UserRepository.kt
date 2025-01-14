@@ -8,11 +8,11 @@ interface UserRepository {
         password: String,
     ): User
 
-    suspend fun sendAuthenticationNumber(email: String): Boolean
+    suspend fun sendAuthenticationNumber(email: String)
 
     suspend fun verifyAuthenticationNumber(authenticationNumber: String): Boolean
 
-    suspend fun checkDuplicateId(id: String): Boolean
+    suspend fun isNotDuplicateId(id: String): Boolean
 
     suspend fun signUp(
         loginId: String,

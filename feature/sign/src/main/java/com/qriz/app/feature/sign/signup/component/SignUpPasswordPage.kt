@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.SupportingText
 import com.qriz.app.feature.sign.R
+import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.PW_MAX_LENGTH
 
 @Composable
 fun SignUpPasswordPage(
@@ -53,8 +54,9 @@ fun SignUpPasswordPage(
             onValueChange = onChangeUserPw,
             supportingText = passwordSupportingText,
             singleLine = true,
+            //TODO : 변경된 비밀번호 조건에 맞는 hint UI 업데이트 필요 (디자인 수정 대기중)
             hint = stringResource(R.string.sign_up_password_page_hint),
-            maxLength = 10,
+            maxLength = PW_MAX_LENGTH,
             modifier = Modifier.padding(bottom = 12.dp),
             visualTransformation = PasswordVisualTransformation(),
             contentPadding = PaddingValues(
@@ -69,7 +71,7 @@ fun SignUpPasswordPage(
             supportingText = passwordCheckSupportingText,
             singleLine = true,
             hint = stringResource(R.string.sign_up_password_page_hint_check),
-            maxLength = 10,
+            maxLength = PW_MAX_LENGTH,
             visualTransformation = PasswordVisualTransformation(),
             contentPadding = PaddingValues(
                 horizontal = 16.dp,

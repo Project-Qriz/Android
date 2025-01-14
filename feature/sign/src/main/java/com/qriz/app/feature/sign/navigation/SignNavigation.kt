@@ -28,7 +28,7 @@ fun NavGraphBuilder.signNavGraph(
     composable<Route.SignUp> {
         SignUpScreen(
             onBack = onBack,
-            onSignUp = onSignUpComplete,
+            onSignUpComplete = onSignUpComplete,
             onShowSnackbar = onShowSnackbar,
         )
     }

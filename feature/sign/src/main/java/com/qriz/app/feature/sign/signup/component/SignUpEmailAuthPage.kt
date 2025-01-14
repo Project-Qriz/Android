@@ -11,34 +11,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.SupportingText
 import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Mint800
+import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.sign.R
-import com.qriz.app.feature.sign.signup.SignUpUiState.AuthenticationState
 
 @Composable
 fun SignUpEmailAuthPage(
     emailAuthNumber: String,
-    emailAuthState: AuthenticationState,
+    isVerifiedEmailAuth: Boolean,
     timer: String,
     errorMessage: String,
     onChangeEmailAuthNum: (String) -> Unit,
     onClickEmailAuthNumSend: () -> Unit,
     onClickNextPage: () -> Unit,
 ) {
-    val supportingText = if (emailAuthState == AuthenticationState.Verified) {
+    val supportingText = if (isVerifiedEmailAuth) {
         SupportingText(
             message = stringResource(R.string.sign_up_auth_page_supporting_verified),
             color = Mint800
         )
     } else {
-        SupportingText(
+        if (errorMessage.isBlank()) null
+        else SupportingText(
             message = errorMessage,
             color = MaterialTheme.colorScheme.error,
         )
@@ -47,7 +46,7 @@ fun SignUpEmailAuthPage(
     SignUpBasePage(
         title = stringResource(R.string.sign_up_auth_page_title),
         subTitle = stringResource(R.string.sign_up_auth_page_sub_title),
-        buttonEnabled = emailAuthState == AuthenticationState.Verified,
+        buttonEnabled = isVerifiedEmailAuth,
         buttonText = stringResource(R.string.sign_up_auth_page_button_text),
         onButtonClick = onClickNextPage,
     ) {
@@ -55,6 +54,7 @@ fun SignUpEmailAuthPage(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             QrizTextFiled(
+                enabled = isVerifiedEmailAuth.not(),
                 value = emailAuthNumber,
                 supportingText = supportingText,
                 onValueChange = onChangeEmailAuthNum,
@@ -67,24 +67,31 @@ fun SignUpEmailAuthPage(
                     vertical = 14.dp,
                 ),
                 trailing = {
-                    Text(
-                        text = timer,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
+                    if (isVerifiedEmailAuth.not()) {
+                        Text(
+                            text = timer,
+                            style = QrizTheme.typography.body1,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                 },
             )
-            Text(
-                text = stringResource(R.string.sign_up_auth_page_retry),
-                color = Gray400,
-                style = TextStyle.Default.copy(
-                    fontSize = 12.sp,
-                    textDecoration = TextDecoration.Underline,
-                ),
-                modifier = Modifier
-                    .padding(5.dp)
-                    .clickable { onClickEmailAuthNumSend() },
-            )
+            if (isVerifiedEmailAuth.not()) {
+                Text(
+                    text = stringResource(R.string.sign_up_auth_page_retry),
+                    color = Gray400,
+                    style = QrizTheme.typography.subhead.copy(
+                        textDecoration = TextDecoration.Underline
+                    ),
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .clickable(
+                            enabled = isVerifiedEmailAuth.not(),
+                            onClick = { onClickEmailAuthNumSend() }
+                        )
+                        .padding(5.dp)
+                )
+            }
         }
     }
 }

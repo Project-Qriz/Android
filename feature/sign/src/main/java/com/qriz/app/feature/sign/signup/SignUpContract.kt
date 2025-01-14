@@ -28,13 +28,10 @@ data class SignUpUiState(
     val idErrorMessageResId: Int,
     val pwErrorMessageResId: Int,
     val pwCheckErrorMessageResId: Int,
-    val isAvailableId: Boolean,
     val page: SignUpPage,
+    val isNotDuplicatedId: Boolean,
     val timer: Long,
 ) : UiState {
-    val emailVerified: Boolean
-        get() = EMAIL_REGEX.matches(email)
-
     val topBarTitleResId: Int = when (page) {
         NAME -> R.string.screen_title_enter_name
         EMAIL, EMAIL_AUTH -> R.string.screen_title_email_auth
@@ -48,11 +45,26 @@ data class SignUpUiState(
         get() = PW_REGEX.matches(pw)
                 && pw == pwCheck
 
-    val validName: Boolean
+    val isValidEmail: Boolean
+        get() = EMAIL_REGEX.matches(email)
+
+    val isValidId: Boolean
+        get() = ID_REGEX.matches(id)
+
+    val isValidName: Boolean
         get() = USER_NAME_REGEX.matches(name)
 
+    val isVerifiedEmailAuth: Boolean
+        get() = emailAuthState == AuthenticationState.VERIFIED
+
+    val isTimeExpiredEmailAuth: Boolean
+        get() = emailAuthState == AuthenticationState.TIME_EXPIRED
+
+    val isSendFailedEmailAuth: Boolean
+        get() = emailAuthState == AuthenticationState.SEND_FAILED
+
     enum class AuthenticationState {
-        None, Verified, Unverified;
+        SEND_FAILED, NONE, VERIFIED, UNVERIFIED, TIME_EXPIRED;
     }
 
     enum class SignUpPage(val index: Int) {
@@ -78,15 +90,15 @@ data class SignUpUiState(
             pw = "",
             pwCheck = "",
             emailAuthNumber = "",
-            emailAuthState = AuthenticationState.None,
+            emailAuthState = AuthenticationState.NONE,
             emailErrorMessageResId = R.string.empty,
             emailAuthNumberErrorMessageResId = R.string.empty,
             idErrorMessageResId = R.string.empty,
             pwErrorMessageResId = R.string.empty,
             nameErrorMessageResId = R.string.empty,
             pwCheckErrorMessageResId = R.string.empty,
-            isAvailableId = false,
             page = NAME,
+            isNotDuplicatedId = false,
             timer = AUTHENTICATION_LIMIT_MILS,
         )
 
@@ -96,10 +108,8 @@ data class SignUpUiState(
          * 2. 도메인 이름 부분 : 영문 대소문자와 숫자만 허용, 최소 2자 최대 6자까지 가능
          * 3. 최상위 도메인 부분 : 영문 대소문자만 허용, 최소 2자 최대 3자까지 가능 (예: com, net, org)
          */
-        private val EMAIL_REGEX =
-            ("[a-zA-Z0-9+._%\\-]{1,256}@"
-                    + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}"
-                    + "(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+").toRegex()
+        val EMAIL_REGEX =
+            "^[a-zA-Z0-9]{2,10}@[a-zA-Z0-9]{2,6}\\\\.[a-zA-Z]{2,3}\$".toRegex()
 
         /**
          * 1. 길이 6자 이상 20자 이하
@@ -107,7 +117,8 @@ data class SignUpUiState(
          * 3. 공백 불포함
          * 4. 특수문자 불포함
          */
-        private val ID_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,20}\$".toRegex()
+        const val ID_MAX_LENGTH = 20
+        val ID_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,$ID_MAX_LENGTH}\$".toRegex()
 
         /**
          * 1. 길이 : 최소 8 ~ 16 자
@@ -116,11 +127,14 @@ data class SignUpUiState(
          * 4. 숫자 포함 : 하나 이상의 숫자 포함
          * 5. 특수 문자 포함 : 하나 이상의 특수 문자 포함
          */
-        private val PW_REGEX =
-            "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=*!])(?=\\S+$).{8,16}$".toRegex()
+        const val PW_MAX_LENGTH = 16
+        val PW_REGEX =
+            "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=*!])(?=\\S+$).{8,$PW_MAX_LENGTH}$".toRegex()
 
         /** 한글/영문 1~20자 이내 */
-        private val USER_NAME_REGEX = "^[a-zA-Z가-힣]{1,20}\$".toRegex()
+        const val USER_NAME_MAX_LENGTH = 20
+        val USER_NAME_REGEX = "^[a-zA-Z가-힣]{1,$USER_NAME_MAX_LENGTH}\$".toRegex()
+
     }
 }
 

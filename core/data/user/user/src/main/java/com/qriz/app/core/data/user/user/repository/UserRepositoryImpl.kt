@@ -1,5 +1,6 @@
 package com.qriz.app.core.data.user.user.repository
 
+import com.qriz.app.core.datastore.UserDataStore
 import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.network.user.mapper.toDataModel
 import com.qriz.app.core.network.user.model.request.JoinRequest
@@ -23,19 +24,26 @@ internal class UserRepositoryImpl @Inject constructor(
     }
 
     /* TODO: 주소 값 나오면 실제 API 연결 */
-    override suspend fun sendAuthenticationNumber(email: String): Boolean = true
+    var test = 0
+    override suspend fun sendAuthenticationNumber(email: String) {
+        if (test++ % 2 == 0) throw Exception()
+    }
 
     /* TODO: 주소 값 나오면 실제 API 연결 */
     override suspend fun verifyAuthenticationNumber(authenticationNumber: String): Boolean {
-        return true
+        return authenticationNumber == "123456"
     }
 
-    override suspend fun checkDuplicateId(id: String): Boolean {
-        return true
+    override suspend fun isNotDuplicateId(id: String): Boolean {
+        return id != "asd"
+//        throw Exception()
     }
 
     override suspend fun signUp(
-        loginId: String, password: String, email: String, nickname: String
+        loginId: String,
+        password: String,
+        email: String,
+        nickname: String
     ): User {
         userApi.signUp(
             JoinRequest(

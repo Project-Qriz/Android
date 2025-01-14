@@ -35,7 +35,7 @@ import com.qriz.app.feature.sign.signup.component.SignUpPasswordPage
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
-    onSignUp: () -> Unit,
+    onSignUpComplete: () -> Unit,
     onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
 ) {
@@ -43,7 +43,7 @@ fun SignUpScreen(
     val context = LocalContext.current
     viewModel.collectSideEffect {
         when (it) {
-            SignUpUiEffect.SignUpUiComplete -> onSignUp()
+            SignUpUiEffect.SignUpUiComplete -> onSignUpComplete()
             is SignUpUiEffect.ShowSnackBer -> onShowSnackbar(
                 it.message ?: context.getString(it.defaultResId)
             )
@@ -116,7 +116,7 @@ fun SignUpContent(
             when (page) {
                 NAME.index -> SignUpNamePage(
                     name = uiState.name,
-                    validName = uiState.validName,
+                    isValidName = uiState.isValidName,
                     errorMessage = stringResource(uiState.nameErrorMessageResId),
                     onChangeUserName = onChangeUserName,
                     onClickNextPage = onClickNextPage,
@@ -125,14 +125,14 @@ fun SignUpContent(
                 EMAIL.index -> SignUpEmailPage(
                     email = uiState.email,
                     errorMessage = stringResource(uiState.emailErrorMessageResId),
-                    emailVerified = uiState.emailVerified,
+                    isValidEmail = uiState.isValidEmail,
                     onChangeEmail = onChangeEmail,
                     onClickNextPage = onClickNextPage,
                 )
 
                 EMAIL_AUTH.index -> SignUpEmailAuthPage(
                     emailAuthNumber = uiState.emailAuthNumber,
-                    emailAuthState = uiState.emailAuthState,
+                    isVerifiedEmailAuth = uiState.isVerifiedEmailAuth,
                     timer = uiState.timerText,
                     errorMessage = stringResource(uiState.emailAuthNumberErrorMessageResId),
                     onChangeEmailAuthNum = onChangeEmailAuthNum,
@@ -144,7 +144,7 @@ fun SignUpContent(
                     id = uiState.id,
                     onChangeUserId = onChangeUserId,
                     onClickIdDuplicateCheck = onClickIdDuplicateCheck,
-                    isAvailableId = uiState.isAvailableId,
+                    isAvailableId = uiState.isValidId && uiState.isNotDuplicatedId,
                     errorMessage = stringResource(uiState.idErrorMessageResId),
                     onClickNextPage = onClickNextPage,
                 )

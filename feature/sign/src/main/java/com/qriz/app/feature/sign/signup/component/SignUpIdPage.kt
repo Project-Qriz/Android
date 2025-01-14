@@ -16,7 +16,10 @@ import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.SupportingText
 import com.qriz.app.core.designsystem.theme.Black
+import com.qriz.app.core.designsystem.theme.Mint800
+import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.sign.R
+import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.ID_MAX_LENGTH
 
 @Composable
 fun SignUpIdPage(
@@ -27,15 +30,21 @@ fun SignUpIdPage(
     onClickIdDuplicateCheck: () -> Unit,
     onClickNextPage: () -> Unit,
 ) {
-    val supportingText = if (errorMessage.isNotEmpty()) {
-        SupportingText(
+    val supportingText = when {
+        isAvailableId -> SupportingText(
+            message = stringResource(R.string.id_can_be_used),
+            color = Mint800
+        )
+
+        errorMessage.isNotBlank() -> SupportingText(
             message = errorMessage,
             color = MaterialTheme.colorScheme.error
         )
-    } else {
-        SupportingText(
-            message = "${id.length}/8",
-            color = Black
+
+        else -> SupportingText(
+            message = "${id.length}/$ID_MAX_LENGTH",
+            color = Black,
+            isBorderColorRequired = false
         )
     }
 
@@ -55,7 +64,7 @@ fun SignUpIdPage(
                 supportingText = supportingText,
                 singleLine = true,
                 hint = stringResource(R.string.sign_up_id_page_hint),
-                maxLength = 8,
+                maxLength = ID_MAX_LENGTH,
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(
                     horizontal = 16.dp,
@@ -78,7 +87,7 @@ fun SignUpIdPage(
                 Text(
                     stringResource(R.string.sign_up_id_page_check_duplicate),
                     color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = QrizTheme.typography.subhead,
                 )
             }
         }

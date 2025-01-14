@@ -1,21 +1,21 @@
 package com.qriz.app.feature.sign.signup
 
-import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiState.AuthenticationState
+import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.EMAIL_REGEX
+import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.ID_REGEX
+import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.PW_REGEX
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
@@ -38,22 +38,7 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private val timer: Flow<Long>
-        get() = flow {
-            var current = 0L
-            while (true) {
-                emit(AUTHENTICATION_LIMIT_MILS - current)
-                delay(1000)
-                current += 1000
-                if (current >= AUTHENTICATION_LIMIT_MILS) {
-                    break
-                }
-            }
-        }
-
     private var timerJob: Job? = null
-
-    private val passwordPattern = Pattern.compile("^[a-zA-Z0-9]{8,10}$")
 
     private fun onUserNameChanged(name: String) { //TODO : 테스트 필요
         val nameErrorMessage =
@@ -67,58 +52,93 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onEmailChanged(email: String) { //TODO : 테스트 필요
-//        val emailErrorMessage = if (verifyEmail(email)) R.string.empty
-//        else uiState.value.emailErrorMessage
-
+    private fun onEmailChanged(email: String) {
+        val emailErrorMessageResId = when {
+            email.isBlank() || EMAIL_REGEX.matches(email) -> R.string.empty
+            else -> R.string.please_check_email_again
+        }
         updateState {
             copy(
                 email = email,
-                emailErrorMessageResId = R.string.empty,
+                emailErrorMessageResId = emailErrorMessageResId,
             )
         }
     }
 
-    private fun onEmailAuthNumChanged(authNum: String) { //TODO : 테스트 필요
-        updateState { copy(emailAuthNumber = authNum) }
+    private fun onEmailAuthNumChanged(authNum: String) {
+        when (uiState.value.emailAuthState) {
+            AuthenticationState.VERIFIED -> return
+            AuthenticationState.TIME_EXPIRED -> {
+                updateState {
+                    copy(
+                        emailAuthNumber = authNum,
+                        emailAuthState = AuthenticationState.TIME_EXPIRED,
+                        emailAuthNumberErrorMessageResId = R.string.email_auth_time_has_expired
+                    )
+                }
+            }
 
-        if (authNum.length == AUTHENTICATION_NUMBER_LENGTH) {
-            verifyAuthenticationNumber()
+            AuthenticationState.SEND_FAILED -> {
+                updateState {
+                    copy(
+                        emailAuthNumber = authNum,
+                        emailAuthState = AuthenticationState.SEND_FAILED,
+                        emailAuthNumberErrorMessageResId = R.string.email_auth_sent_fail
+                    )
+                }
+            }
+
+            AuthenticationState.NONE,
+            AuthenticationState.UNVERIFIED -> {
+                updateState {
+                    copy(
+                        emailAuthNumber = authNum,
+                        emailAuthState = AuthenticationState.NONE,
+                        emailAuthNumberErrorMessageResId = R.string.empty
+                    )
+                }
+                if (authNum.length == EMAIL_AUTH_NUMBER_LENGTH) verifyAuthenticationNumber()
+            }
         }
     }
 
-    private fun onUserIdChanged(id: String) {  //TODO : 테스트 필요
+    private fun onUserIdChanged(id: String) {
+        //TODO : 아이디 생성 조건 노출 필요 (디자인 수정 대기중)
+        val idErrorMessageResId =
+            if (ID_REGEX.matches(id)) R.string.empty
+            else R.string.id_cannot_be_used
         updateState {
             copy(
                 id = id,
-                isAvailableId = false,
+                isNotDuplicatedId = false,
+                idErrorMessageResId = idErrorMessageResId
             )
         }
     }
 
-    private fun onUserPwChanged(password: String) {  //TODO : 테스트 필요
-        val errorMessage = if (passwordPattern.matcher(password).matches()) R.string.empty
-        else R.string.password_cannot_be_used
+    private fun onUserPwChanged(pw: String) {
+        val pwErrorMessageResId =
+            if (PW_REGEX.matches(pw)) R.string.empty
+            //TODO : 경고 문구 UI 수정 대기 중
+            else R.string.pw_warning
 
-        val passwordCheck = uiState.value.pwCheck
-        val passwordCheckErrorMessage = if (password == passwordCheck) R.string.empty
-        else R.string.password_is_incorrect
-
+        val pwCheckErrorMessageResId =
+            if (pw == uiState.value.pwCheck) R.string.empty
+            else R.string.password_is_incorrect
 
         updateState {
             copy(
-                pw = password,
-                pwErrorMessageResId = errorMessage,
-                pwCheckErrorMessageResId = passwordCheckErrorMessage,
+                pw = pw,
+                pwErrorMessageResId = pwErrorMessageResId,
+                pwCheckErrorMessageResId = pwCheckErrorMessageResId,
             )
         }
     }
 
-    private fun onUserPwCheckChanged(passwordCheck: String) {   //TODO : 테스트 필요
+    private fun onUserPwCheckChanged(passwordCheck: String) {
         val password = uiState.value.pw
         val errorMessage = if (password == passwordCheck) R.string.empty
         else R.string.password_is_incorrect
-
 
         updateState {
             copy(
@@ -128,101 +148,134 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onClickNextPage() { //TODO : 테스트 필요
+    private fun onClickNextPage() {
         val currentUiState = uiState.value
-        if (currentUiState.name.length < 2) {
-            updateState { copy(nameErrorMessageResId = R.string.user_name_is_short) }
-            return
-        }
-        if (currentUiState.page == SignUpPage.EMAIL) sendAuthenticationNumberEmail()
-        if (currentUiState.page == SignUpPage.EMAIL_AUTH) cancelAuthTimer()
+        when {
+            currentUiState.name.length < 2 -> {
+                updateState { copy(nameErrorMessageResId = R.string.user_name_is_short) }
+            }
 
+            currentUiState.page == SignUpPage.EMAIL -> {
+                if (timerJob == null || timerJob?.isCompleted == true) sendEmailAuthNumber()
+            }
+
+            currentUiState.page == SignUpPage.ID -> cancelEmailAuthTimer()
+        }
         updateState { copy(page = currentUiState.page.next) }
     }
 
 
-    private fun onClickPreviousPage() { //TODO : 테스트 필요
+    private fun onClickPreviousPage() {
         if (uiState.value.page == SignUpPage.NAME) return
         updateState { copy(page = uiState.value.page.previous) }
     }
 
-    private fun onClickEmailAuthNumSend() { //TODO : 테스트 필요
-        sendAuthenticationNumberEmail()
+    private fun onClickEmailAuthNumSend() {
+        sendEmailAuthNumber()
     }
 
     private fun onClickSignUp() {
         signUp()
     }
 
-    private fun onClickIdDuplicateCheck() { //TODO : 테스트 필요
+    private fun onClickIdDuplicateCheck() {
         checkDuplicateId()
     }
 
-    private fun sendAuthenticationNumberEmail() { //TODO : 테스트 필요
-        val email = uiState.value.email
-
-        viewModelScope.launch {
-            cancelAuthTimer()
-            userRepository.sendAuthenticationNumber(email)
-            sendEffect(SignUpUiEffect.ShowSnackBer(R.string.email_auth_sent))
-            startAuthTimer()
+    private fun sendEmailAuthNumber() = viewModelScope.launch {
+        if (uiState.value.isVerifiedEmailAuth) return@launch
+        cancelEmailAuthTimer()
+        updateState {
+            copy(
+                emailAuthNumber = "",
+                emailAuthState = AuthenticationState.NONE,
+                emailAuthNumberErrorMessageResId = R.string.empty
+            )
         }
+        runCatching { userRepository.sendAuthenticationNumber(uiState.value.email) }
+            .onSuccess {
+                sendEffect(SignUpUiEffect.ShowSnackBer(R.string.email_auth_sent))
+                startEmailAuthTimer()
+            }
+            .onFailure {
+                updateState {
+                    copy(
+                        emailAuthState = AuthenticationState.SEND_FAILED,
+                        emailAuthNumberErrorMessageResId = R.string.email_auth_sent_fail
+                    )
+                }
+            }
     }
 
-    fun signUp() {
-        //TODO: 추후 실제 연결
-//        val uiState = state.value
-//        viewModelScope.launch {
+    private fun signUp() = viewModelScope.launch {
+        runCatching {
 //            userRepository.signUp(
-//                loginId = state.id,
-//                password = state.password,
-//                nickname = state.name,
-//                email = state.email,
+//                loginId = uiState.value.id,
+//                password = uiState.value.pw,
+//                nickname = uiState.value.name,
+//                email = uiState.value.email,
 //            )
-//        }
-
-        sendEffect(SignUpUiEffect.SignUpUiComplete)
+        }
+            .onSuccess { sendEffect(SignUpUiEffect.SignUpUiComplete) }
+            .onFailure {
+                //TODO : "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
+            }
     }
 
-    private fun verifyEmail(email: String): Boolean =
-        Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
+    //TODO : 로딩 UI 추가되어야함
     private fun verifyAuthenticationNumber() {
+        if (uiState.value.isSendFailedEmailAuth) return
         val authenticationNumber = uiState.value.emailAuthNumber
 
         viewModelScope.launch {
             runCatching { userRepository.verifyAuthenticationNumber(authenticationNumber) }
-                .onSuccess { updateState { copy(emailAuthState = AuthenticationState.Verified) } }
-                .onFailure {
-                    updateState {
-                        copy(
-                            emailAuthState = AuthenticationState.Unverified,
-                            emailAuthNumberErrorMessageResId = R.string.email_auth_num_is_different
-                        )
+                .onSuccess { isVerified ->
+                    if (isVerified) {
+                        updateState { copy(emailAuthState = AuthenticationState.VERIFIED) }
+                        cancelEmailAuthTimer()
+                    } else {
+                        updateState {
+                            copy(
+                                emailAuthState = AuthenticationState.UNVERIFIED,
+                                emailAuthNumberErrorMessageResId = R.string.email_auth_num_is_different
+                            )
+                        }
                     }
+                }
+                .onFailure {
+                    //TODO : 재시도 가능하게 UI 구현되어야함
+                    // API 실패 유저에게 전달
+                    // "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
                 }
         }
     }
 
     private fun checkDuplicateId() {
-        val id = uiState.value.id
+        if (uiState.value.isNotDuplicatedId) return
 
-        if (id.isEmpty()) {
+        if (uiState.value.id.isEmpty()) {
             updateState { copy(idErrorMessageResId = R.string.please_enter_id) }
             return
         }
 
+        if (ID_REGEX.matches(uiState.value.id).not()) return
+
         viewModelScope.launch {
-            runCatching { userRepository.checkDuplicateId(uiState.value.id) }
-                .onSuccess { isAvailable ->
+            runCatching { userRepository.isNotDuplicateId(uiState.value.id) }
+                .onSuccess { isNotDuplicated ->
+                    val idErrorMessageResId =
+                        if (isNotDuplicated) R.string.empty else R.string.id_cannot_be_used
                     updateState {
                         copy(
-                            isAvailableId = isAvailable,
-                            idErrorMessageResId = R.string.empty
+                            isNotDuplicatedId = isNotDuplicated,
+                            idErrorMessageResId = idErrorMessageResId
                         )
                     }
                 }.onFailure { t ->
-                    updateState { copy(idErrorMessageResId = R.string.id_duplication_check_failed) }
+                    //TODO : "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
+                    // SignUpUiEffect.ShowErrorDialog(재시도 해야하는 action 전달)
+                    // 다이얼로그 확인 누르면 재시도 혹은 확인 버튼 = 재시도 버튼
                     sendEffect(
                         SignUpUiEffect.ShowSnackBer(
                             defaultResId = R.string.id_duplication_check_failed,
@@ -233,22 +286,36 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun startAuthTimer() {
+    private fun startEmailAuthTimer() {
+        timerJob?.cancel()
         timerJob = viewModelScope.launch {
-            timer.collect { seconds ->
-                updateState { copy(timer = seconds) }
+            var currentTime = AUTHENTICATION_LIMIT_MILS
+            val interval = 1.seconds.inWholeMilliseconds
+            while (true) {
+                if (currentTime <= 0L) {
+                    updateState {
+                        copy(
+                            emailAuthState = AuthenticationState.TIME_EXPIRED,
+                            emailAuthNumberErrorMessageResId = R.string.email_auth_time_has_expired
+                        )
+                    }
+                    break
+                }
+                delay(interval)
+                currentTime -= interval
+                updateState { copy(timer = currentTime) }
             }
         }
     }
 
-    private fun cancelAuthTimer() {
+    private fun cancelEmailAuthTimer() {
         timerJob?.cancel()
         timerJob = null
         updateState { copy(timer = AUTHENTICATION_LIMIT_MILS) }
     }
 
     companion object {
-        const val AUTHENTICATION_NUMBER_LENGTH = 6
+        const val EMAIL_AUTH_NUMBER_LENGTH = 6
         val AUTHENTICATION_LIMIT_MILS = 3.minutes.inWholeMilliseconds
     }
 }

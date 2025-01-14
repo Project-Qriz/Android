@@ -10,16 +10,17 @@ import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.SupportingText
 import com.qriz.app.feature.sign.R
+import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.USER_NAME_MAX_LENGTH
 
 @Composable
 fun SignUpNamePage(
     name: String,
-    validName: Boolean,
+    isValidName: Boolean,
     errorMessage: String,
     onChangeUserName: (String) -> Unit,
     onClickNextPage: () -> Unit,
 ) {
-    val supportingText: SupportingText? = if (errorMessage.isNotEmpty()) SupportingText(
+    val supportingText: SupportingText? = if (errorMessage.isNotBlank()) SupportingText(
         message = errorMessage,
         color = MaterialTheme.colorScheme.error
     ) else null
@@ -27,7 +28,7 @@ fun SignUpNamePage(
     SignUpBasePage(
         title = stringResource(R.string.sign_up_name_page_title),
         subTitle = stringResource(R.string.sign_up_name_page_sub_title),
-        buttonEnabled = validName,
+        buttonEnabled = isValidName,
         buttonText = stringResource(R.string.sign_up_name_page_button_text),
         onButtonClick = onClickNextPage,
     ) {
@@ -36,6 +37,7 @@ fun SignUpNamePage(
             supportingText = supportingText,
             onValueChange = onChangeUserName,
             singleLine = true,
+            maxLength = USER_NAME_MAX_LENGTH,
             hint = stringResource(R.string.sign_up_name_page_hint),
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(

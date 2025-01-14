@@ -15,11 +15,11 @@ import com.qriz.app.feature.sign.R
 fun SignUpEmailPage(
     email: String,
     errorMessage: String,
-    emailVerified: Boolean,
+    isValidEmail: Boolean,
     onChangeEmail: (String) -> Unit,
     onClickNextPage: () -> Unit,
 ) {
-    val supportingText: SupportingText? = if (errorMessage.isNotEmpty()) SupportingText(
+    val supportingText: SupportingText? = if (errorMessage.isNotBlank()) SupportingText(
         message = errorMessage,
         color = MaterialTheme.colorScheme.error
     ) else null
@@ -27,7 +27,7 @@ fun SignUpEmailPage(
     SignUpBasePage(
         title = stringResource(R.string.sign_up_email_page_title),
         subTitle = stringResource(R.string.sign_up_email_page_sub_title),
-        buttonEnabled = emailVerified,
+        buttonEnabled = isValidEmail,
         buttonText = stringResource(R.string.sign_up_email_page_button_text),
         onButtonClick = onClickNextPage,
     ) {
