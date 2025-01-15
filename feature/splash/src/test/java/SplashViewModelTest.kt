@@ -5,7 +5,7 @@ import com.qriz.app.feature.splash.SplashUiAction
 import com.qriz.app.feature.splash.SplashUiEffect
 import com.qriz.app.feature.splash.SplashViewModel
 import com.qriz.app.feature.splash.SplashViewModel.Companion.IS_TEST_FLAG
-import com.quiz.app.core.data.user.user_api.repository.UserRepository
+import com.qriz.core.data.token.token_api.TokenRepository
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -19,25 +19,25 @@ class SplashViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private val fakeUserRepository = mockk<UserRepository>()
+    private val fakeTokenRepository = mockk<TokenRepository>()
 
     private fun TestScope.splashViewModel() = SplashViewModel(
         savedStateHandle = SavedStateHandle().apply {
             set(IS_TEST_FLAG, true)
         },
-        userRepository = fakeUserRepository
+        tokenRepository = fakeTokenRepository
     )
 
     @Test
     fun `Action_OCheckLoginState process - Effect_MoveToMain 발생`() = runTest {
         with(splashViewModel()) {
             // given
-            every { fakeUserRepository.flowLogin } returns flowOf(false)
+            every { fakeTokenRepository.flowTokenExist } returns flowOf(false)
             // when
             process(SplashUiAction.CheckLoginState)
             // then
             effect.test {
-                (awaitItem() is SplashUiEffect.MoveToMain) shouldBe true
+                awaitItem() shouldBe SplashUiEffect.MoveToMain(false)
             }
         }
     }
