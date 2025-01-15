@@ -47,20 +47,18 @@ fun SignUpScreen(
             is SignUpUiEffect.ShowSnackBer -> onShowSnackbar(
                 it.message ?: context.getString(it.defaultResId)
             )
+
+            SignUpUiEffect.MoveToBack -> onBack()
         }
     }
 
     BackHandler {
-        if (state.page == NAME) onBack()
-        else viewModel.process(SignUpUiAction.ClickPreviousPage)
+        viewModel.process(SignUpUiAction.ClickPreviousPage)
     }
 
     SignUpContent(
         uiState = state,
-        onClickPreviousPage = {
-            if (state.page == NAME) onBack()
-            else viewModel.process(SignUpUiAction.ClickPreviousPage)
-        },
+        onClickPreviousPage = { viewModel.process(SignUpUiAction.ClickPreviousPage) },
         onClickNextPage = { viewModel.process(SignUpUiAction.ClickNextPage) },
         onClickEmailAuthNumSend = { viewModel.process(SignUpUiAction.ClickEmailAuthNumSend) },
         onClickIdDuplicateCheck = { viewModel.process(SignUpUiAction.ClickIdDuplicateCheck) },
@@ -71,6 +69,7 @@ fun SignUpScreen(
         onChangeUserPwCheck = { viewModel.process(SignUpUiAction.ChangeUserPwCheck(it)) },
         onChangeEmail = { viewModel.process(SignUpUiAction.ChangeEmail(it)) },
         onChangeEmailAuthNum = { viewModel.process(SignUpUiAction.ChangeEmailAuthNum(it)) },
+        onSignUpEmailAuthPageInit = { viewModel.process(SignUpUiAction.RequestEmailAuthNumber) },
     )
 }
 
@@ -88,6 +87,7 @@ fun SignUpContent(
     onChangeUserPwCheck: (String) -> Unit,
     onChangeEmail: (String) -> Unit,
     onChangeEmailAuthNum: (String) -> Unit,
+    onSignUpEmailAuthPageInit: () -> Unit,
 ) {
     val pagerState = rememberPagerState { SignUpPage.entries.size }
     val currentPage = uiState.page
@@ -137,7 +137,8 @@ fun SignUpContent(
                     errorMessage = stringResource(uiState.emailAuthNumberErrorMessageResId),
                     onChangeEmailAuthNum = onChangeEmailAuthNum,
                     onClickNextPage = onClickNextPage,
-                    onClickEmailAuthNumSend = onClickEmailAuthNumSend
+                    onClickEmailAuthNumSend = onClickEmailAuthNumSend,
+                    onSignUpEmailAuthPageInit = onSignUpEmailAuthPageInit,
                 )
 
                 ID.index -> SignUpIdPage(

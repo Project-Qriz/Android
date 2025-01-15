@@ -8,9 +8,9 @@ interface UserRepository {
         password: String,
     ): User
 
-    suspend fun sendAuthenticationNumber(email: String)
+    suspend fun requestEmailAuthNumber(email: String)
 
-    suspend fun verifyAuthenticationNumber(authenticationNumber: String): Boolean
+    suspend fun verifyEmailAuthNumber(authenticationNumber: String): Boolean
 
     suspend fun isNotDuplicateId(id: String): Boolean
 

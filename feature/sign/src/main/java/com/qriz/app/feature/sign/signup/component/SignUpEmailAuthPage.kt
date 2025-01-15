@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,7 +32,17 @@ fun SignUpEmailAuthPage(
     onChangeEmailAuthNum: (String) -> Unit,
     onClickEmailAuthNumSend: () -> Unit,
     onClickNextPage: () -> Unit,
+    onSignUpEmailAuthPageInit: () -> Unit,
 ) {
+    val isInitialized = rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (isInitialized.value.not()) {
+            onSignUpEmailAuthPageInit()
+            isInitialized.value = true
+        }
+    }
+
     val supportingText = if (isVerifiedEmailAuth) {
         SupportingText(
             message = stringResource(R.string.sign_up_auth_page_supporting_verified),

@@ -5,7 +5,6 @@
     <string name="email_auth_sent_fail">인증번호 전송을 실패했습니다.</string>
     <string name="id_cannot_be_used">사용 불가능한 아이디입니다.</string>
     <string name="id_can_be_used">사용 가능한 아이디입니다.</string>
-    <string name="user_name_is_short">이름은 두글자 이상입니다</string>
     <string name="email_auth_num_is_different">인증번호가 다르게 입력되었어요</string>
     <string name="email_auth_time_has_expired">인증 시간이 만료되었습니다</string>
     <string name="please_enter_id">아이디를 입력해주세요</string>

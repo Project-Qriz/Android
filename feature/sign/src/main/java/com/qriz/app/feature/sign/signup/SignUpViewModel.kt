@@ -1,5 +1,6 @@
 package com.qriz.app.feature.sign.signup
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.sign.R
@@ -18,41 +19,36 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(
+open class SignUpViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : BaseViewModel<SignUpUiState, SignUpUiEffect, SignUpUiAction>(SignUpUiState.Default) {
 
-    override fun process(action: SignUpUiAction): Job = viewModelScope.launch {
+    final override fun process(action: SignUpUiAction): Job = viewModelScope.launch {
         when (action) {
-            is SignUpUiAction.ChangeUserName -> onUserNameChanged(action.name)
-            is SignUpUiAction.ChangeUserId -> onUserIdChanged(action.id)
-            is SignUpUiAction.ChangeUserPw -> onUserPwChanged(action.pw)
-            is SignUpUiAction.ChangeUserPwCheck -> onUserPwCheckChanged(action.pw)
-            is SignUpUiAction.ChangeEmail -> onEmailChanged(action.email)
-            is SignUpUiAction.ChangeEmailAuthNum -> onEmailAuthNumChanged(action.authNum)
+            is SignUpUiAction.ChangeUserName -> onChangeUserName(action.name)
+            is SignUpUiAction.ChangeEmail -> onChangeEmail(action.email)
+            is SignUpUiAction.ChangeUserId -> onChangeUserId(action.id)
+            is SignUpUiAction.ChangeUserPw -> onChangeUserPw(action.pw)
+            is SignUpUiAction.ChangeUserPwCheck -> onChangeUserPwCheck(action.pw)
+            is SignUpUiAction.ChangeEmailAuthNum -> onChangeEmailAuthNum(action.authNum)
             SignUpUiAction.ClickPreviousPage -> onClickPreviousPage()
             SignUpUiAction.ClickNextPage -> onClickNextPage()
             SignUpUiAction.ClickEmailAuthNumSend -> onClickEmailAuthNumSend()
             SignUpUiAction.ClickIdDuplicateCheck -> onClickIdDuplicateCheck()
             SignUpUiAction.ClickSignUp -> onClickSignUp()
+            SignUpUiAction.RequestEmailAuthNumber -> requestEmailAuthNumber()
+            SignUpUiAction.StartEmailAuthTimer -> startEmailAuthTimer()
         }
     }
 
-    private var timerJob: Job? = null
+    @VisibleForTesting
+    var timerJob: Job? = null
 
-    private fun onUserNameChanged(name: String) { //TODO : 테스트 필요
-        val nameErrorMessage =
-            if (name.length > 2) R.string.empty else uiState.value.nameErrorMessageResId
-
-        updateState {
-            copy(
-                name = name,
-                nameErrorMessageResId = nameErrorMessage,
-            )
-        }
+    private fun onChangeUserName(name: String) {
+        updateState { copy(name = name) }
     }
 
-    private fun onEmailChanged(email: String) {
+    private fun onChangeEmail(email: String) {
         val emailErrorMessageResId = when {
             email.isBlank() || EMAIL_REGEX.matches(email) -> R.string.empty
             else -> R.string.please_check_email_again
@@ -65,31 +61,15 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onEmailAuthNumChanged(authNum: String) {
+    private fun onChangeEmailAuthNum(authNum: String) {
         when (uiState.value.emailAuthState) {
             AuthenticationState.VERIFIED -> return
-            AuthenticationState.TIME_EXPIRED -> {
-                updateState {
-                    copy(
-                        emailAuthNumber = authNum,
-                        emailAuthState = AuthenticationState.TIME_EXPIRED,
-                        emailAuthNumberErrorMessageResId = R.string.email_auth_time_has_expired
-                    )
-                }
-            }
 
-            AuthenticationState.SEND_FAILED -> {
-                updateState {
-                    copy(
-                        emailAuthNumber = authNum,
-                        emailAuthState = AuthenticationState.SEND_FAILED,
-                        emailAuthNumberErrorMessageResId = R.string.email_auth_sent_fail
-                    )
-                }
-            }
+            AuthenticationState.TIME_EXPIRED,
+            AuthenticationState.SEND_FAILED -> updateState { copy(emailAuthNumber = authNum) }
 
             AuthenticationState.NONE,
-            AuthenticationState.UNVERIFIED -> {
+            AuthenticationState.REJECTED -> {
                 updateState {
                     copy(
                         emailAuthNumber = authNum,
@@ -97,12 +77,12 @@ class SignUpViewModel @Inject constructor(
                         emailAuthNumberErrorMessageResId = R.string.empty
                     )
                 }
-                if (authNum.length == EMAIL_AUTH_NUMBER_LENGTH) verifyAuthenticationNumber()
+                if (authNum.length == EMAIL_AUTH_NUMBER_LENGTH) verifyEmailAuthNumber()
             }
         }
     }
 
-    private fun onUserIdChanged(id: String) {
+    private fun onChangeUserId(id: String) {
         //TODO : 아이디 생성 조건 노출 필요 (디자인 수정 대기중)
         val idErrorMessageResId =
             if (ID_REGEX.matches(id)) R.string.empty
@@ -116,7 +96,7 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onUserPwChanged(pw: String) {
+    private fun onChangeUserPw(pw: String) {
         val pwErrorMessageResId =
             if (PW_REGEX.matches(pw)) R.string.empty
             //TODO : 경고 문구 UI 수정 대기 중
@@ -135,7 +115,7 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    private fun onUserPwCheckChanged(passwordCheck: String) {
+    private fun onChangeUserPwCheck(passwordCheck: String) {
         val password = uiState.value.pw
         val errorMessage = if (password == passwordCheck) R.string.empty
         else R.string.password_is_incorrect
@@ -150,28 +130,20 @@ class SignUpViewModel @Inject constructor(
 
     private fun onClickNextPage() {
         val currentUiState = uiState.value
-        when {
-            currentUiState.name.length < 2 -> {
-                updateState { copy(nameErrorMessageResId = R.string.user_name_is_short) }
-            }
-
-            currentUiState.page == SignUpPage.EMAIL -> {
-                if (timerJob == null || timerJob?.isCompleted == true) sendEmailAuthNumber()
-            }
-
-            currentUiState.page == SignUpPage.ID -> cancelEmailAuthTimer()
-        }
+        if (currentUiState.page == SignUpPage.EMAIL_AUTH) cancelEmailAuthTimer()
         updateState { copy(page = currentUiState.page.next) }
     }
 
-
     private fun onClickPreviousPage() {
-        if (uiState.value.page == SignUpPage.NAME) return
+        if (uiState.value.page == SignUpPage.NAME) {
+            sendEffect(SignUpUiEffect.MoveToBack)
+            return
+        }
         updateState { copy(page = uiState.value.page.previous) }
     }
 
     private fun onClickEmailAuthNumSend() {
-        sendEmailAuthNumber()
+        requestEmailAuthNumber()
     }
 
     private fun onClickSignUp() {
@@ -182,7 +154,7 @@ class SignUpViewModel @Inject constructor(
         checkDuplicateId()
     }
 
-    private fun sendEmailAuthNumber() = viewModelScope.launch {
+    private fun requestEmailAuthNumber() = viewModelScope.launch {
         if (uiState.value.isVerifiedEmailAuth) return@launch
         cancelEmailAuthTimer()
         updateState {
@@ -192,10 +164,10 @@ class SignUpViewModel @Inject constructor(
                 emailAuthNumberErrorMessageResId = R.string.empty
             )
         }
-        runCatching { userRepository.sendAuthenticationNumber(uiState.value.email) }
+        runCatching { userRepository.requestEmailAuthNumber(uiState.value.email) }
             .onSuccess {
                 sendEffect(SignUpUiEffect.ShowSnackBer(R.string.email_auth_sent))
-                startEmailAuthTimer()
+                process(SignUpUiAction.StartEmailAuthTimer)
             }
             .onFailure {
                 updateState {
@@ -218,18 +190,20 @@ class SignUpViewModel @Inject constructor(
         }
             .onSuccess { sendEffect(SignUpUiEffect.SignUpUiComplete) }
             .onFailure {
-                //TODO : "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
+                //TODO : 재시도 가능하게 UI 구현되어야함 혹은 API 실패 유저에게 전달
+                // "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
+                // 수정 후 테스트 케이스 추가
             }
     }
 
 
     //TODO : 로딩 UI 추가되어야함
-    private fun verifyAuthenticationNumber() {
+    private fun verifyEmailAuthNumber() {
         if (uiState.value.isSendFailedEmailAuth) return
         val authenticationNumber = uiState.value.emailAuthNumber
 
         viewModelScope.launch {
-            runCatching { userRepository.verifyAuthenticationNumber(authenticationNumber) }
+            runCatching { userRepository.verifyEmailAuthNumber(authenticationNumber) }
                 .onSuccess { isVerified ->
                     if (isVerified) {
                         updateState { copy(emailAuthState = AuthenticationState.VERIFIED) }
@@ -237,16 +211,16 @@ class SignUpViewModel @Inject constructor(
                     } else {
                         updateState {
                             copy(
-                                emailAuthState = AuthenticationState.UNVERIFIED,
+                                emailAuthState = AuthenticationState.REJECTED,
                                 emailAuthNumberErrorMessageResId = R.string.email_auth_num_is_different
                             )
                         }
                     }
                 }
                 .onFailure {
-                    //TODO : 재시도 가능하게 UI 구현되어야함
-                    // API 실패 유저에게 전달
+                    //TODO : 재시도 가능하게 UI 구현되어야함 혹은 API 실패 유저에게 전달
                     // "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
+                    // 수정 후 테스트 케이스 추가
                 }
         }
     }
@@ -273,9 +247,9 @@ class SignUpViewModel @Inject constructor(
                         )
                     }
                 }.onFailure { t ->
-                    //TODO : "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
-                    // SignUpUiEffect.ShowErrorDialog(재시도 해야하는 action 전달)
-                    // 다이얼로그 확인 누르면 재시도 혹은 확인 버튼 = 재시도 버튼
+                    //TODO : 재시도 가능하게 UI 구현되어야함 혹은 API 실패 유저에게 전달
+                    // "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
+                    // 수정 후 테스트 케이스 추가
                     sendEffect(
                         SignUpUiEffect.ShowSnackBer(
                             defaultResId = R.string.id_duplication_check_failed,
@@ -303,7 +277,7 @@ class SignUpViewModel @Inject constructor(
                 }
                 delay(interval)
                 currentTime -= interval
-                updateState { copy(timer = currentTime) }
+                updateState { copy(emailAuthTime = currentTime) }
             }
         }
     }
@@ -311,7 +285,7 @@ class SignUpViewModel @Inject constructor(
     private fun cancelEmailAuthTimer() {
         timerJob?.cancel()
         timerJob = null
-        updateState { copy(timer = AUTHENTICATION_LIMIT_MILS) }
+        updateState { copy(emailAuthTime = AUTHENTICATION_LIMIT_MILS) }
     }
 
     companion object {

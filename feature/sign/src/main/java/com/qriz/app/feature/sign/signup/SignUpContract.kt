@@ -30,7 +30,7 @@ data class SignUpUiState(
     val pwCheckErrorMessageResId: Int,
     val page: SignUpPage,
     val isNotDuplicatedId: Boolean,
-    val timer: Long,
+    val emailAuthTime: Long,
 ) : UiState {
     val topBarTitleResId: Int = when (page) {
         NAME -> R.string.screen_title_enter_name
@@ -39,7 +39,7 @@ data class SignUpUiState(
     }
 
     val timerText: String =
-        "${(timer / 60000)}:${(timer % 60000 / 1000).toString().padStart(2, '0')}"
+        "${(emailAuthTime / 60000)}:${(emailAuthTime % 60000 / 1000).toString().padStart(2, '0')}"
 
     val canSignUp: Boolean
         get() = PW_REGEX.matches(pw)
@@ -64,7 +64,7 @@ data class SignUpUiState(
         get() = emailAuthState == AuthenticationState.SEND_FAILED
 
     enum class AuthenticationState {
-        SEND_FAILED, NONE, VERIFIED, UNVERIFIED, TIME_EXPIRED;
+        SEND_FAILED, NONE, VERIFIED, REJECTED, TIME_EXPIRED;
     }
 
     enum class SignUpPage(val index: Int) {
@@ -99,17 +99,16 @@ data class SignUpUiState(
             pwCheckErrorMessageResId = R.string.empty,
             page = NAME,
             isNotDuplicatedId = false,
-            timer = AUTHENTICATION_LIMIT_MILS,
+            emailAuthTime = AUTHENTICATION_LIMIT_MILS,
         )
 
-        //TODO : 아이디부분 10자 짧은 것같아 서버 수정 대기중
         /**
          * 1. 이메일 아이디 부분 : 영문 대소문자와 숫자만 허용, 최소 2자 최대 10자까지 가능
          * 2. 도메인 이름 부분 : 영문 대소문자와 숫자만 허용, 최소 2자 최대 6자까지 가능
          * 3. 최상위 도메인 부분 : 영문 대소문자만 허용, 최소 2자 최대 3자까지 가능 (예: com, net, org)
          */
         val EMAIL_REGEX =
-            "^[a-zA-Z0-9]{2,10}@[a-zA-Z0-9]{2,6}\\\\.[a-zA-Z]{2,3}\$".toRegex()
+            "^[a-zA-Z0-9._%+-]{2,64}@[a-zA-Z0-9.-]{2,255}\\.[a-zA-Z]{2,10}".toRegex()
 
         /**
          * 1. 길이 6자 이상 20자 이하
@@ -150,10 +149,13 @@ sealed interface SignUpUiAction : UiAction {
     data object ClickEmailAuthNumSend : SignUpUiAction
     data object ClickIdDuplicateCheck : SignUpUiAction
     data object ClickSignUp : SignUpUiAction
+    data object RequestEmailAuthNumber : SignUpUiAction
+    data object StartEmailAuthTimer : SignUpUiAction
 }
 
 sealed interface SignUpUiEffect : UiEffect {
     data object SignUpUiComplete : SignUpUiEffect
+    data object MoveToBack : SignUpUiEffect
     data class ShowSnackBer(
         @StringRes val defaultResId: Int,
         val message: String? = null
