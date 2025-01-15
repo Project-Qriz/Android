@@ -20,4 +20,6 @@ interface UserRepository {
         email: String,
         nickname: String,
     ): User
+
+    suspend fun sendEmailToFindId(email: String)
 }
