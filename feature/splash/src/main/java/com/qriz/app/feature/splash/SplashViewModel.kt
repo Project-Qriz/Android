@@ -1,30 +1,40 @@
 package com.qriz.app.feature.splash
 
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.qriz.app.feature.splash.model.SplashEffect
+import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.core.data.token.token_api.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    tokenRepository: TokenRepository,
-) : ViewModel() {
+    savedStateHandle: SavedStateHandle,
+    private val tokenRepository: TokenRepository,
+) : BaseViewModel<SplashUiState, SplashUiEffect, SplashUiAction>(SplashUiState) {
+    private val isTest = savedStateHandle.get<Boolean>(IS_TEST_FLAG) ?: false
 
-    @OptIn(FlowPreview::class)
-    val effect: SharedFlow<SplashEffect> = tokenRepository.flowTokenExist
-        .debounce(2000)
-        .map { isTokenExist ->
-            SplashEffect.CheckLogin(isTokenExist)
-        }.shareIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-        )
+    init {
+        if (isTest.not()) process(SplashUiAction.CheckLoginState)
+    }
+
+    override fun process(action: SplashUiAction): Job = viewModelScope.launch {
+        when (action) {
+            SplashUiAction.CheckLoginState -> checkLoginState()
+        }
+    }
+
+    private fun checkLoginState() = viewModelScope.launch {
+        delay(2000)
+        val isLoggedIn = tokenRepository.flowTokenExist.first()
+        sendEffect(SplashUiEffect.MoveToMain(isLoggedIn))
+    }
+
+    companion object {
+        internal const val IS_TEST_FLAG = "IS_TEST_FLAG"
+    }
 }
