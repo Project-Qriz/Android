@@ -78,7 +78,10 @@ private fun QrizNavHost(
         signNavGraph(
             onBack = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
-            onClickSignUp = navController::navigateSignUp,
+            moveToSignUp = navController::navigateSignUp,
+            moveToFindId = {},
+            moveToFindPw = {},
+            moveToHome = {},
             onSignUpComplete = navController::navigateCheckGuide,
         )
 

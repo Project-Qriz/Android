@@ -1,6 +1,17 @@
 <resources>
-    <!--Viewmodel-->
     <string name="empty" />
+
+    <!--SignInScreen-->
+    <string name="please_enter_id_sign_in">아이디를 입력해주세요.</string>
+    <string name="please_enter_pw_sign_in">비밀번호를 입력해주세요.</string>
+    <string name="easy_login">간편 로그인하기</string>
+    <string name="login">로그인</string>
+    <string name="find_id">아이디 찾기</string>
+    <string name="find_pw">비밀번호 찾기</string>
+    <string name="sing_up">회원가입</string>
+    <string name="user_not_registered">입력하신 정보와 일치하는 회원이 없습니다.</string>
+
+    <!--SignUpViewmodel-->
     <string name="email_auth_sent">인증번호를 메일로 전송하였습니다.</string>
     <string name="email_auth_sent_fail">인증번호 전송을 실패했습니다.</string>
     <string name="id_cannot_be_used">사용 불가능한 아이디입니다.</string>
@@ -29,7 +40,7 @@
     <string name="sign_up_email_page_sub_title">이메일 형식을 맞춰 입력해주세요.</string>
     <string name="sign_up_email_page_button_text">다음</string>
     <string name="sign_up_email_page_hint">이메일 입력</string>
-    
+
     <!-- SignUpAuthPage -->
     <string name="sign_up_auth_page_title">이메일로 받은\n인증번호를 입력해주세요</string>
     <string name="sign_up_auth_page_sub_title">메일 수신함에서 인증번호를 확인해주세요</string>
