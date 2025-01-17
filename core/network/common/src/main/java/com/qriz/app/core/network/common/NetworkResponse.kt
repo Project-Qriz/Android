@@ -8,4 +8,7 @@ data class NetworkResponse<T>(
     @SerialName("code") val code: Int,
     @SerialName("msg") val message: String,
     @SerialName("data") val data: T,
-)
+) {
+    val isSuccess = code == 1
+    val isFailure = isSuccess.not()
+}

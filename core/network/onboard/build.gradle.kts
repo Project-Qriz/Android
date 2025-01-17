@@ -11,6 +11,7 @@ android {
 dependencies {
     api(projects.core.network.common)
     implementation(projects.core.data.onboard.onboardApi)
+    implementation(projects.core.data.test.testApi)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.retrofit)
 }
