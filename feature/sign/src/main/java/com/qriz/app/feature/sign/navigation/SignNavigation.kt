@@ -4,7 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.qriz.app.core.navigation.route.Route
+import com.qriz.app.core.navigation.route.SignRoute
 import com.qriz.app.feature.sign.findId.FindIdScreen
 import com.qriz.app.feature.sign.findPassword.auth.FindPasswordAuthScreen
 import com.qriz.app.feature.sign.findPassword.reset.ResetPasswordScreen
@@ -13,25 +13,25 @@ import com.qriz.app.feature.sign.signup.SignUpScreen
 
 fun NavHostController.navigateSignIn(navOptions: NavOptions? = null) {
     navigate(
-        route = Route.SignIn,
+        route = SignRoute.SignIn,
         navOptions = navOptions,
     )
 }
 
 fun NavHostController.navigateSignUp() {
-    navigate(Route.SignUp)
+    navigate(SignRoute.SignUp)
 }
 
 fun NavHostController.navigateFindId() {
-    navigate(Route.FindId)
+    navigate(SignRoute.FindId)
 }
 
 fun NavHostController.navigateFindPasswordAuth() {
-    navigate(Route.FindPasswordAuth)
+    navigate(SignRoute.FindPasswordAuth)
 }
 
 fun NavHostController.navigateResetPassword() {
-    navigate(Route.ResetPassword)
+    navigate(SignRoute.ResetPassword)
 }
 
 fun NavGraphBuilder.signNavGraph(
@@ -40,12 +40,12 @@ fun NavGraphBuilder.signNavGraph(
     moveToFindId: () -> Unit,
     moveToFindPw: () -> Unit,
     moveToHome: () -> Unit,
-    onSignUpComplete: () -> Unit,
+    moveToConceptCheckGuide: () -> Unit,
     onShowSnackbar: (String) -> Unit,
     moveToResetPw: () -> Unit,
     moveToSignIn: () -> Unit,
 ) {
-    composable<Route.SignIn> {
+    composable<SignRoute.SignIn> {
         SignInScreen(
             onShowSnackbar = onShowSnackbar,
             moveToSignUp = moveToSignUp,
@@ -55,26 +55,26 @@ fun NavGraphBuilder.signNavGraph(
         )
     }
 
-    composable<Route.SignUp> {
+    composable<SignRoute.SignUp> {
         SignUpScreen(
             onBack = onBack,
-            onSignUpComplete = onSignUpComplete,
+            moveToConceptCheckGuide = moveToConceptCheckGuide,
             onShowSnackbar = onShowSnackbar,
         )
     }
 
-    composable<Route.FindId> {
+    composable<SignRoute.FindId> {
         FindIdScreen(onBack = onBack)
     }
 
-    composable<Route.FindPasswordAuth> {
+    composable<SignRoute.FindPasswordAuth> {
         FindPasswordAuthScreen(
             onBack = onBack,
             onNavigateReset = moveToResetPw
         )
     }
 
-    composable<Route.ResetPassword> {
+    composable<SignRoute.ResetPassword> {
         ResetPasswordScreen(
             onBack = onBack,
             moveToSignIn = moveToSignIn

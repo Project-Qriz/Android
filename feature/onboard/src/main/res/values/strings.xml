@@ -1,4 +1,14 @@
 <resources>
+    <!--Guide-->
+    <string name="concept_check_guide_title">SQLD를 어느정도\n알고 계시나요?</string>
+    <string name="concept_check_guide_sub_title">선택하신 체크사항을 기반으로\n맞춤 프리뷰 테스트를 제공해 드려요!</string>
+    <string name="concept_check_guide_button_text">시작하기</string>
+    <string name="preview_guide_title">테스트를\n진행해볼까요?</string>
+    <string name="preview_guide_sub_title">간단한 프리뷰 테스트로 실력을 점검하고\n이후 맞춤형 개념과 데일리 테스트를 경험해 보세요!</string>
+    <string name="preview_guide_button_text">간단한 테스트 시작</string>
+    <string name="welcome_guide_title">%1$s님\n환영합니다</string>
+    <string name="welcome_guide_sub_title">준비되어 있는 오늘의 공부와 모의고사로\n시험을 같이 준비해봐요!</string>
+
     <!--Survey-->
     <string name="know_nothing_about_concepts">모든 개념을 처음 봐요 \uD83D\uDE05</string>
     <string name="know_all_about_concepts">전부 아는 개념이에요! \uD83D\uDE06</string>

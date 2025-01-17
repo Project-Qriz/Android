@@ -13,15 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizButton
+import com.qriz.app.core.designsystem.theme.QrizTheme
 
 @Composable
-fun GuideScreen(
+fun GuideBaseScreen(
     title: String,
     subTitle: String,
-    buttonText: String,
+    buttonText: String? = null,
     @DrawableRes image: Int,
     onNext: () -> Unit,
 ) {
@@ -32,9 +32,7 @@ fun GuideScreen(
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.W600
-            ),
+            style = QrizTheme.typography.title1,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(
                 top = 132.dp,
@@ -45,7 +43,7 @@ fun GuideScreen(
 
         Text(
             text = subTitle,
-            style = MaterialTheme.typography.bodyLarge,
+            style = QrizTheme.typography.body1Long,
             color = MaterialTheme.colorScheme.onSecondary,
             modifier = Modifier.padding(
                 bottom = 40.dp,
@@ -62,12 +60,15 @@ fun GuideScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        QrizButton(
-            text = buttonText,
-            enable = true,
-            onClick = onNext,
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 18.dp)
-        )
+        if (buttonText != null) {
+            QrizButton(
+                text = buttonText,
+                enable = true,
+                onClick = onNext,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp)
+            )
+        }
     }
 }

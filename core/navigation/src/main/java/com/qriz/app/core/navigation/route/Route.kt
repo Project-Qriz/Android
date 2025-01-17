@@ -2,37 +2,55 @@ package com.qriz.app.core.navigation.route
 
 import kotlinx.serialization.Serializable
 
-sealed interface Route {
+sealed interface Route
+
+sealed interface SignRoute : Route {
     @Serializable
-    data object Main : Route
+    data object SignIn : SignRoute
 
     @Serializable
-    data object SignIn : Route
+    data object SignUp : SignRoute
 
     @Serializable
-    data object SignUp : Route
+    data object FindId : SignRoute
 
     @Serializable
-    data object FindId : Route
+    data object FindPasswordAuth : SignRoute
 
     @Serializable
-    data object FindPasswordAuth : Route
+    data object ResetPassword : SignRoute
+}
+
+sealed interface OnBoardRoute : Route {
+    @Serializable
+    data object ConceptCheckGuide : OnBoardRoute
 
     @Serializable
-    data object ResetPassword : Route
+    data object ConceptCheck : OnBoardRoute
 
     @Serializable
-    data class Guide(
-        val title: String,
-        val subTitle: String,
-        val image: Int,
-        val buttonText: String,
-        val route: String,
-    ) : Route
+    data object PreviewGuide : OnBoardRoute
 
     @Serializable
-    data object ConceptCheck : Route
+    data object Preview : OnBoardRoute
 
     @Serializable
-    data object Preview : Route
+    data object PreviewResult : OnBoardRoute
+
+    @Serializable
+    data object WelcomeGuide : OnBoardRoute
+}
+
+sealed interface MainTabRoute : Route {
+    @Serializable
+    data object Home : MainTabRoute
+
+    @Serializable
+    data object ConceptBook : MainTabRoute
+
+    @Serializable
+    data object WrongAnswersNote : MainTabRoute
+
+    @Serializable
+    data object MyPage : MainTabRoute
 }
