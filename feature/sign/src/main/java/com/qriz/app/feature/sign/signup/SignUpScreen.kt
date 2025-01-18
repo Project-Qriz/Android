@@ -74,7 +74,7 @@ fun SignUpScreen(
 }
 
 @Composable
-fun SignUpContent(
+private fun SignUpContent(
     uiState: SignUpUiState,
     onClickPreviousPage: () -> Unit,
     onClickNextPage: () -> Unit,

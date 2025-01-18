@@ -85,7 +85,7 @@ fun SignInScreen(
 }
 
 @Composable
-fun SignInContent(
+private fun SignInContent(
     id: String,
     pw: String,
     isVisiblePw: Boolean,
