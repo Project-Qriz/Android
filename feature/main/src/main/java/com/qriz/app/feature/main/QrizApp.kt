@@ -19,8 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.qriz.app.core.navigation.route.Route
-import com.qriz.app.feature.onboard.navigation.navigateCheckGuide
+import com.qriz.app.core.navigation.route.SignRoute
 import com.qriz.app.feature.onboard.navigation.navigateConceptCheckGuide
 import com.qriz.app.feature.onboard.navigation.onboardNavGraph
 import com.qriz.app.feature.sign.navigation.navigateFindId
@@ -79,7 +78,7 @@ private fun QrizNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Route.SignIn,
+        startDestination = SignRoute.SignIn,
     ) {
         signNavGraph(
             onBack = navController::popBackStack,
@@ -104,7 +103,6 @@ private fun QrizNavHost(
                     }
                 )
             },
-            onSignUpComplete = navController::navigateCheckGuide,
         )
 
         onboardNavGraph(
