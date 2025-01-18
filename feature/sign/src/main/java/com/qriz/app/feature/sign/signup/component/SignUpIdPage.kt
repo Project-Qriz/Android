@@ -19,7 +19,7 @@ import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Mint800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.sign.R
-import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.ID_MAX_LENGTH
+import com.quiz.app.core.data.user.user_api.model.ID_MAX_LENGTH
 
 @Composable
 fun SignUpIdPage(

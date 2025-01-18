@@ -5,10 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiState.AuthenticationState
-import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.EMAIL_REGEX
-import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.ID_REGEX
-import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.PW_REGEX
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage
+import com.quiz.app.core.data.user.user_api.model.EMAIL_REGEX
+import com.quiz.app.core.data.user.user_api.model.ID_REGEX
+import com.quiz.app.core.data.user.user_api.model.PW_REGEX
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job

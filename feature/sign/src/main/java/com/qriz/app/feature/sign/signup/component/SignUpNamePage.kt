@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.SupportingText
 import com.qriz.app.feature.sign.R
-import com.qriz.app.feature.sign.signup.SignUpUiState.Companion.USER_NAME_MAX_LENGTH
+import com.quiz.app.core.data.user.user_api.model.USER_NAME_MAX_LENGTH
 
 @Composable
 fun SignUpNamePage(
