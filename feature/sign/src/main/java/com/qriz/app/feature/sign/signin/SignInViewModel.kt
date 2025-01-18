@@ -19,10 +19,10 @@ class SignInViewModel @Inject constructor(
             is SignInUiAction.ChangeUserId -> onChangeUserId(action.id)
             is SignInUiAction.ChangeUserPw -> onChangeUserPw(action.pw)
             is SignInUiAction.ClickPwVisibility -> onClickPwVisibility(action.isVisible)
-            SignInUiAction.ClickLogin -> onClickLogin()
-            SignInUiAction.ClickFindId -> onClickFindId()
-            SignInUiAction.ClickFindPw -> onClickFindPw()
-            SignInUiAction.ClickSignUp -> onClickSignUp()
+            is SignInUiAction.ClickLogin -> onClickLogin()
+            is SignInUiAction.ClickFindId -> onClickFindId()
+            is SignInUiAction.ClickFindPw -> onClickFindPw()
+            is SignInUiAction.ClickSignUp -> onClickSignUp()
         }
     }
 

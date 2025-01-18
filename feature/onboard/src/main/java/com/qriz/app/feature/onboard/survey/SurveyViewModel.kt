@@ -38,8 +38,8 @@ class SurveyViewModel @Inject constructor(
                 isChecked = action.isChecked
             )
 
-            SurveyUiAction.ClickCancel -> onClickCancel()
-            SurveyUiAction.ClickSubmit -> onClickSubmit()
+            is SurveyUiAction.ClickCancel -> onClickCancel()
+            is SurveyUiAction.ClickSubmit -> onClickSubmit()
         }
     }
 

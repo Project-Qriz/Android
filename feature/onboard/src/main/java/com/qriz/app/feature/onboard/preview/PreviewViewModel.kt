@@ -42,16 +42,16 @@ open class PreviewViewModel @Inject constructor(
 
     final override fun process(action: PreviewUiAction): Job = viewModelScope.launch {
         when (action) {
-            PreviewUiAction.ObservePreviewTestItem -> observePreviewTestItems()
+            is PreviewUiAction.ObservePreviewTestItem -> observePreviewTestItems()
             is PreviewUiAction.SelectOption -> onSelectOption(
                 questionID = action.questionID,
                 option = action.option
             )
 
-            PreviewUiAction.ClickNextPage -> onClickNextPage()
-            PreviewUiAction.ClickPreviousPage -> onClickPreviousPage()
-            PreviewUiAction.ClickSubmit -> onClickSubmit()
-            PreviewUiAction.ClickCancel -> onClickCancel()
+            is PreviewUiAction.ClickNextPage -> onClickNextPage()
+            is PreviewUiAction.ClickPreviousPage -> onClickPreviousPage()
+            is PreviewUiAction.ClickSubmit -> onClickSubmit()
+            is PreviewUiAction.ClickCancel -> onClickCancel()
         }
     }
 

@@ -24,7 +24,7 @@ class SplashViewModel @Inject constructor(
 
     override fun process(action: SplashUiAction): Job = viewModelScope.launch {
         when (action) {
-            SplashUiAction.CheckLoginState -> checkLoginState()
+            is SplashUiAction.CheckLoginState -> checkLoginState()
         }
     }
 

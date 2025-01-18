@@ -31,13 +31,13 @@ open class SignUpViewModel @Inject constructor(
             is SignUpUiAction.ChangeUserPw -> onChangeUserPw(action.pw)
             is SignUpUiAction.ChangeUserPwCheck -> onChangeUserPwCheck(action.pw)
             is SignUpUiAction.ChangeEmailAuthNum -> onChangeEmailAuthNum(action.authNum)
-            SignUpUiAction.ClickPreviousPage -> onClickPreviousPage()
-            SignUpUiAction.ClickNextPage -> onClickNextPage()
-            SignUpUiAction.ClickEmailAuthNumSend -> onClickEmailAuthNumSend()
-            SignUpUiAction.ClickIdDuplicateCheck -> onClickIdDuplicateCheck()
-            SignUpUiAction.ClickSignUp -> onClickSignUp()
-            SignUpUiAction.RequestEmailAuthNumber -> requestEmailAuthNumber()
-            SignUpUiAction.StartEmailAuthTimer -> startEmailAuthTimer()
+            is SignUpUiAction.ClickPreviousPage -> onClickPreviousPage()
+            is SignUpUiAction.ClickNextPage -> onClickNextPage()
+            is SignUpUiAction.ClickEmailAuthNumSend -> onClickEmailAuthNumSend()
+            is SignUpUiAction.ClickIdDuplicateCheck -> onClickIdDuplicateCheck()
+            is SignUpUiAction.ClickSignUp -> onClickSignUp()
+            is SignUpUiAction.RequestEmailAuthNumber -> requestEmailAuthNumber()
+            is SignUpUiAction.StartEmailAuthTimer -> startEmailAuthTimer()
         }
     }
 
