@@ -45,7 +45,7 @@ fun ConceptCheckScreen(
         when (it) {
             is SurveyUiEffect.MoveToGuide -> moveToGuide()
             SurveyUiEffect.MoveToBack -> moveToBack()
-            is SurveyUiEffect.ShowSnackBer -> onShowSnackBar(it.message)
+            is SurveyUiEffect.ShowSnackBar -> onShowSnackBar(it.message)
         }
     }
 

@@ -38,8 +38,8 @@ class SurveyViewModel @Inject constructor(
                 isChecked = action.isChecked
             )
 
-            SurveyUiAction.ClickCancel -> onClickCancel()
-            SurveyUiAction.ClickSubmit -> onClickSubmit()
+            is SurveyUiAction.ClickCancel -> onClickCancel()
+            is SurveyUiAction.ClickSubmit -> onClickSubmit()
         }
     }
 
@@ -85,7 +85,7 @@ class SurveyViewModel @Inject constructor(
             .onSuccess { sendEffect(SurveyUiEffect.MoveToGuide) }
             .onFailure { throwable ->
                 sendEffect(
-                    SurveyUiEffect.ShowSnackBer(
+                    SurveyUiEffect.ShowSnackBar(
                         throwable.message ?: "알 수 없는 에러가 발생했습니다."
                     )
                 )

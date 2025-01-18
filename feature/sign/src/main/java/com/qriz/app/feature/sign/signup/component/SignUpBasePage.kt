@@ -1,4 +1,4 @@
-package com.qriz.app.feature.sign.component
+package com.qriz.app.feature.sign.signup.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizButton
 
 @Composable
-internal fun SignUpContent(
+internal fun SignUpBasePage(
     title: String,
     subTitle: String,
     buttonText: String,

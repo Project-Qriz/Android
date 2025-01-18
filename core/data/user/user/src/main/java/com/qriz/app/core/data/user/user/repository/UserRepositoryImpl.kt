@@ -23,19 +23,23 @@ internal class UserRepositoryImpl @Inject constructor(
     }
 
     /* TODO: 주소 값 나오면 실제 API 연결 */
-    override suspend fun sendAuthenticationNumber(email: String): Boolean = true
+    override suspend fun requestEmailAuthNumber(email: String) {
+    }
 
     /* TODO: 주소 값 나오면 실제 API 연결 */
-    override suspend fun verifyAuthenticationNumber(authenticationNumber: String): Boolean {
+    override suspend fun verifyEmailAuthNumber(authenticationNumber: String): Boolean {
         return true
     }
 
-    override suspend fun checkDuplicateId(id: String): Boolean {
+    override suspend fun isNotDuplicateId(id: String): Boolean {
         return true
     }
 
     override suspend fun signUp(
-        loginId: String, password: String, email: String, nickname: String
+        loginId: String,
+        password: String,
+        email: String,
+        nickname: String
     ): User {
         userApi.signUp(
             JoinRequest(
