@@ -271,7 +271,7 @@ class SurveyViewModelTest {
                 // then
                 coVerify { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) }
                 effect.test {
-                    (awaitItem() is SurveyUiEffect.ShowSnackBer) shouldBe true
+                    (awaitItem() is SurveyUiEffect.ShowSnackBar) shouldBe true
                 }
             }
         }

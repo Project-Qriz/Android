@@ -10,6 +10,10 @@ private val BoldStyle = TextStyle(
     fontWeight = FontWeight.Bold,
 )
 
+private val MediumStyle = TextStyle(
+    fontWeight = FontWeight.Medium,
+)
+
 private val NormalStyle = TextStyle(
     fontWeight = FontWeight.Normal,
 )
@@ -51,14 +55,14 @@ val Typography = QrizTypography(
         fontSize = 16.sp,
         lineHeight = 23.sp,
     ),
+    headline3 = MediumStyle.copy(
+        fontSize = 16.sp,
+        lineHeight = 23.sp,
+    ),
 
-    subhead = BoldStyle.copy(
+    subhead = MediumStyle.copy(
         fontSize = 14.sp,
         lineHeight = 22.sp,
-    ),
-    subheadLong = BoldStyle.copy(
-        fontSize = 14.sp,
-        lineHeight = 28.sp,
     ),
 
     /** Body */
@@ -95,7 +99,7 @@ val Typography = QrizTypography(
     ),
 
     /** Splash*/
-    splash = NormalStyle.copy(
+    splash = MediumStyle.copy(
         fontSize = 24.sp,
         lineHeight = 34.sp,
     )
@@ -115,9 +119,9 @@ data class QrizTypography(
 
     val headline1: TextStyle,
     val headline2: TextStyle,
+    val headline3: TextStyle,
 
     val subhead: TextStyle,
-    val subheadLong: TextStyle,
 
     /** Body */
     val body1: TextStyle,
@@ -143,8 +147,8 @@ data class QrizTypography(
             heading2 = BoldStyle,
             headline1 = BoldStyle,
             headline2 = BoldStyle,
-            subhead = BoldStyle,
-            subheadLong = BoldStyle,
+            headline3 = MediumStyle,
+            subhead = MediumStyle,
             body1 = NormalStyle,
             body1Long = NormalStyle,
             body2 = NormalStyle,
@@ -152,7 +156,7 @@ data class QrizTypography(
             label = NormalStyle,
             label2 = NormalStyle,
             caption = NormalStyle,
-            splash = NormalStyle,
+            splash = MediumStyle,
         )
     }
 }

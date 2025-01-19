@@ -76,8 +76,12 @@ private fun QrizNavHost(
         startDestination = Route.SignIn,
     ) {
         signNavGraph(
+            onBack = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
-            onClickSignUp = navController::navigateSignUp,
+            moveToSignUp = navController::navigateSignUp,
+            moveToFindId = {},
+            moveToFindPw = {},
+            moveToHome = {},
             onSignUpComplete = navController::navigateCheckGuide,
         )
 

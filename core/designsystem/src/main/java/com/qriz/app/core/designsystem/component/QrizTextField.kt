@@ -1,6 +1,8 @@
 package com.qriz.app.core.designsystem.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.Gray700
+import com.qriz.app.core.designsystem.theme.QrizTheme
 
 @Composable
 fun QrizTextFiled(
@@ -39,6 +42,7 @@ fun QrizTextFiled(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     supportingText: SupportingText? = null,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    cornerShape: RoundedCornerShape = RoundedCornerShape(10.dp),
     trailing: (@Composable () -> Unit)? = null,
 ) {
     BasicTextField(
@@ -68,7 +72,23 @@ fun QrizTextFiled(
                             .fillMaxWidth()
                             .background(
                                 color = MaterialTheme.colorScheme.primaryContainer,
-                                shape = RoundedCornerShape(10.dp),
+                                shape = cornerShape,
+                            )
+                            .border(
+                                border =
+                                if (supportingText != null && supportingText.isBorderColorRequired) {
+                                    BorderStroke(
+                                        width = 1.dp,
+                                        color = supportingText.color
+                                    )
+                                } else {
+                                    BorderStroke(
+                                        width = 0.dp,
+                                        color = MaterialTheme.colorScheme.primaryContainer
+                                    )
+                                },
+
+                                shape = cornerShape,
                             )
                             .padding(contentPadding),
                     ) {
@@ -98,7 +118,7 @@ fun QrizTextFiled(
                 if (supportingText != null) {
                     Text(
                         text = supportingText.message,
-                        style = MaterialTheme.typography.bodySmall.copy(
+                        style = QrizTheme.typography.body2.copy(
                             color = supportingText.color,
                         ),
                         modifier = Modifier.padding(top = 8.dp)
@@ -113,4 +133,5 @@ fun QrizTextFiled(
 data class SupportingText(
     val message: String,
     val color: Color,
+    val isBorderColorRequired: Boolean = true
 )
