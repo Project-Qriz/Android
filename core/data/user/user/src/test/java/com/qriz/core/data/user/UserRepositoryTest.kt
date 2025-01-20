@@ -4,20 +4,16 @@ import com.qriz.app.core.data.user.user.repository.UserRepositoryImpl
 import com.qriz.app.core.network.common.NetworkResponse
 import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.network.user.model.request.FindIdRequest
-import com.qriz.app.core.testing.MainDispatcherRule
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.Test
 
 class UserRepositoryTest {
 
-    @get:Rule
-    val testDispatcherRule = MainDispatcherRule()
-
     private val mockApi = mockk<UserApi>()
+
     private val userRepository = UserRepositoryImpl(userApi = mockApi)
 
     @Test
