@@ -24,7 +24,6 @@ import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.core.designsystem.R as dsR
 
-//todo : 화면 회전 방지 필요
 @Composable
 fun SplashScreen() {
     Box(
