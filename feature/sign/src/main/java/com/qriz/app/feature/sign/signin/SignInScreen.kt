@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -38,6 +37,7 @@ import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Gray500
 import com.qriz.app.core.designsystem.theme.QrizTheme
+import com.qriz.app.core.designsystem.theme.Red800
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.sign.R
 import com.qriz.app.core.designsystem.R as DSR
@@ -170,7 +170,7 @@ private fun SignInContent(
                 Text(
                     text = loginErrorMessage,
                     style = QrizTheme.typography.body2,
-                    color = MaterialTheme.colorScheme.error,
+                    color = Red800,
                     modifier = Modifier.padding(bottom = 12.dp),
                 )
             }

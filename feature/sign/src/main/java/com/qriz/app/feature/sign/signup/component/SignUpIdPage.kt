@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,8 +15,10 @@ import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.SupportingText
 import com.qriz.app.core.designsystem.theme.Black
+import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Mint800
 import com.qriz.app.core.designsystem.theme.QrizTheme
+import com.qriz.app.core.designsystem.theme.Red800
 import com.qriz.app.feature.sign.R
 import com.quiz.app.core.data.user.user_api.model.ID_MAX_LENGTH
 
@@ -38,7 +39,7 @@ fun SignUpIdPage(
 
         errorMessage.isNotBlank() -> SupportingText(
             message = errorMessage,
-            color = MaterialTheme.colorScheme.error
+            color = Red800
         )
 
         else -> SupportingText(
@@ -75,7 +76,7 @@ fun SignUpIdPage(
                 onClick = onClickIdDuplicateCheck,
                 border = BorderStroke(
                     width = 1.dp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Blue600
                 ),
                 shape = RoundedCornerShape(10.dp),
                 contentPadding = PaddingValues(
@@ -86,7 +87,7 @@ fun SignUpIdPage(
             ) {
                 Text(
                     stringResource(R.string.sign_up_id_page_check_duplicate),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = Blue600,
                     style = QrizTheme.typography.subhead,
                 )
             }

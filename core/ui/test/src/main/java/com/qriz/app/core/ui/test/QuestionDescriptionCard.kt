@@ -1,5 +1,6 @@
 package com.qriz.app.core.ui.test
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -9,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizCard
 import com.qriz.app.core.designsystem.theme.QrizTheme
+import com.qriz.app.core.designsystem.theme.White
 
 @Composable
 fun QuestionDescriptionCard(
@@ -17,6 +19,7 @@ fun QuestionDescriptionCard(
 ) {
     QrizCard(
         modifier = modifier
+            .background(White)
             .fillMaxWidth()
     ) {
         Text(

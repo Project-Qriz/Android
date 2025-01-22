@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,13 +21,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.R
+import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
+import com.qriz.app.core.designsystem.theme.White
 
 @Composable
 fun QrizTopBar(
     title: String? = null,
     navigationType: NavigationType = NavigationType.NONE,
-    background: Color = MaterialTheme.colorScheme.surface,
+    background: Color = White,
     onNavigationClick: () -> Unit,
     actions: (@Composable () -> Unit)? = null,
 ) {
@@ -48,7 +49,8 @@ fun QrizTopBar(
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.close_icon),
                             contentDescription = null,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(28.dp),
+                            tint = Gray800
                         )
                     }
                 )
@@ -62,7 +64,8 @@ fun QrizTopBar(
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.back_icon),
                             contentDescription = null,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(28.dp),
+                            tint = Gray800
                         )
                     }
                 )
@@ -80,6 +83,7 @@ fun QrizTopBar(
                         modifier = Modifier
                             .padding(10.dp),
                         text = stringResource(R.string.cancel),
+                        color = Gray800,
                         style = QrizTheme.typography.headline2,
                         textAlign = TextAlign.Center
                     )
@@ -91,7 +95,7 @@ fun QrizTopBar(
             Text(
                 text = title!!,
                 style = QrizTheme.typography.headline1,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = Gray800,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
