@@ -44,7 +44,7 @@ fun TestPageBottomNavigator(
                 text = stringResource(R.string.previous),
                 modifier = Modifier.width(90.dp),
                 onClick = onClickPreviousPage,
-                color = Gray700
+                containerColor = Gray700
             )
         } else {
             Spacer(Modifier.width(90.dp))
@@ -91,7 +91,7 @@ fun TestPageBottomNavigator(
                 text = nextButtonText,
                 modifier = Modifier.width(90.dp),
                 onClick = if (isLastPage) onClickSubmit else onClickNextPage,
-                color = Gray700
+                containerColor = Gray700
             )
         } else {
             Spacer(Modifier.width(90.dp))

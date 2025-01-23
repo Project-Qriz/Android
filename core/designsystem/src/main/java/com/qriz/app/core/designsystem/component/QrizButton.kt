@@ -1,6 +1,7 @@
 package com.qriz.app.core.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -25,15 +26,23 @@ fun QrizButton(
     enable: Boolean = true,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    color: Color? = null,
+    containerColor: Color? = null,
+    strokeColor: Color? = null,
+    textColor: Color? = null,
 ) {
-    val containerColor = if (enable) color ?: Blue500 else Gray200
-    val textColor = if (enable) White else Gray500
+    val backgroundColor = if (enable) containerColor ?: Blue500 else Gray200
+    val selectedTextColor = if (enable) textColor ?: White else Gray500
+    val borderColor = strokeColor ?: Color.Transparent
 
     Box(
         modifier = modifier
+            .border(
+                width = 1.dp,
+                color = borderColor,
+                shape = RoundedCornerShape(10.dp)
+            )
             .background(
-                color = containerColor,
+                color = backgroundColor,
                 shape = RoundedCornerShape(10.dp)
             )
             .clickable(
@@ -49,7 +58,7 @@ fun QrizButton(
         Text(
             text = text,
             style = QrizTheme.typography.headline2,
-            color = textColor
+            color = selectedTextColor
         )
     }
 }
@@ -60,7 +69,7 @@ fun QrizButtonEnablePreview() {
     QrizTheme {
         QrizButton(
             enable = true,
-            text = "Enabled",
+            text = "확인",
             onClick = { }
         )
     }
@@ -68,13 +77,29 @@ fun QrizButtonEnablePreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun QrizButtonForcedColorPreview() {
+fun QrizButtonColorPreview() {
     QrizTheme {
         QrizButton(
             enable = true,
-            text = "Enabled",
+            text = "다음",
             onClick = {},
-            color = Gray700
+            containerColor = Gray700
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun QrizButtonStrokeColorPreview() {
+    QrizTheme {
+        QrizButton(
+            enable = true,
+            text = "취소",
+            onClick = {},
+            strokeColor = Blue500,
+            textColor = Blue500,
+            containerColor = White
         )
     }
 }
@@ -85,7 +110,7 @@ fun QrizButtonDisablePreview() {
     QrizTheme {
         QrizButton(
             enable = false,
-            text = "Enabled",
+            text = "확인",
             onClick = {}
         )
     }
