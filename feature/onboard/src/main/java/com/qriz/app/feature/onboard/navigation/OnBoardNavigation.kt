@@ -10,6 +10,7 @@ import com.qriz.app.feature.onboard.guide.ConceptCheckGuideScreen
 import com.qriz.app.feature.onboard.guide.PreviewGuideScreen
 import com.qriz.app.feature.onboard.guide.WelcomeGuideScreen
 import com.qriz.app.feature.onboard.preview.PreviewScreen
+import com.qriz.app.feature.onboard.previewresult.PreviewResultScreen
 import com.qriz.app.feature.onboard.survey.ConceptCheckScreen
 
 fun NavHostController.navigateConceptCheckGuide() {
@@ -31,7 +32,7 @@ fun NavGraphBuilder.onboardNavGraph(
 
     composable<OnBoardRoute.ConceptCheck> {
         ConceptCheckScreen(
-            moveToGuide = { onNavigate(OnBoardRoute.PreviewGuide) },
+            moveToPreviewGuide = { onNavigate(OnBoardRoute.PreviewGuide) },
             moveToBack = onBack,
             onShowSnackBar = onShowSnackbar,
         )
@@ -45,20 +46,23 @@ fun NavGraphBuilder.onboardNavGraph(
 
     composable<OnBoardRoute.Preview> {
         PreviewScreen(
-            moveToBack = onBack,
-            moveToGuide = { onNavigate(OnBoardRoute.PreviewResult) },
+            moveToResult = { onNavigate(OnBoardRoute.PreviewResult) },
+            moveToHome = {},
             onShowSnackBar = onShowSnackbar,
         )
     }
 
     composable<OnBoardRoute.PreviewResult> {
-
+        PreviewResultScreen(
+            moveToWelcomeGuide = { onNavigate(OnBoardRoute.WelcomeGuide) },
+            onShowSnackBar = onShowSnackbar,
+        )
     }
 
     composable<OnBoardRoute.WelcomeGuide> {
         WelcomeGuideScreen(
             userName = "asfa",
-            onNext = { }
+            moveToHome = {}
         )
     }
 }

@@ -6,27 +6,36 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.qriz.app.core.ui.test.TestScreen
+import com.qriz.app.core.ui.test.TestSubmitWarningDialog
 import com.qriz.app.core.ui.test.TestTimeType
 import com.qriz.app.feature.base.extention.collectSideEffect
 
 @Composable
 fun PreviewScreen(
     viewModel: PreviewViewModel = hiltViewModel(),
-    moveToBack: () -> Unit,
-    moveToGuide: () -> Unit,
+    moveToResult: () -> Unit,
+    moveToHome: () -> Unit,
     onShowSnackBar: (String) -> Unit,
 ) {
+
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
     viewModel.collectSideEffect {
         when (it) {
-            PreviewUiEffect.MoveToGuide -> moveToGuide()
-            PreviewUiEffect.MoveToBack -> moveToBack()
+            is PreviewUiEffect.MoveToResult -> moveToResult()
+            is PreviewUiEffect.MoveToHome -> moveToHome()
             is PreviewUiEffect.ShowSnackBar -> onShowSnackBar(
                 it.message ?: context.getString(it.defaultResId)
             )
         }
+    }
+
+    if (uiState.isVisibleTestSubmitWarningDialog) {
+        TestSubmitWarningDialog(
+            onCancelClick = { viewModel.process(PreviewUiAction.ClickDismissTestSubmitWarningDialog) },
+            onConfirmClick = { viewModel.process(PreviewUiAction.ClickConfirmTestSubmitWarningDialog) },
+        )
     }
 
     TestScreen(

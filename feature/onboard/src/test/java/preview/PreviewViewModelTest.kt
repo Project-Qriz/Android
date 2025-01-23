@@ -68,18 +68,19 @@ class PreviewViewModelTest {
     }
 
     @Test
-    fun `Action_ObservePreviewTestItem process 실패 - Effect_ShowSnackBar 발생, 타이머 시작되지 않음`() = runTest {
-        with(previewViewModel()) {
-            // given
-            coEvery { fakeOnBoardRepository.getPreviewTest() } throws Exception()
-            // when
-            process(PreviewUiAction.ObservePreviewTestItem)
-            //then
-            uiState.test { awaitItem().isLoading shouldBe false }
-            effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBar) shouldBe true }
-            timerJob.shouldBeNull()
+    fun `Action_ObservePreviewTestItem process 실패 - Effect_ShowSnackBar 발생, 타이머 시작되지 않음`() =
+        runTest {
+            with(previewViewModel()) {
+                // given
+                coEvery { fakeOnBoardRepository.getPreviewTest() } throws Exception()
+                // when
+                process(PreviewUiAction.ObservePreviewTestItem)
+                //then
+                uiState.test { awaitItem().isLoading shouldBe false }
+                effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBar) shouldBe true }
+                timerJob.shouldBeNull()
+            }
         }
-    }
 
     @Test
     fun `Action_ObservePreviewTestItem process 로딩 상태 - API호출되지 않음`() = runTest {
@@ -157,20 +158,37 @@ class PreviewViewModelTest {
     }
 
     @Test
-    fun `Action_ClickPreviousPage process - 페이지 인덱스가 1씩 감소함`() = runTest {
+    fun `Action_ClickPreviousPage process 첫 페이지가 아님 - 페이지 인덱스가 1씩 감소함`() = runTest {
         with(previewViewModel()) {
             // given
+            val clickCount = 3
+            (1..clickCount).forEach { process(PreviewUiAction.ClickNextPage) }
             process(PreviewUiAction.ClickPreviousPage)
 
             // when & then
-            uiState.test {
-                awaitItem().currentIndex shouldBe PreviewUiState.Default.currentIndex - 1
-            }
+            uiState.test { awaitItem().currentIndex shouldBe clickCount - 1 }
         }
     }
 
     @Test
-    fun `Action_ClickSubmit process 성공 - 로딩 해제, Effect_MoveToGuide 발생`() = runTest {
+    fun `Action_ClickPreviousPage process 첫 페이지 - 페이지 감소 x, isVisibleTestSubmitWarningDialog = true`() =
+        runTest {
+            with(previewViewModel()) {
+                // given
+                process(PreviewUiAction.ClickPreviousPage)
+
+                // when & then
+                uiState.test {
+                    with(awaitItem()) {
+                        currentIndex shouldBe 0
+                        isVisibleTestSubmitWarningDialog shouldBe true
+                    }
+                }
+            }
+        }
+
+    @Test
+    fun `Action_ClickSubmit process 성공 - 로딩 해제, Effect_MoveToResult 발생`() = runTest {
         with(previewViewModel()) {
             // given
             coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } returns Unit
@@ -180,7 +198,7 @@ class PreviewViewModelTest {
 
             // then
             uiState.test { awaitItem().isLoading shouldBe false }
-            effect.test { (awaitItem() is PreviewUiEffect.MoveToGuide) shouldBe true }
+            effect.test { (awaitItem() is PreviewUiEffect.MoveToResult) shouldBe true }
         }
     }
 
@@ -246,14 +264,40 @@ class PreviewViewModelTest {
         }
 
     @Test
-    fun `Action_ClickCancel process - Effect_MoveToBack 발생`() = runTest {
+    fun `Action_ClickCancel process - isVisibleTestSubmitWarningDialog = true`() = runTest {
         with(previewViewModel()) {
             // given
             process(PreviewUiAction.ClickCancel)
             // when & then
-            effect.test { (awaitItem() is PreviewUiEffect.MoveToBack) shouldBe true }
+            uiState.test {
+                awaitItem().isVisibleTestSubmitWarningDialog shouldBe true
+            }
         }
     }
+
+    @Test
+    fun `Action_ClickConfirmTestSubmitWarningDialog process - isVisibleTestSubmitWarningDialog = false, Effect_MoveToHome 발생`() =
+        runTest {
+            with(previewViewModel()) {
+                // given
+                process(PreviewUiAction.ClickConfirmTestSubmitWarningDialog)
+                // when & then
+                uiState.test { awaitItem().isVisibleTestSubmitWarningDialog shouldBe false }
+                effect.test { (awaitItem() is PreviewUiEffect.MoveToHome) shouldBe true }
+            }
+        }
+
+    @Test
+    fun `Action_ClickDismissTestSubmitWarningDialog process - isVisibleTestSubmitWarningDialog = false`() =
+        runTest {
+            with(previewViewModel()) {
+                // given
+                process(PreviewUiAction.ClickDismissTestSubmitWarningDialog)
+                // when & then
+                uiState.test { awaitItem().isVisibleTestSubmitWarningDialog shouldBe false }
+                effect.test { expectNoEvents() }
+            }
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test

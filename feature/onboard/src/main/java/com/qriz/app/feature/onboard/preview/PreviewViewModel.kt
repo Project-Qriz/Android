@@ -21,9 +21,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// TODO : 시험 중 강제 종료 시 정책 결정 필요함
-//      1. 재시도 가능
-//      2. 그냥 홈으로 이동 (홈에서 재시도 가능하게도 가능)
 @HiltViewModel
 open class PreviewViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -52,6 +49,8 @@ open class PreviewViewModel @Inject constructor(
             is PreviewUiAction.ClickPreviousPage -> onClickPreviousPage()
             is PreviewUiAction.ClickSubmit -> onClickSubmit()
             is PreviewUiAction.ClickCancel -> onClickCancel()
+            is PreviewUiAction.ClickConfirmTestSubmitWarningDialog -> onClickConfirmTestSubmitWarningDialog()
+            is PreviewUiAction.ClickDismissTestSubmitWarningDialog -> onClickDismissTestSubmitWarningDialog()
         }
     }
 
@@ -64,11 +63,24 @@ open class PreviewViewModel @Inject constructor(
     }
 
     private fun onClickPreviousPage() {
+        if (uiState.value.currentIndex == 0) {
+            onClickCancel()
+            return
+        }
         updateState { copy(currentIndex = uiState.value.currentIndex - 1) }
     }
 
     private fun onClickCancel() {
-        sendEffect(PreviewUiEffect.MoveToBack)
+        updateState { copy(isVisibleTestSubmitWarningDialog = true) }
+    }
+
+    private fun onClickConfirmTestSubmitWarningDialog() {
+        updateState { copy(isVisibleTestSubmitWarningDialog = false) }
+        sendEffect(PreviewUiEffect.MoveToHome)
+    }
+
+    private fun onClickDismissTestSubmitWarningDialog() {
+        updateState { copy(isVisibleTestSubmitWarningDialog = false) }
     }
 
     private fun onClickSubmit() {
@@ -130,7 +142,7 @@ open class PreviewViewModel @Inject constructor(
         }
         updateState { copy(isLoading = true) }
         runCatching { onBoardRepository.submitPreviewTest(selectedOptions) }
-            .onSuccess { sendEffect(PreviewUiEffect.MoveToGuide) }
+            .onSuccess { sendEffect(PreviewUiEffect.MoveToResult) }
             .onFailure {
                 sendEffect(
                     PreviewUiEffect.ShowSnackBar(
