@@ -21,7 +21,6 @@ interface OnBoardApi {
     @GET("api/v1/preview/submit")
     fun submitPreviewTest(request: TestSubmitRequest): NetworkResponse<Unit>
 
-    @GET("/api/v1/preview/analyze/Preview Test") //TODO : 서버 수정 대기 (대문자, 띄워쓰기)
+    @GET("/api/v1/preview/analyze")
     fun getPreviewTestResult(): NetworkResponse<AnalyzePreviewResponse>
-
 }
