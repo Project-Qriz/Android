@@ -18,9 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
-import com.qriz.app.core.designsystem.component.NavigationType
 import com.qriz.app.core.designsystem.component.QrizButton
-import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.theme.Blue50
 import com.qriz.app.core.designsystem.theme.Gray500
 import com.qriz.app.core.designsystem.theme.Gray800
@@ -36,7 +34,6 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun ConceptCheckScreen(
-    moveToBack: () -> Unit,
     moveToPreviewGuide: () -> Unit,
     onShowSnackBar: (String) -> Unit,
     viewModel: SurveyViewModel = hiltViewModel(),
@@ -46,7 +43,6 @@ fun ConceptCheckScreen(
     viewModel.collectSideEffect {
         when (it) {
             is SurveyUiEffect.MoveToGuide -> moveToPreviewGuide()
-            is SurveyUiEffect.MoveToBack -> moveToBack()
             is SurveyUiEffect.ShowSnackBar -> onShowSnackBar(it.message)
         }
     }
@@ -69,7 +65,6 @@ fun ConceptCheckScreen(
             )
         },
         onClickSubmit = { viewModel.process(SurveyUiAction.ClickSubmit) },
-        onClickCancel = { viewModel.process(SurveyUiAction.ClickCancel) },
     )
 }
 
@@ -81,18 +76,12 @@ private fun ConceptCheckContent(
     onClickKnowsNothing: (isChecked: Boolean) -> Unit,
     onClickConcept: (preCheckConcept: PreCheckConcept, isChecked: Boolean) -> Unit,
     onClickSubmit: () -> Unit,
-    onClickCancel: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .background(Blue50)
             .fillMaxSize(),
     ) {
-        QrizTopBar(
-            navigationType = NavigationType.CANCEL,
-            onNavigationClick = onClickCancel,
-            background = Blue50,
-        )
 
         //TODO : String res 처리 필요
         Text(
@@ -100,7 +89,7 @@ private fun ConceptCheckContent(
             style = QrizTheme.typography.heading1,
             color = Gray800,
             modifier = Modifier.padding(
-                top = 24.dp,
+                top = 48.dp,
                 bottom = 8.dp,
                 start = 24.dp,
             ),
@@ -187,7 +176,6 @@ fun ConceptCheckContentPreview() {
             onClickKnowsNothing = {},
             onClickConcept = { _, _ -> },
             onClickSubmit = {},
-            onClickCancel = {},
         )
     }
 }

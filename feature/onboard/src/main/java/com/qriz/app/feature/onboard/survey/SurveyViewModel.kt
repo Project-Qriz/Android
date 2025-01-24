@@ -38,7 +38,6 @@ class SurveyViewModel @Inject constructor(
                 isChecked = action.isChecked
             )
 
-            is SurveyUiAction.ClickCancel -> onClickCancel()
             is SurveyUiAction.ClickSubmit -> onClickSubmit()
         }
     }
@@ -68,10 +67,6 @@ class SurveyViewModel @Inject constructor(
     private fun onClickConcept(preCheckConcept: PreCheckConcept, isChecked: Boolean) {
         if (isChecked) _isChecked.update { _isChecked.value + (preCheckConcept to true) }
         else _isChecked.update { _isChecked.value - preCheckConcept }
-    }
-
-    private fun onClickCancel() {
-        sendEffect(SurveyUiEffect.MoveToBack)
     }
 
     private fun onClickSubmit() {

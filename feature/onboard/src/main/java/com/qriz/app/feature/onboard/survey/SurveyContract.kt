@@ -34,11 +34,9 @@ sealed interface SurveyUiAction : UiAction {
     ) : SurveyUiAction
 
     data object ClickSubmit : SurveyUiAction
-    data object ClickCancel : SurveyUiAction
 }
 
 sealed interface SurveyUiEffect : UiEffect {
     data object MoveToGuide : SurveyUiEffect
-    data object MoveToBack : SurveyUiEffect
     data class ShowSnackBar(val message: String) : SurveyUiEffect
 }

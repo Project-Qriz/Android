@@ -294,18 +294,6 @@ class SurveyViewModelTest {
             }
         }
 
-    @Test
-    fun `Action_ClickCancel process - Effect_MoveToBack 발생`() = runTest {
-        with(surveyViewModel()) {
-            // given
-            process(SurveyUiAction.ClickCancel)
-            // when & then
-            effect.test {
-                (awaitItem() is SurveyUiEffect.MoveToBack) shouldBe true
-            }
-        }
-    }
-
     companion object {
         val fakeSelectedConcepts = listOf(
             PreCheckConcept.ATTRIBUTION,
