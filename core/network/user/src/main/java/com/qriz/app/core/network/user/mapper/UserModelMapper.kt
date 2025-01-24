@@ -2,21 +2,23 @@ package com.qriz.app.core.network.user.mapper
 
 import com.qriz.app.core.network.user.model.response.JoinResponse
 import com.qriz.app.core.network.user.model.response.LoginResponse
+import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.model.User
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 fun LoginResponse.toDataModel(): User =
     User(
         id = id,
-        username = userName,
+        userId = userName,
+        name = nickname,
         createdAt = createdAt,
+        previewTestStatus = PreviewTestStatus.valueOf(previewTestStatus)
     )
 
-//TODO : SimpleDateFormat부분 Util class로 뽑기
 fun JoinResponse.toDataModel(): User =
     User(
         id = id,
-        username = username,
-        createdAt = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(date)
+        userId = username,
+        name = name,
+        createdAt = date,
+        previewTestStatus = PreviewTestStatus.NOT_STARTED
     )
