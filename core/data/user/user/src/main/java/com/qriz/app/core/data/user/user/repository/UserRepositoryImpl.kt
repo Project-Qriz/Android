@@ -11,11 +11,18 @@ import com.qriz.app.core.network.user.model.request.ResetPwdRequest
 import com.qriz.app.core.network.user.model.request.VerifyPwdResetRequest
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 internal class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
 ) : UserRepository {
+    private val client = MutableStateFlow<User?>(null)
+
     override suspend fun login(id: String, password: String): User {
         val response = userApi.login(
             LoginRequest(
@@ -23,8 +30,13 @@ internal class UserRepositoryImpl @Inject constructor(
                 password = password
             )
         )
+        val newClient = response.data.toDataModel()
+        client.update { newClient }
+        return newClient
+    }
 
-        return response.data.toDataModel()
+    override fun getClientFlow(): Flow<User> {
+        return client.asStateFlow().filterNotNull()
     }
 
     /* TODO: 주소 값 나오면 실제 API 연결 */
