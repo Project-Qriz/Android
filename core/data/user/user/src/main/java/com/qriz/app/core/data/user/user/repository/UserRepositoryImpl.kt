@@ -1,5 +1,6 @@
 package com.qriz.app.core.data.user.user.repository
 
+import com.qriz.app.core.network.common.util.verifyResponseCode
 import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.network.user.mapper.toDataModel
 import com.qriz.app.core.network.user.model.request.FindIdRequest
@@ -56,10 +57,7 @@ internal class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun sendEmailToFindId(email: String) {
-        userApi.sendEmailToFindId(
-            FindIdRequest(
-                email = email
-            )
-        )
+        userApi.sendEmailToFindId(FindIdRequest(email = email))
+            .verifyResponseCode()
     }
 }
