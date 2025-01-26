@@ -1,7 +1,9 @@
 package com.qriz.app.core.data.user.user.repository
 
+import com.qriz.app.core.network.common.util.verifyResponseCode
 import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.network.user.mapper.toDataModel
+import com.qriz.app.core.network.user.model.request.FindIdRequest
 import com.qriz.app.core.network.user.model.request.JoinRequest
 import com.qriz.app.core.network.user.model.request.LoginRequest
 import com.quiz.app.core.data.user.user_api.model.User
@@ -52,5 +54,10 @@ internal class UserRepositoryImpl @Inject constructor(
 
         val user = login(loginId, password)
         return user
+    }
+
+    override suspend fun sendEmailToFindId(email: String) {
+        userApi.sendEmailToFindId(FindIdRequest(email = email))
+            .verifyResponseCode()
     }
 }

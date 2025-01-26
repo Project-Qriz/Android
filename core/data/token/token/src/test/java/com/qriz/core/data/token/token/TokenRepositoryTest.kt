@@ -1,21 +1,16 @@
 package com.qriz.core.data.token.token
 
 import com.qriz.app.core.datastore.TokenDataStore
-import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.core.data.token.token.repository.TokenRepositoryImpl
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
-import org.junit.Rule
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class TokenRepositoryTest {
-
-    @get:Rule
-    val testDispatcher = MainDispatcherRule()
 
     private val dataStore = mockk<TokenDataStore>(relaxed = true)
 

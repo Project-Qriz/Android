@@ -5,6 +5,8 @@ plugins {
 }
 
 dependencies {
+    testImplementation(kotlin("test"))
+    
     testImplementation(libs.findBundle("unit-test").get())
     androidTestImplementation(libs.findBundle("unit-test").get())
 
