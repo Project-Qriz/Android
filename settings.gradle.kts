@@ -42,6 +42,7 @@ include(":core:data:token:token-api")
 include(":core:data:test:test-api")
 
 include(":core:ui:test")
+include(":core:ui:common")
 
 include(":feature:base")
 include(":feature:main")
