@@ -3,9 +3,9 @@ package com.qriz.app.feature.onboard.navigation
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.qriz.app.core.navigation.route.OnBoardRoute
 import com.qriz.app.core.navigation.route.Route
-import com.qriz.app.core.navigation.route.SignRoute
 import com.qriz.app.feature.onboard.guide.ConceptCheckGuideScreen
 import com.qriz.app.feature.onboard.guide.PreviewGuideScreen
 import com.qriz.app.feature.onboard.guide.WelcomeGuideScreen
@@ -15,7 +15,25 @@ import com.qriz.app.feature.onboard.survey.ConceptCheckScreen
 
 fun NavHostController.navigateConceptCheckGuide() {
     navigate(OnBoardRoute.ConceptCheckGuide) {
-        popUpTo<SignRoute.SignIn>()
+        popUpTo(graph.id)
+    }
+}
+
+fun NavHostController.navigatePreviewGuide() {
+    navigate(OnBoardRoute.PreviewGuide) {
+        popUpTo(graph.id)
+    }
+}
+
+fun NavHostController.navigatePreviewResult() {
+    navigate(OnBoardRoute.PreviewResult) {
+        popUpTo(graph.id)
+    }
+}
+
+fun NavHostController.navigateWelcomeGuide(userName: String) {
+    navigate(OnBoardRoute.WelcomeGuide(userName)) {
+        popUpTo(graph.id)
     }
 }
 
@@ -23,6 +41,9 @@ fun NavGraphBuilder.onboardNavGraph(
     onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
     onNavigate: (Route) -> Unit,
+    moveToPreviewGuide: () -> Unit,
+    moveToPreviewResult: () -> Unit,
+    moveToWelcomeGuide: (String) -> Unit,
 ) {
     composable<OnBoardRoute.ConceptCheckGuide> {
         ConceptCheckGuideScreen(
@@ -32,8 +53,7 @@ fun NavGraphBuilder.onboardNavGraph(
 
     composable<OnBoardRoute.ConceptCheck> {
         ConceptCheckScreen(
-            moveToPreviewGuide = { onNavigate(OnBoardRoute.PreviewGuide) },
-            moveToBack = onBack,
+            moveToPreviewGuide = moveToPreviewGuide,
             onShowSnackBar = onShowSnackbar,
         )
     }
@@ -46,7 +66,7 @@ fun NavGraphBuilder.onboardNavGraph(
 
     composable<OnBoardRoute.Preview> {
         PreviewScreen(
-            moveToResult = { onNavigate(OnBoardRoute.PreviewResult) },
+            moveToPreviewResult = moveToPreviewResult,
             moveToHome = {},
             onShowSnackBar = onShowSnackbar,
         )
@@ -54,14 +74,15 @@ fun NavGraphBuilder.onboardNavGraph(
 
     composable<OnBoardRoute.PreviewResult> {
         PreviewResultScreen(
-            moveToWelcomeGuide = { onNavigate(OnBoardRoute.WelcomeGuide) },
+            moveToWelcomeGuide = moveToWelcomeGuide,
             onShowSnackBar = onShowSnackbar,
         )
     }
 
-    composable<OnBoardRoute.WelcomeGuide> {
+    composable<OnBoardRoute.WelcomeGuide> { navBackStackEntry ->
+        val userName = navBackStackEntry.toRoute<OnBoardRoute.WelcomeGuide>().userName
         WelcomeGuideScreen(
-            userName = "asfa",
+            userName = userName,
             moveToHome = {}
         )
     }
