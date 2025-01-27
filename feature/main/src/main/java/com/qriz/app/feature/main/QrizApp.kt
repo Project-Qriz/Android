@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.feature.onboard.navigation.navigateCheckGuide
 import com.qriz.app.feature.onboard.navigation.onboardNavGraph
+import com.qriz.app.feature.sign.navigation.navigateFindId
 import com.qriz.app.feature.sign.navigation.navigateSignUp
 import com.qriz.app.feature.sign.navigation.signNavGraph
 import kotlinx.coroutines.launch
@@ -79,7 +80,7 @@ private fun QrizNavHost(
             onBack = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
             moveToSignUp = navController::navigateSignUp,
-            moveToFindId = {},
+            moveToFindId = navController::navigateFindId,
             moveToFindPw = {},
             moveToHome = {},
             onSignUpComplete = navController::navigateCheckGuide,

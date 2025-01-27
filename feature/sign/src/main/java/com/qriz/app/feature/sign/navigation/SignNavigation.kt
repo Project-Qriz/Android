@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.qriz.app.core.navigation.route.Route
+import com.qriz.app.feature.sign.findId.FindIdScreen
 import com.qriz.app.feature.sign.signin.SignInScreen
 import com.qriz.app.feature.sign.signup.SignUpScreen
 
@@ -13,6 +14,10 @@ fun NavHostController.navigateSignIn() {
 
 fun NavHostController.navigateSignUp() {
     navigate(Route.SignUp)
+}
+
+fun NavHostController.navigateFindId() {
+    navigate(Route.FindId)
 }
 
 fun NavGraphBuilder.signNavGraph(
@@ -40,5 +45,9 @@ fun NavGraphBuilder.signNavGraph(
             onSignUpComplete = onSignUpComplete,
             onShowSnackbar = onShowSnackbar,
         )
+    }
+
+    composable<Route.FindId> {
+        FindIdScreen(onBack = onBack)
     }
 }
