@@ -110,7 +110,7 @@ private fun FindIdContent(
             QrizTextFiled(
                 value = email,
                 onValueChange = onEmailChanged,
-                hint = "qriz@gmail.com",
+                hint = stringResource(R.string.email_sample_hint),
                 supportingText = if (errorMessageResId != R.string.empty) {
                     SupportingText(
                         message = stringResource(errorMessageResId),

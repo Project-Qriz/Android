@@ -33,6 +33,7 @@
     <string name="email_is_not_exist">가입되지 않은 이메일입니다.</string>
     <string name="send_email_success">이메일 발송 완료</string>
     <string name="check_email_to_find_id">입력하신 이메일 주소로 비밀번호가 발송되었습니다. 메일함을 확인해주세요.</string>
+    <string name="email_sample_hint">qriz@gmail.com</string>
 
     <!--ScreenTitle-->
     <string name="screen_title_enter_name">이름 입력</string>
