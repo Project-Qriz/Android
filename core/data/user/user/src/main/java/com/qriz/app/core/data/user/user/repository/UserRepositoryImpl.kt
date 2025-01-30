@@ -4,8 +4,11 @@ import com.qriz.app.core.network.common.util.verifyResponseCode
 import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.network.user.mapper.toDataModel
 import com.qriz.app.core.network.user.model.request.FindIdRequest
+import com.qriz.app.core.network.user.model.request.FindPwdRequest
 import com.qriz.app.core.network.user.model.request.JoinRequest
 import com.qriz.app.core.network.user.model.request.LoginRequest
+import com.qriz.app.core.network.user.model.request.ResetPwdRequest
+import com.qriz.app.core.network.user.model.request.VerifyPwdResetRequest
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import javax.inject.Inject
@@ -38,10 +41,7 @@ internal class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signUp(
-        loginId: String,
-        password: String,
-        email: String,
-        nickname: String
+        loginId: String, password: String, email: String, nickname: String
     ): User {
         userApi.signUp(
             JoinRequest(
@@ -52,12 +52,42 @@ internal class UserRepositoryImpl @Inject constructor(
             )
         )
 
-        val user = login(loginId, password)
+        val user = login(
+            loginId,
+            password
+        )
         return user
     }
 
     override suspend fun sendEmailToFindId(email: String) {
-        userApi.sendEmailToFindId(FindIdRequest(email = email))
-            .verifyResponseCode()
+        userApi.sendEmailToFindId(
+            request = FindIdRequest(
+                email = email
+            )
+        ).verifyResponseCode()
+    }
+
+    override suspend fun sendEmailToFindPassword(email: String) {
+        userApi.sendEmailToPwd(
+            request = FindPwdRequest(
+                email = email
+            )
+        ).verifyResponseCode()
+    }
+
+    override suspend fun verifyPasswordAuthNumber(authNumber: String) {
+        userApi.verifyPwdReset(
+            request = VerifyPwdResetRequest(
+                authNumber = authNumber
+            )
+        ).verifyResponseCode()
+    }
+
+    override suspend fun resetPassword(password: String) {
+        userApi.resetPwd(
+            request = ResetPwdRequest(
+                password = password
+            )
+        ).verifyResponseCode()
     }
 }
