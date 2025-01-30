@@ -10,4 +10,5 @@ android {
 
 dependencies {
     implementation(projects.core.data.user.userApi)
+    implementation(projects.core.ui.common)
 }

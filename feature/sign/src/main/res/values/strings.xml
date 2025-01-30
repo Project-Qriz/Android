@@ -1,5 +1,6 @@
 <resources>
     <string name="empty" />
+    <string name="network_error_message">네트워크 상태를 확인해주세요.</string>
 
     <!--SignInScreen-->
     <string name="please_enter_id_sign_in">아이디를 입력해주세요.</string>
@@ -23,6 +24,16 @@
     <string name="pw_warning">영문, 숫자, 특수 문자를 조합하여 8~16자로 입력해 주세요.</string>
     <string name="password_is_incorrect">비밀번호가 일치하지 않습니다.</string>
     <string name="id_duplication_check_failed">아이디 중복검사를 실패했습니다.</string>
+
+    <!--FindIdViewModel-->
+    <string name="find_id_screen_title">이메일로 아이디를 전송해 드릴게요.</string>
+    <string name="find_id_screen_guide">가입했던 이메일을 입력하고\n‘아이디 찾기’ 버튼을 눌러주세요.</string>
+    <string name="email_is_invalid_format">잘못된 이메일 형식입니다</string>
+    <string name="email_is_empty">이메일을 입력해주세요</string>
+    <string name="email_is_not_exist">가입되지 않은 이메일입니다.</string>
+    <string name="send_email_success">이메일 발송 완료</string>
+    <string name="check_email_to_find_id">입력하신 이메일 주소로 비밀번호가 발송되었습니다. 메일함을 확인해주세요.</string>
+    <string name="email_sample_hint">qriz@gmail.com</string>
 
     <!--ScreenTitle-->
     <string name="screen_title_enter_name">이름 입력</string>
