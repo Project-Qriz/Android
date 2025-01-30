@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -19,13 +22,47 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
+import com.qriz.app.core.navigation.route.MainTabRoute
+import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.core.designsystem.R as dsR
 
 @Composable
-fun SplashScreen() {
+fun SplashScreen(
+    moveToMain: (MainTabRoute) -> Unit,
+    moveToSurvey: () -> Unit,
+    moveToLogin: () -> Unit,
+    viewModel: SplashViewModel = hiltViewModel()
+) {
+    viewModel.collectSideEffect {
+        when (it) {
+            is SplashUiEffect.MoveToMain -> moveToMain(it.startDestination)
+            is SplashUiEffect.MoveToSurvey -> moveToSurvey()
+            is SplashUiEffect.MoveToLogin -> moveToLogin()
+        }
+    }
+
+    SplashContent(
+        onInitSplash = { viewModel.process(SplashUiAction.LoadUserProfile) }
+    )
+}
+
+@Composable
+fun SplashContent(
+    onInitSplash: () -> Unit
+) {
+    val isInitialized = rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (isInitialized.value.not()) {
+            onInitSplash()
+            isInitialized.value = true
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -77,6 +114,8 @@ fun SplashScreen() {
 @Composable
 private fun PreviewSplashScreen() {
     QrizTheme {
-        SplashScreen()
+        SplashContent(
+            onInitSplash = {}
+        )
     }
 }
