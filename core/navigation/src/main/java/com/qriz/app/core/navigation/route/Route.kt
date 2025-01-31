@@ -4,6 +4,9 @@ import kotlinx.serialization.Serializable
 
 sealed interface Route
 
+@Serializable
+data object SplashRoute : Route
+
 sealed interface SignRoute : Route {
     @Serializable
     data object SignIn : SignRoute
@@ -38,7 +41,9 @@ sealed interface OnBoardRoute : Route {
     data object PreviewResult : OnBoardRoute
 
     @Serializable
-    data object WelcomeGuide : OnBoardRoute
+    data class WelcomeGuide(
+        val userName: String
+    ) : OnBoardRoute
 }
 
 sealed interface MainTabRoute : Route {
@@ -49,7 +54,7 @@ sealed interface MainTabRoute : Route {
     data object ConceptBook : MainTabRoute
 
     @Serializable
-    data object WrongAnswersNote : MainTabRoute
+    data object IncorrectAnswersNote : MainTabRoute
 
     @Serializable
     data object MyPage : MainTabRoute

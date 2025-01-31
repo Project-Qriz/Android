@@ -1,15 +1,15 @@
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.feature.splash.SplashUiAction
 import com.qriz.app.feature.splash.SplashUiEffect
 import com.qriz.app.feature.splash.SplashViewModel
-import com.qriz.app.feature.splash.SplashViewModel.Companion.IS_TEST_FLAG
-import com.qriz.core.data.token.token_api.TokenRepository
+import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
+import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus.NOT_STARTED
+import com.quiz.app.core.data.user.user_api.model.User
+import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import io.kotest.matchers.shouldBe
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -19,27 +19,52 @@ class SplashViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private val fakeTokenRepository = mockk<TokenRepository>()
+    private val fakeUserRepository = mockk<UserRepository>()
 
     private fun TestScope.splashViewModel() = SplashViewModel(
-        savedStateHandle = SavedStateHandle().apply {
-            set(IS_TEST_FLAG, true)
-        },
-        tokenRepository = fakeTokenRepository
+        userRepository = fakeUserRepository
     )
 
     @Test
-    fun `Action_OCheckLoginState process - Effect_MoveToMain 발생`() = runTest {
+    fun `Action_LoadClientProfile process 유저정보가 존재하지 않음 - Effect_MoveToLogin 발생`() = runTest {
         with(splashViewModel()) {
             // given
-            every { fakeTokenRepository.flowTokenExist } returns flowOf(false)
+            coEvery { fakeUserRepository.getClient() } returns null
             // when
-            process(SplashUiAction.CheckLoginState)
+            process(SplashUiAction.LoadClientProfile)
             // then
-            effect.test {
-                awaitItem() shouldBe SplashUiEffect.MoveToMain(false)
-            }
+            effect.test { awaitItem() shouldBe SplashUiEffect.MoveToLogin }
         }
     }
 
+    @Test
+    fun `Action_LoadClientProfile process 유저가 Survey를 완료하지않음 - Effect_MoveToSurvey 발생`() = runTest {
+        with(splashViewModel()) {
+            // given
+            coEvery { fakeUserRepository.getClient() } returns User.Default.copy(
+                previewTestStatus = NOT_STARTED
+            )
+            // when
+            process(SplashUiAction.LoadClientProfile)
+            // then
+            effect.test { awaitItem() shouldBe SplashUiEffect.MoveToSurvey }
+        }
+    }
+
+    @Test
+    fun `Action_LoadClientProfile process 유저가 Survey를 완료함 - Effect_MoveToMain 발생`() = runTest {
+        val states = PreviewTestStatus.entries.filter { it != NOT_STARTED }
+        for (previewTestStatus in states) {
+            with(splashViewModel()) {
+                // given
+                coEvery { fakeUserRepository.getClient() } returns User.Default.copy(
+                    previewTestStatus = previewTestStatus
+                )
+                // when
+                process(SplashUiAction.LoadClientProfile)
+                // then
+                effect.test { awaitItem() shouldBe SplashUiEffect.MoveToMain() }
+            }
+        }
+    }
 }

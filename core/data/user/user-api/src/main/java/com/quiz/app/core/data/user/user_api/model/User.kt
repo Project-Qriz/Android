@@ -19,7 +19,17 @@ data class User(
     val name: String,
     val createdAt: String,
     val previewTestStatus: PreviewTestStatus
-)
+) {
+    companion object {
+        val Default = User(
+            id = -1,
+            userId = "",
+            name = "",
+            createdAt = "",
+            previewTestStatus = NOT_STARTED
+        )
+    }
+}
 
 /**
  * 유저의 프리뷰 테스트 진행 상태

@@ -1,40 +1,42 @@
 package com.qriz.app.feature.splash
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.feature.base.BaseViewModel
-import com.qriz.core.data.token.token_api.TokenRepository
+import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
+import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
-    private val tokenRepository: TokenRepository,
+    private val userRepository: UserRepository,
 ) : BaseViewModel<SplashUiState, SplashUiEffect, SplashUiAction>(SplashUiState) {
-    private val isTest = savedStateHandle.get<Boolean>(IS_TEST_FLAG) ?: false
-
-    init {
-        if (isTest.not()) process(SplashUiAction.CheckLoginState)
-    }
 
     override fun process(action: SplashUiAction): Job = viewModelScope.launch {
         when (action) {
-            is SplashUiAction.CheckLoginState -> checkLoginState()
+            is SplashUiAction.LoadClientProfile -> loadClientProfile()
         }
     }
 
-    private fun checkLoginState() = viewModelScope.launch {
+    private fun loadClientProfile() = viewModelScope.launch {
         delay(2000)
-        val isLoggedIn = tokenRepository.flowTokenExist.first()
-        sendEffect(SplashUiEffect.MoveToMain(isLoggedIn))
+        val client = userRepository.getClient()
+        when {
+            client == null -> {
+                sendEffect(SplashUiEffect.MoveToLogin)
+                return@launch
+            }
+
+            client.previewTestStatus == PreviewTestStatus.NOT_STARTED -> {
+                sendEffect(SplashUiEffect.MoveToSurvey)
+                return@launch
+            }
+
+            else -> sendEffect(SplashUiEffect.MoveToMain())
+        }
     }
 
-    companion object {
-        internal const val IS_TEST_FLAG = "IS_TEST_FLAG"
-    }
 }

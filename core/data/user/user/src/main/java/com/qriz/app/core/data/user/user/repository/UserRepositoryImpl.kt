@@ -53,7 +53,10 @@ internal class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signUp(
-        loginId: String, password: String, email: String, nickname: String
+        loginId: String,
+        password: String,
+        email: String,
+        nickname: String
     ): User {
         userApi.signUp(
             JoinRequest(
@@ -65,8 +68,8 @@ internal class UserRepositoryImpl @Inject constructor(
         )
 
         val user = login(
-            loginId,
-            password
+            id = loginId,
+            password = password
         )
         return user
     }

@@ -10,11 +10,11 @@ import com.qriz.app.feature.base.UiState
 data object SplashUiState : UiState
 
 sealed interface SplashUiAction : UiAction {
-    data object LoadUserProfile : SplashUiAction
+    data object LoadClientProfile : SplashUiAction
 }
 
 sealed interface SplashUiEffect : UiEffect {
-    data class MoveToMain(val startDestination: MainTabRoute) : SplashUiEffect
+    data class MoveToMain(val startDestination: MainTabRoute = MainTabRoute.Home) : SplashUiEffect
     data object MoveToSurvey : SplashUiEffect
     data object MoveToLogin : SplashUiEffect
 }
