@@ -22,4 +22,10 @@ interface UserRepository {
     ): User
 
     suspend fun sendEmailToFindId(email: String)
+
+    suspend fun sendEmailToFindPassword(email: String)
+
+    suspend fun verifyPasswordAuthNumber(authNumber: String)
+
+    suspend fun resetPassword(password: String)
 }
