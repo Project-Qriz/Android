@@ -159,6 +159,34 @@ class UserRepositoryTest {
     }
 
     @Test
+    fun `비밀번호 변경 요청이 실패할 경우 예외를 던진다`() = runTest {
+        //given
+        val mockPassword = "test1234"
+        val failResponse = NetworkResponse(
+            code = -1,
+            message = "잘못된 비밀번호 형식입니다.",
+            data = Unit,
+        )
+
+        coEvery {
+            mockApi.resetPwd(
+                request = ResetPwdRequest(
+                    password = mockPassword,
+                )
+            )
+        } returns failResponse
+
+        //when
+        val exception = assertFailsWith<QrizNetworkException> {
+            userRepository.resetPassword(password = mockPassword)
+        }
+
+        //then
+        assert(exception.code == failResponse.code)
+        assert(exception.message == failResponse.message)
+    }
+
+    @Test
     fun `아이디 찾기 이메일 요청 시 서버에서 받은 응답의 코드가 올바르지 않을 때 예외를 던진다`() = runTest {
         //given
         val failResponse = NetworkResponse(
