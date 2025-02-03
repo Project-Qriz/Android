@@ -14,9 +14,7 @@ import com.qriz.app.feature.onboard.previewresult.PreviewResultScreen
 import com.qriz.app.feature.onboard.survey.ConceptCheckScreen
 
 fun NavHostController.navigateConceptCheckGuide() {
-    navigate(OnBoardRoute.ConceptCheckGuide) {
-        popUpTo(graph.id)
-    }
+    navigate(OnBoardRoute.ConceptCheckGuide)
 }
 
 fun NavHostController.navigatePreviewGuide() {
@@ -44,6 +42,7 @@ fun NavGraphBuilder.onboardNavGraph(
     moveToPreviewGuide: () -> Unit,
     moveToPreviewResult: () -> Unit,
     moveToWelcomeGuide: (String) -> Unit,
+    moveToHome: () -> Unit,
 ) {
     composable<OnBoardRoute.ConceptCheckGuide> {
         ConceptCheckGuideScreen(
@@ -60,14 +59,15 @@ fun NavGraphBuilder.onboardNavGraph(
 
     composable<OnBoardRoute.PreviewGuide> {
         PreviewGuideScreen(
-            onNext = { onNavigate(OnBoardRoute.Preview) }
+            onNext = { onNavigate(OnBoardRoute.Preview) },
+            moveToHome = moveToHome,
         )
     }
 
     composable<OnBoardRoute.Preview> {
         PreviewScreen(
             moveToPreviewResult = moveToPreviewResult,
-            moveToHome = {},
+            moveToHome = moveToHome,
             onShowSnackBar = onShowSnackbar,
         )
     }
@@ -83,7 +83,7 @@ fun NavGraphBuilder.onboardNavGraph(
         val userName = navBackStackEntry.toRoute<OnBoardRoute.WelcomeGuide>().userName
         WelcomeGuideScreen(
             userName = userName,
-            moveToHome = {}
+            moveToHome = moveToHome
         )
     }
 }

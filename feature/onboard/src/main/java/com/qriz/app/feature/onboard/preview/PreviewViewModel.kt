@@ -51,6 +51,8 @@ open class PreviewViewModel @Inject constructor(
             is PreviewUiAction.ClickCancel -> onClickCancel()
             is PreviewUiAction.ClickConfirmTestSubmitWarningDialog -> onClickConfirmTestSubmitWarningDialog()
             is PreviewUiAction.ClickDismissTestSubmitWarningDialog -> onClickDismissTestSubmitWarningDialog()
+            is PreviewUiAction.ClickConfirmTestEndWarningDialog -> onClickConfirmTestEndWarningDialog()
+            is PreviewUiAction.ClickDismissTestEndWarningDialog -> onClickDismissTestEndWarningDialog()
         }
     }
 
@@ -71,7 +73,7 @@ open class PreviewViewModel @Inject constructor(
     }
 
     private fun onClickCancel() {
-        updateState { copy(isVisibleTestSubmitWarningDialog = true) }
+        updateState { copy(isVisibleTestEndWarningDialog = true) }
     }
 
     private fun onClickConfirmTestSubmitWarningDialog() {
@@ -81,6 +83,15 @@ open class PreviewViewModel @Inject constructor(
 
     private fun onClickDismissTestSubmitWarningDialog() {
         updateState { copy(isVisibleTestSubmitWarningDialog = false) }
+    }
+
+    private fun onClickConfirmTestEndWarningDialog() {
+        updateState { copy(isVisibleTestEndWarningDialog = false) }
+        sendEffect(PreviewUiEffect.MoveToHome)
+    }
+
+    private fun onClickDismissTestEndWarningDialog() {
+        updateState { copy(isVisibleTestEndWarningDialog = false) }
     }
 
     private fun onClickSubmit() {

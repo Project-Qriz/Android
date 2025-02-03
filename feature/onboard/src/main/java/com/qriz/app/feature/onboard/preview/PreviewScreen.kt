@@ -9,11 +9,12 @@ import com.qriz.app.core.ui.test.TestScreen
 import com.qriz.app.core.ui.test.TestSubmitWarningDialog
 import com.qriz.app.core.ui.test.TestTimeType
 import com.qriz.app.feature.base.extention.collectSideEffect
+import com.qriz.app.feature.onboard.guide.TestEndWarningDialog
 
 @Composable
 fun PreviewScreen(
     viewModel: PreviewViewModel = hiltViewModel(),
-    moveToResult: () -> Unit,
+    moveToPreviewResult: () -> Unit,
     moveToHome: () -> Unit,
     onShowSnackBar: (String) -> Unit,
 ) {
@@ -23,7 +24,7 @@ fun PreviewScreen(
 
     viewModel.collectSideEffect {
         when (it) {
-            is PreviewUiEffect.MoveToResult -> moveToResult()
+            is PreviewUiEffect.MoveToResult -> moveToPreviewResult()
             is PreviewUiEffect.MoveToHome -> moveToHome()
             is PreviewUiEffect.ShowSnackBar -> onShowSnackBar(
                 it.message ?: context.getString(it.defaultResId)
@@ -35,6 +36,13 @@ fun PreviewScreen(
         TestSubmitWarningDialog(
             onCancelClick = { viewModel.process(PreviewUiAction.ClickDismissTestSubmitWarningDialog) },
             onConfirmClick = { viewModel.process(PreviewUiAction.ClickConfirmTestSubmitWarningDialog) },
+        )
+    }
+
+    if (uiState.isVisibleTestEndWarningDialog) {
+        TestEndWarningDialog(
+            onCancelClick = { viewModel.process(PreviewUiAction.ClickDismissTestEndWarningDialog) },
+            onConfirmClick = { viewModel.process(PreviewUiAction.ClickConfirmTestEndWarningDialog) },
         )
     }
 

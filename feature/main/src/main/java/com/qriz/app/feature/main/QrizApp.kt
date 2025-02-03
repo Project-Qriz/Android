@@ -140,6 +140,7 @@ private fun QrizNavHost(
             moveToPreviewGuide = navController::navigatePreviewGuide,
             moveToPreviewResult = navController::navigatePreviewResult,
             moveToWelcomeGuide = navController::navigateWelcomeGuide,
+            moveToHome = { mainNavigator.navigateMainTabClearingStack(MainTab.HOME) },
         )
 
         homeNavGraph(

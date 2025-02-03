@@ -171,7 +171,7 @@ class PreviewViewModelTest {
     }
 
     @Test
-    fun `Action_ClickPreviousPage process 첫 페이지 - 페이지 감소 x, isVisibleTestSubmitWarningDialog = true`() =
+    fun `Action_ClickPreviousPage process 첫 페이지 - 페이지 감소 x, isVisibleTestEndWarningDialog = true`() =
         runTest {
             with(previewViewModel()) {
                 // given
@@ -181,7 +181,7 @@ class PreviewViewModelTest {
                 uiState.test {
                     with(awaitItem()) {
                         currentIndex shouldBe 0
-                        isVisibleTestSubmitWarningDialog shouldBe true
+                        isVisibleTestEndWarningDialog shouldBe true
                     }
                 }
             }
@@ -264,13 +264,13 @@ class PreviewViewModelTest {
         }
 
     @Test
-    fun `Action_ClickCancel process - isVisibleTestSubmitWarningDialog = true`() = runTest {
+    fun `Action_ClickCancel process - isVisibleTestEndWarningDialog = true`() = runTest {
         with(previewViewModel()) {
             // given
             process(PreviewUiAction.ClickCancel)
             // when & then
             uiState.test {
-                awaitItem().isVisibleTestSubmitWarningDialog shouldBe true
+                awaitItem().isVisibleTestEndWarningDialog shouldBe true
             }
         }
     }
@@ -295,6 +295,30 @@ class PreviewViewModelTest {
                 process(PreviewUiAction.ClickDismissTestSubmitWarningDialog)
                 // when & then
                 uiState.test { awaitItem().isVisibleTestSubmitWarningDialog shouldBe false }
+                effect.test { expectNoEvents() }
+            }
+        }
+
+    @Test
+    fun `Action_ClickConfirmTestEndWarningDialog process - isVisibleTestEndWarningDialog = false, Effect_MoveToHome 발생`() =
+        runTest {
+            with(previewViewModel()) {
+                // given
+                process(PreviewUiAction.ClickConfirmTestEndWarningDialog)
+                // when & then
+                uiState.test { awaitItem().isVisibleTestEndWarningDialog shouldBe false }
+                effect.test { (awaitItem() is PreviewUiEffect.MoveToHome) shouldBe true }
+            }
+        }
+
+    @Test
+    fun `Action_ClickDismissTestEndWarningDialog process - isVisibleTestEndWarningDialog = false`() =
+        runTest {
+            with(previewViewModel()) {
+                // given
+                process(PreviewUiAction.ClickDismissTestEndWarningDialog)
+                // when & then
+                uiState.test { awaitItem().isVisibleTestEndWarningDialog shouldBe false }
                 effect.test { expectNoEvents() }
             }
         }
