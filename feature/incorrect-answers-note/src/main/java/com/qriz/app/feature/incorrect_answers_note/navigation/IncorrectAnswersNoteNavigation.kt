@@ -1,6 +1,5 @@
 package com.qriz.app.feature.incorrect_answers_note.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -13,15 +12,11 @@ fun NavController.navigateToIncorrectAnswersNote(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.incorrectAnswersNoteNavGraph(
-    padding: PaddingValues,
-    popBackStack: () -> Unit,
-    onShowSnackBar: (String) -> Unit,
+    onShowSnackbar: (String) -> Unit,
 ) {
     composable<MainTabRoute.IncorrectAnswersNote> {
         IncorrectAnswersNoteScreen(
-//            padding = padding,
-//            popBackStack = popBackStack,
-            onShowSnackBar = onShowSnackBar,
+            onShowSnackBar = onShowSnackbar,
         )
     }
 }

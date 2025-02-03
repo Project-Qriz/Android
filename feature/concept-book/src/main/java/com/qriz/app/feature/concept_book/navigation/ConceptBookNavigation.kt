@@ -1,6 +1,5 @@
 package com.qriz.app.feature.concept_book.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -13,15 +12,11 @@ fun NavController.navigateToConceptBook(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.conceptBookNavGraph(
-    padding: PaddingValues,
-    popBackStack: () -> Unit,
-    onShowSnackBar: (String) -> Unit,
+    onShowSnackbar: (String) -> Unit,
 ) {
     composable<MainTabRoute.ConceptBook> {
         ConceptBookScreen(
-//            padding = padding,
-//            popBackStack = popBackStack,
-            onShowSnackBar = onShowSnackBar,
+            onShowSnackBar = onShowSnackbar,
         )
     }
 }

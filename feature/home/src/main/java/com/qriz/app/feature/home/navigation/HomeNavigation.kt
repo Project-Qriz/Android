@@ -1,6 +1,5 @@
 package com.qriz.app.feature.home.navigation
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -13,15 +12,11 @@ fun NavController.navigateToHome(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.homeNavGraph(
-    padding: PaddingValues,
-    popBackStack: () -> Unit,
-    onShowSnackBar: (String) -> Unit,
+    onShowSnackbar: (String) -> Unit,
 ) {
     composable<MainTabRoute.Home> {
         HomeScreen(
-//            padding = padding,
-//            popBackStack = popBackStack,
-            onShowSnackBar = onShowSnackBar,
+            onShowSnackBar = onShowSnackbar,
         )
     }
 }
