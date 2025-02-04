@@ -1,6 +1,5 @@
 package com.qriz.app.core.ui.test
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -10,7 +9,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizCard
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.White
 
 @Composable
 fun QuestionDescriptionCard(
@@ -19,8 +17,8 @@ fun QuestionDescriptionCard(
 ) {
     QrizCard(
         modifier = modifier
-            .background(White)
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        elevation = 0.dp
     ) {
         Text(
             text = description,
@@ -34,7 +32,7 @@ fun QuestionDescriptionCard(
 
 @Preview
 @Composable
-fun TestDescriptionCardPreview() {
+private fun TestDescriptionCardPreview() {
     QrizTheme {
         QuestionDescriptionCard("다음 중 GROUP BY 절의 특징으로 올바르지 않은 것은?")
     }

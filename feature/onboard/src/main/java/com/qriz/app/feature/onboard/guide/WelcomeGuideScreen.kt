@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.onboard.R
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
@@ -35,9 +36,11 @@ fun WelcomeGuideScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewWelcomeGuideScreen() {
-    WelcomeGuideScreen(
-        userName = "Qriz",
-        moveToHome = {}
-    )
+private fun WelcomeGuideScreenPreview() {
+    QrizTheme {
+        WelcomeGuideScreen(
+            userName = "Qriz",
+            moveToHome = {}
+        )
+    }
 }

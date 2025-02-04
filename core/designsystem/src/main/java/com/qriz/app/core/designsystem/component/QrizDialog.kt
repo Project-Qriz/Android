@@ -81,28 +81,32 @@ fun QrizDialog(
 
 @Preview(showBackground = true)
 @Composable
-fun QrizDialogPreview() {
-    QrizDialog(
-        title = "제출하시겠습니까?",
-        description = "확인 버튼을 누르면 다시 돌아올 수 없어요.",
-        cancelText = "취소",
-        confirmText = "확인",
-        onCancelClick = { },
-        onConfirmClick = { },
-        onDismissRequest = { }
-    )
+private fun QrizDialogPreview() {
+    QrizTheme {
+        QrizDialog(
+            title = "제출하시겠습니까?",
+            description = "확인 버튼을 누르면 다시 돌아올 수 없어요.",
+            cancelText = "취소",
+            confirmText = "확인",
+            onCancelClick = { },
+            onConfirmClick = { },
+            onDismissRequest = { }
+        )
+    }
 }
 
 
 @Preview(showBackground = true)
 @Composable
-fun QrizDialog2Preview() {
-    QrizDialog(
-        title = "네트워크 오류 발생",
-        description = "인터넷에 연결되어 있지 않는 것 같습니다. \n다시 시도해 주세요.",
-        confirmText = "재시도 하기",
-        onCancelClick = { },
-        onConfirmClick = { },
-        onDismissRequest = { }
-    )
+private fun QrizDialog2Preview() {
+    QrizTheme {
+        QrizDialog(
+            title = "네트워크 오류 발생",
+            description = "인터넷에 연결되어 있지 않는 것 같습니다. \n다시 시도해 주세요.",
+            confirmText = "재시도 하기",
+            onCancelClick = { },
+            onConfirmClick = { },
+            onDismissRequest = { }
+        )
+    }
 }

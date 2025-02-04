@@ -3,6 +3,7 @@ package com.qriz.app.feature.onboard.guide
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.onboard.R
 
 @Composable
@@ -20,8 +21,10 @@ fun ConceptCheckGuideScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewConceptCheckGuideScreen() {
-    ConceptCheckGuideScreen(
-        onNext = {}
-    )
+private fun ConceptCheckGuideScreenPreview() {
+    QrizTheme {
+        ConceptCheckGuideScreen(
+            onNext = {}
+        )
+    }
 }

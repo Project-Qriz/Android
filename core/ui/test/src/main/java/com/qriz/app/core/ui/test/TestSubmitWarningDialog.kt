@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.qriz.app.core.designsystem.component.QrizDialog
+import com.qriz.app.core.designsystem.theme.QrizTheme
 
 @Composable
 fun TestSubmitWarningDialog(
@@ -24,9 +25,11 @@ fun TestSubmitWarningDialog(
 
 @Preview(showBackground = true)
 @Composable
-fun TestSubmitWarningDialogPreview() {
-    TestSubmitWarningDialog(
-        onCancelClick = { },
-        onConfirmClick = { },
-    )
+private fun TestSubmitWarningDialogPreview() {
+    QrizTheme {
+        TestSubmitWarningDialog(
+            onCancelClick = { },
+            onConfirmClick = { },
+        )
+    }
 }

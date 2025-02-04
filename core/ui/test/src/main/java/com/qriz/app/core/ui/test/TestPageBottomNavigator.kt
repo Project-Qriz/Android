@@ -101,7 +101,7 @@ fun TestPageBottomNavigator(
 
 @Preview(showBackground = true)
 @Composable
-fun TestPageBottomNavigatorFirstPagePreview() {
+private fun TestPageBottomNavigatorFirstPagePreview() {
     QrizTheme {
         TestPageBottomNavigator(
             currentIndex = 0,
@@ -117,7 +117,7 @@ fun TestPageBottomNavigatorFirstPagePreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun TestPageBottomNavigatorSelectedFirstPagePreview() {
+private fun TestPageBottomNavigatorSelectedFirstPagePreview() {
     QrizTheme {
         TestPageBottomNavigator(
             currentIndex = 0,
@@ -132,7 +132,7 @@ fun TestPageBottomNavigatorSelectedFirstPagePreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun TestPageBottomNavigatorSelectedMiddlePagePreview() {
+private fun TestPageBottomNavigatorSelectedMiddlePagePreview() {
     QrizTheme {
         TestPageBottomNavigator(
             currentIndex = 5,
@@ -147,7 +147,7 @@ fun TestPageBottomNavigatorSelectedMiddlePagePreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun TestPageBottomNavigatorSelectedLastPagePreview() {
+private fun TestPageBottomNavigatorSelectedLastPagePreview() {
     QrizTheme {
         TestPageBottomNavigator(
             currentIndex = 19,

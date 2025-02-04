@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.onboard.R
 
 @Composable
@@ -18,7 +19,7 @@ fun PreviewGuideScreen(
     BackHandler {
         isVisibleWarningDialog.value = isVisibleWarningDialog.value.not()
     }
-    
+
     if (isVisibleWarningDialog.value) {
         TestEndWarningDialog(
             onCancelClick = { isVisibleWarningDialog.value = false },
@@ -41,9 +42,11 @@ fun PreviewGuideScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewPreviewGuideScreen() {
-    PreviewGuideScreen(
-        onNext = {},
-        moveToHome = {}
-    )
+private fun PreviewGuideScreenPreview() {
+    QrizTheme {
+        PreviewGuideScreen(
+            onNext = {},
+            moveToHome = {}
+        )
+    }
 }

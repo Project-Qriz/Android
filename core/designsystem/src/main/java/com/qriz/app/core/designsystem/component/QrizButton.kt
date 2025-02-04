@@ -65,7 +65,7 @@ fun QrizButton(
 
 @Preview(showBackground = true)
 @Composable
-fun QrizButtonEnablePreview() {
+private fun QrizButtonEnablePreview() {
     QrizTheme {
         QrizButton(
             enable = true,
@@ -77,7 +77,7 @@ fun QrizButtonEnablePreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun QrizButtonColorPreview() {
+private fun QrizButtonColorPreview() {
     QrizTheme {
         QrizButton(
             enable = true,
@@ -91,7 +91,7 @@ fun QrizButtonColorPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun QrizButtonStrokeColorPreview() {
+private fun QrizButtonStrokeColorPreview() {
     QrizTheme {
         QrizButton(
             enable = true,
@@ -106,7 +106,7 @@ fun QrizButtonStrokeColorPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun QrizButtonDisablePreview() {
+private fun QrizButtonDisablePreview() {
     QrizTheme {
         QrizButton(
             enable = false,

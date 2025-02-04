@@ -79,23 +79,26 @@ enum class TestTimeType {
 
 @Preview(showBackground = true)
 @Composable
-fun TestTopBarTotalTimePreview() {
-    TestTopBar(
-        remainTimeText = "10:45",
-        progressPercent = 0.7f,
-        testTimeType = TestTimeType.TOTAL,
-        onCancel = {}
-    )
+private fun TestTopBarTotalTimePreview() {
+    QrizTheme {
+        TestTopBar(
+            remainTimeText = "10:45",
+            progressPercent = 0.7f,
+            testTimeType = TestTimeType.TOTAL,
+            onCancel = {}
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun TestTopBarIndividualTimePreview() {
-    TestTopBar(
-        remainTimeText = "10:45",
-        progressPercent = 0.7f,
-        testTimeType = TestTimeType.INDIVIDUAL,
-        onCancel = {}
-    )
+private fun TestTopBarIndividualTimePreview() {
+    QrizTheme {
+        TestTopBar(
+            remainTimeText = "10:45",
+            progressPercent = 0.7f,
+            testTimeType = TestTimeType.INDIVIDUAL,
+            onCancel = {}
+        )
+    }
 }
-

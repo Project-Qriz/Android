@@ -117,40 +117,48 @@ enum class NavigationType {
 
 @Preview(showBackground = true)
 @Composable
-fun QrizTopBarPreviewNone() {
-    QrizTopBar(
-        title = "Title",
-        navigationType = NavigationType.NONE,
-        onNavigationClick = {}
-    )
+private fun QrizTopBarPreviewNone() {
+    QrizTheme {
+        QrizTopBar(
+            title = "Title",
+            navigationType = NavigationType.NONE,
+            onNavigationClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun QrizTopBarPreviewClose() {
-    QrizTopBar(
-        title = "Title",
-        navigationType = NavigationType.CLOSE,
-        onNavigationClick = {}
-    )
+private fun QrizTopBarPreviewClose() {
+    QrizTheme {
+        QrizTopBar(
+            title = "Title",
+            navigationType = NavigationType.CLOSE,
+            onNavigationClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun QrizTopBarPreviewBack() {
-    QrizTopBar(
-        title = "Title",
-        navigationType = NavigationType.BACK,
-        onNavigationClick = {}
-    )
+private fun QrizTopBarPreviewBack() {
+    QrizTheme {
+        QrizTopBar(
+            title = "Title",
+            navigationType = NavigationType.BACK,
+            onNavigationClick = {}
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun QrizTopBarPreviewCancel() {
-    QrizTopBar(
-        title = "Title",
-        navigationType = NavigationType.CANCEL,
-        onNavigationClick = {}
-    )
+private fun QrizTopBarPreviewCancel() {
+    QrizTheme {
+        QrizTopBar(
+            title = "Title",
+            navigationType = NavigationType.CANCEL,
+            onNavigationClick = {}
+        )
+    }
 }

@@ -167,7 +167,7 @@ private fun ConceptCheckContent(
     showBackground = true
 )
 @Composable
-fun ConceptCheckContentPreview() {
+private fun ConceptCheckContentPreview() {
     QrizTheme {
         ConceptCheckContent(
             surveyItems = persistentListOf(),
