@@ -1,6 +1,6 @@
 package com.qriz.app.core.data.onboard.onboard.repository
 
-import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.onboard.onboard_api.model.PreviewTestResult
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.data.test.test_api.model.Option
@@ -19,7 +19,7 @@ internal class OnBoardRepositoryImpl @Inject constructor(
     private val onBoardApi: OnBoardApi
 ) : OnBoardRepository {
 
-    override fun submitSurvey(concepts: Collection<PreCheckConcept>) {
+    override fun submitSurvey(concepts: Collection<SQLDConcept>) {
         val response = onBoardApi.submitSurvey(
             SurveyRequest(keyConcept = concepts.map { it.title })
         )

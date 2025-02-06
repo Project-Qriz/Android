@@ -1,7 +1,7 @@
 package com.qriz.app.feature.onboard.survey
 
 import androidx.compose.runtime.Immutable
-import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
@@ -29,7 +29,7 @@ sealed interface SurveyUiAction : UiAction {
     data class ClickKnowsAll(val isChecked: Boolean) : SurveyUiAction
     data class ClickKnowsNothing(val isChecked: Boolean) : SurveyUiAction
     data class ClickConcept(
-        val preCheckConcept: PreCheckConcept,
+        val sqldConcept: SQLDConcept,
         val isChecked: Boolean
     ) : SurveyUiAction
 

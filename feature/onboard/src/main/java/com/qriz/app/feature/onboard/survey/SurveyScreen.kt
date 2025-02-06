@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.theme.Blue50
 import com.qriz.app.core.designsystem.theme.Gray500
@@ -56,10 +56,10 @@ fun ConceptCheckScreen(
         onClickKnowsNothing = { isChecked ->
             viewModel.process(SurveyUiAction.ClickKnowsNothing(isChecked))
         },
-        onClickConcept = { preCheckConcept, isChecked ->
+        onClickConcept = { sqldConcept, isChecked ->
             viewModel.process(
                 SurveyUiAction.ClickConcept(
-                    preCheckConcept = preCheckConcept,
+                    sqldConcept = sqldConcept,
                     isChecked = isChecked
                 )
             )
@@ -74,7 +74,7 @@ private fun ConceptCheckContent(
     isPossibleSubmit: Boolean,
     onClickKnowsAll: (isChecked: Boolean) -> Unit,
     onClickKnowsNothing: (isChecked: Boolean) -> Unit,
-    onClickConcept: (preCheckConcept: PreCheckConcept, isChecked: Boolean) -> Unit,
+    onClickConcept: (sqldConcept: SQLDConcept, isChecked: Boolean) -> Unit,
     onClickSubmit: () -> Unit,
 ) {
     Column(

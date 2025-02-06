@@ -2,7 +2,7 @@ package com.qriz.app.feature.onboard.survey
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.onboard.survey.mapper.toSurveyListItem
@@ -22,7 +22,7 @@ class SurveyViewModel @Inject constructor(
 ) : BaseViewModel<SurveyUiState, SurveyUiEffect, SurveyUiAction>(SurveyUiState.Default) {
     private val isTest = savedStateHandle.get<Boolean>(IS_TEST_FLAG) ?: false
 
-    private val _isChecked = MutableStateFlow<Map<PreCheckConcept, Boolean>>(emptyMap())
+    private val _isChecked = MutableStateFlow<Map<SQLDConcept, Boolean>>(emptyMap())
 
     init {
         if (isTest.not()) process(SurveyUiAction.ObserveSurveyItems)
@@ -34,7 +34,7 @@ class SurveyViewModel @Inject constructor(
             is SurveyUiAction.ClickKnowsAll -> onClickKnowsAll(action.isChecked)
             is SurveyUiAction.ClickKnowsNothing -> onClickKnowsNothing(action.isChecked)
             is SurveyUiAction.ClickConcept -> onClickConcept(
-                preCheckConcept = action.preCheckConcept,
+                sqldConcept = action.sqldConcept,
                 isChecked = action.isChecked
             )
 
@@ -46,7 +46,7 @@ class SurveyViewModel @Inject constructor(
         _isChecked.collect { isCheckedMap ->
             updateState {
                 copy(
-                    surveyItems = PreCheckConcept.entries
+                    surveyItems = SQLDConcept.entries
                         .toSurveyListItem(isCheckedMap)
                         .toImmutableList()
                 )
@@ -55,18 +55,18 @@ class SurveyViewModel @Inject constructor(
     }
 
     private fun onClickKnowsAll(isChecked: Boolean) {
-        if (isChecked) _isChecked.update { PreCheckConcept.entries.associateWith { true } }
+        if (isChecked) _isChecked.update { SQLDConcept.entries.associateWith { true } }
         else _isChecked.update { emptyMap() }
     }
 
     private fun onClickKnowsNothing(isChecked: Boolean) {
-        if (isChecked) _isChecked.update { PreCheckConcept.entries.associateWith { false } }
+        if (isChecked) _isChecked.update { SQLDConcept.entries.associateWith { false } }
         else _isChecked.update { emptyMap() }
     }
 
-    private fun onClickConcept(preCheckConcept: PreCheckConcept, isChecked: Boolean) {
-        if (isChecked) _isChecked.update { _isChecked.value + (preCheckConcept to true) }
-        else _isChecked.update { _isChecked.value - preCheckConcept }
+    private fun onClickConcept(sqldConcept: SQLDConcept, isChecked: Boolean) {
+        if (isChecked) _isChecked.update { _isChecked.value + (sqldConcept to true) }
+        else _isChecked.update { _isChecked.value - sqldConcept }
     }
 
     private fun onClickSubmit() {
@@ -75,7 +75,7 @@ class SurveyViewModel @Inject constructor(
         submitSurvey(checked)
     }
 
-    private fun submitSurvey(checked: List<PreCheckConcept>) = viewModelScope.launch {
+    private fun submitSurvey(checked: List<SQLDConcept>) = viewModelScope.launch {
         runCatching { onBoardRepository.submitSurvey(checked) }
             .onSuccess { sendEffect(SurveyUiEffect.MoveToGuide) }
             .onFailure { throwable ->

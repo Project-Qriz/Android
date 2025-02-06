@@ -1,6 +1,6 @@
 package com.qriz.app.core.data.onboard.onboard.repository
 
-import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.onboard.onboard_api.model.PreviewTestResult
 import com.qriz.app.core.data.onboard.onboard_api.model.WeakArea
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 /** API 완성되기 전까지 사용할 테스트 Repository */
 internal class FakeOnBoardRepository @Inject constructor() : OnBoardRepository {
-    override fun submitSurvey(concepts: Collection<PreCheckConcept>) {}
+    override fun submitSurvey(concepts: Collection<SQLDConcept>) {}
 
     override suspend fun getPreviewTest(): Test {
         val defaultQuestion = Question(
@@ -70,9 +70,9 @@ internal class FakeOnBoardRepository @Inject constructor() : OnBoardRepository {
             /**여러 개념 오답*/
             PreviewTestResult(
                 estimatedScore = 78.0F,
-                totalScore = 90,
-                part1Score = 45,
-                part2Score = 45,
+                totalScore = 60,
+                part1Score = 20,
+                part2Score = 40,
                 totalQuestions = 21,
                 weakAreas = listOf(
                     WeakArea(

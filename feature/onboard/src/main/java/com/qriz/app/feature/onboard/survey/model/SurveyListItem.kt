@@ -1,7 +1,7 @@
 package com.qriz.app.feature.onboard.survey.model
 
 import androidx.compose.runtime.Immutable
-import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 
 @Immutable
 sealed class SurveyListItem(
@@ -27,7 +27,7 @@ sealed class SurveyListItem(
 
     @Immutable
     data class SurveyItem(
-        val concept: PreCheckConcept,
+        val concept: SQLDConcept,
         override val isChecked: Boolean
     ) : SurveyListItem(isChecked)
 

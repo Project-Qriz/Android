@@ -2,7 +2,7 @@ package survey
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.feature.onboard.survey.SurveyUiAction
@@ -122,7 +122,7 @@ class SurveyViewModelTest {
             for (concept in fakeSelectedConcepts) {
                 process(
                     SurveyUiAction.ClickConcept(
-                        preCheckConcept = concept,
+                        sqldConcept = concept,
                         isChecked = true
                     )
                 )
@@ -147,14 +147,14 @@ class SurveyViewModelTest {
             for (concept in fakeSelectedConcepts) {
                 process(
                     SurveyUiAction.ClickConcept(
-                        preCheckConcept = concept,
+                        sqldConcept = concept,
                         isChecked = true
                     )
                 )
             }
             process(
                 SurveyUiAction.ClickConcept(
-                    preCheckConcept = fakeSelectedConcepts.first(),
+                    sqldConcept = fakeSelectedConcepts.first(),
                     isChecked = false
                 )
             )
@@ -176,10 +176,10 @@ class SurveyViewModelTest {
             with(surveyViewModel()) {
                 // given
                 process(SurveyUiAction.ObserveSurveyItems)
-                for (concept in PreCheckConcept.entries) {
+                for (concept in SQLDConcept.entries) {
                     process(
                         SurveyUiAction.ClickConcept(
-                            preCheckConcept = concept,
+                            sqldConcept = concept,
                             isChecked = true
                         )
                     )
@@ -237,7 +237,7 @@ class SurveyViewModelTest {
                 for (concept in fakeSelectedConcepts) {
                     process(
                         SurveyUiAction.ClickConcept(
-                            preCheckConcept = concept,
+                            sqldConcept = concept,
                             isChecked = true
                         )
                     )
@@ -262,7 +262,7 @@ class SurveyViewModelTest {
                 for (concept in fakeSelectedConcepts) {
                     process(
                         SurveyUiAction.ClickConcept(
-                            preCheckConcept = concept,
+                            sqldConcept = concept,
                             isChecked = true
                         )
                     )
@@ -281,13 +281,13 @@ class SurveyViewModelTest {
         runTest {
             with(surveyViewModel()) {
                 // given
-                coEvery { fakeOnBoardRepository.submitSurvey(PreCheckConcept.entries.toList()) } returns Unit
+                coEvery { fakeOnBoardRepository.submitSurvey(SQLDConcept.entries.toList()) } returns Unit
                 //when
                 process(SurveyUiAction.ObserveSurveyItems)
                 process(SurveyUiAction.ClickKnowsAll(true))
                 process(SurveyUiAction.ClickSubmit)
                 //then
-                coVerify { fakeOnBoardRepository.submitSurvey(PreCheckConcept.entries.toList()) }
+                coVerify { fakeOnBoardRepository.submitSurvey(SQLDConcept.entries.toList()) }
                 effect.test {
                     (awaitItem() is SurveyUiEffect.MoveToGuide) shouldBe true
                 }
@@ -296,8 +296,8 @@ class SurveyViewModelTest {
 
     companion object {
         val fakeSelectedConcepts = listOf(
-            PreCheckConcept.ATTRIBUTION,
-            PreCheckConcept.ENTITY
+            SQLDConcept.ATTRIBUTION,
+            SQLDConcept.ENTITY
         )
     }
 }

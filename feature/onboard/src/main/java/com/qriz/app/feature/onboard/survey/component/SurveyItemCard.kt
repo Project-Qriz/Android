@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.designsystem.theme.Blue100
 import com.qriz.app.core.designsystem.theme.Blue500
 import com.qriz.app.core.designsystem.theme.Gray800
@@ -92,14 +92,14 @@ private fun ConceptCheckOptionCardPreview() {
             )
             SurveyItemCard(
                 surveyItem = SurveyListItem.SurveyItem(
-                    concept = PreCheckConcept.JOIN,
+                    concept = SQLDConcept.JOIN,
                     isChecked = true
                 ),
                 onChecked = {}
             )
             SurveyItemCard(
                 surveyItem = SurveyListItem.SurveyItem(
-                    concept = PreCheckConcept.UNDERSTANDING_NULL_PROPERTIES,
+                    concept = SQLDConcept.UNDERSTANDING_NULL_PROPERTIES,
                     isChecked = true
                 ),
                 onChecked = {}
