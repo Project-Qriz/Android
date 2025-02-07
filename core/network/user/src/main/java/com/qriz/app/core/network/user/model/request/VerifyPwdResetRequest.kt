@@ -4,6 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FindPwdRequest(
-    @SerialName("email") val email: String,
+data class VerifyPwdResetRequest(
+    @SerialName("authNumber") val authNumber: String,
 )
