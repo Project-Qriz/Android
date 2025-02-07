@@ -3,10 +3,13 @@ package com.qriz.app.feature.onboard.previewresult
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.feature.base.BaseViewModel
+import com.qriz.app.feature.onboard.previewresult.mapper.toPreviewTestResultItem
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class PreviewResultViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val onBoardRepository: OnBoardRepository,
@@ -32,7 +35,7 @@ class PreviewResultViewModel @Inject constructor(
                 updateState {
                     copy(
                         isLoading = false,
-                        previewTestResult = result
+                        previewTestResultItem = result.toPreviewTestResultItem()
                     )
                 }
             }

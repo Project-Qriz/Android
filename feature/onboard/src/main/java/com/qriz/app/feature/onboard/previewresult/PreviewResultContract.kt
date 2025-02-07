@@ -2,22 +2,22 @@ package com.qriz.app.feature.onboard.previewresult
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
-import com.qriz.app.core.data.onboard.onboard_api.model.PreviewTestResult
 import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
+import com.qriz.app.feature.onboard.previewresult.model.PreviewTestResultItem
 
 @Immutable
 data class PreviewResultUiState(
     val userName: String,
-    val previewTestResult: PreviewTestResult,
+    val previewTestResultItem: PreviewTestResultItem,
     val isLoading: Boolean,
 ) : UiState {
 
     companion object {
         val Default = PreviewResultUiState(
             userName = "",
-            previewTestResult = PreviewTestResult.Default,
+            previewTestResultItem = PreviewTestResultItem.Default,
             isLoading = false
         )
     }

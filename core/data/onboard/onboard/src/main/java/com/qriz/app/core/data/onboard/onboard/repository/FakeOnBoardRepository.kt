@@ -1,11 +1,11 @@
 package com.qriz.app.core.data.onboard.onboard.repository
 
-import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.onboard.onboard_api.model.PreviewTestResult
 import com.qriz.app.core.data.onboard.onboard_api.model.WeakArea
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Question
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.test.test_api.model.Test
 import javax.inject.Inject
 
@@ -50,7 +50,7 @@ internal class FakeOnBoardRepository @Inject constructor() : OnBoardRepository {
                 part2Score = 52,
                 totalQuestions = 21,
                 weakAreas = listOf(),
-                topConceptsToImprove = listOf("조인", "SELECT 문"),
+                topConceptsToImprove = listOf(SQLDConcept.JOIN, SQLDConcept.SELECT),
             ),
             /**프리뷰 테스트 한가지 개념만 오답*/
             PreviewTestResult(
@@ -61,11 +61,11 @@ internal class FakeOnBoardRepository @Inject constructor() : OnBoardRepository {
                 totalQuestions = 21,
                 weakAreas = listOf(
                     WeakArea(
-                        topic = "SELECT 문",
+                        topic = SQLDConcept.SELECT,
                         incorrectCount = 1
                     )
                 ),
-                topConceptsToImprove = listOf("SELECT 문", "조인"),
+                topConceptsToImprove = listOf(SQLDConcept.SELECT, SQLDConcept.JOIN),
             ),
             /**여러 개념 오답*/
             PreviewTestResult(
@@ -76,19 +76,22 @@ internal class FakeOnBoardRepository @Inject constructor() : OnBoardRepository {
                 totalQuestions = 21,
                 weakAreas = listOf(
                     WeakArea(
-                        topic = "데이터 모델의 이해",
+                        topic = SQLDConcept.UNDERSTANDING_THE_DATA_MODEL,
                         incorrectCount = 1
                     ),
                     WeakArea(
-                        topic = "GROUP BY, HAVING 절",
+                        topic = SQLDConcept.GROUP_BY_AND_HAVING,
                         incorrectCount = 1
                     ),
                     WeakArea(
-                        topic = "그룹 함수",
+                        topic = SQLDConcept.GROUP_FUNCTION,
                         incorrectCount = 1
                     ),
                 ),
-                topConceptsToImprove = listOf("데이터모델의 이해", "GROUP BY, HAVING 절"),
+                topConceptsToImprove = listOf(
+                    SQLDConcept.UNDERSTANDING_THE_DATA_MODEL,
+                    SQLDConcept.GROUP_BY_AND_HAVING
+                ),
             ),
         )
         val index = (0..2).random()

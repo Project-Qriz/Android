@@ -10,4 +10,6 @@
     <string name="cancel">취소</string>
     <string name="confirm">확인</string>
 
+    <!--TestResult-->
+    <string name="test_result_score">%1$s점</string>
 </resources>

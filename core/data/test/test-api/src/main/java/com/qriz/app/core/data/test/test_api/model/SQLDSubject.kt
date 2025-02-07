@@ -116,5 +116,12 @@ enum class SQLDConcept(val title: String) {
     DML("DML"),
     TCL("TCL"),
     DDL("DDL"),
-    DCL("DCL"),
+    DCL("DCL");
+
+    companion object {
+        fun find(title: String): SQLDConcept {
+            return entries.find { it.title == title }
+                ?: throw Exception("title에 부합하는 SQLDConcept가 존재하지 않습니다. title : $title")
+        }
+    }
 }
