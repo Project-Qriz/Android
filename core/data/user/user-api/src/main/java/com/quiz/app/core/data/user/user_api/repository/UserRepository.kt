@@ -11,9 +11,7 @@ interface UserRepository {
 
     fun getClientFlow(): Flow<User>
 
-    suspend fun getClient(): User?
-
-    suspend fun isExistClientProfile(): Boolean
+    suspend fun getClient(): User
 
     suspend fun requestEmailAuthNumber(email: String)
 

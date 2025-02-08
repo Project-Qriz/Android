@@ -15,9 +15,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+//TODO : getClientProfile 함수 서버 수정 대기
 internal class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
 ) : UserRepository {
@@ -37,6 +39,16 @@ internal class UserRepositoryImpl @Inject constructor(
 
     override fun getClientFlow(): Flow<User> {
         return client.asStateFlow().filterNotNull()
+    }
+
+    override suspend fun getClient(): User {
+        return client.firstOrNull()
+            ?: getClientProfileFromServer()
+    }
+
+    private suspend fun getClientProfileFromServer(): User {
+        return userApi.getClientProfile().data.toDataModel()
+            .also { newClient -> client.update { newClient } }
     }
 
     /* TODO: 주소 값 나오면 실제 API 연결 */

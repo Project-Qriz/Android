@@ -1,5 +1,6 @@
 package com.qriz.app.core.network.user.mapper
 
+import com.qriz.app.core.network.user.model.response.ClientProfileResponse
 import com.qriz.app.core.network.user.model.response.JoinResponse
 import com.qriz.app.core.network.user.model.response.LoginResponse
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
@@ -15,6 +16,15 @@ fun LoginResponse.toDataModel(): User =
     )
 
 fun JoinResponse.toDataModel(): User =
+    User(
+        id = id,
+        userId = username,
+        name = name,
+        createdAt = date,
+        previewTestStatus = PreviewTestStatus.NOT_STARTED
+    )
+
+fun ClientProfileResponse.toDataModel(): User =
     User(
         id = id,
         userId = username,

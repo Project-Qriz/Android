@@ -1,4 +1,4 @@
-package com.qriz.app.core.datastore.util.crypto
+package com.qriz.app.core.datastore.crypto
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties

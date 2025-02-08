@@ -10,7 +10,7 @@ import com.qriz.app.feature.base.UiState
 data object SplashUiState : UiState
 
 sealed interface SplashUiAction : UiAction {
-    data object LoadClientProfile : SplashUiAction
+    data object StartLogin : SplashUiAction
 }
 
 sealed interface SplashUiEffect : UiEffect {

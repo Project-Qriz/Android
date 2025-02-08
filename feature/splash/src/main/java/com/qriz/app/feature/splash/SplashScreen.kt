@@ -46,7 +46,7 @@ fun SplashScreen(
     }
 
     SplashContent(
-        onInitSplash = { viewModel.process(SplashUiAction.LoadClientProfile) }
+        onInitSplash = { viewModel.process(SplashUiAction.StartLogin) }
     )
 }
 

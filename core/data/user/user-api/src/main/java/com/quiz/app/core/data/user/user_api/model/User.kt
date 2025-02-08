@@ -20,6 +20,9 @@ data class User(
     val createdAt: String,
     val previewTestStatus: PreviewTestStatus
 ) {
+    val isSurveyNeeded
+        get() = previewTestStatus == NOT_STARTED
+
     companion object {
         val Default = User(
             id = -1,
