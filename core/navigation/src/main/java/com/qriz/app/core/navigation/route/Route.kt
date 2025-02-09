@@ -16,6 +16,9 @@ sealed interface Route {
     data object FindId : Route
 
     @Serializable
+    data object FindPasswordAuth : Route
+
+    @Serializable
     data class Guide(
         val title: String,
         val subTitle: String,
