@@ -31,13 +31,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
+import com.qriz.app.core.designsystem.component.QrizCard
 import com.qriz.app.core.designsystem.theme.Blue100
 import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.Gray600
 import com.qriz.app.core.designsystem.theme.Gray700
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
+import com.qriz.app.core.designsystem.theme.Red20
+import com.qriz.app.core.designsystem.theme.Red800
 import com.qriz.app.core.ui.test.model.TestResultItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
@@ -47,20 +52,71 @@ fun TestResultDonutChartCard(
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
     subTitle: String,
-    chartTitle: (@Composable () -> Unit)? = null,
+    chartTitle: String? = null,
+    isLessScore: Boolean = false,
     expectedScore: Int,
     testResultItems: ImmutableList<TestResultItem>
 ) {
     TestResultBaseCard(
         modifier = modifier,
         title = title,
-        subTitle = subTitle,
-        chartTitle = chartTitle,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
+            Text(
+                text = subTitle,
+                style = QrizTheme.typography.subhead,
+                color = Gray600,
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+            )
+
+            if (chartTitle != null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = chartTitle,
+                        style = QrizTheme.typography.headline2,
+                        color = Gray600,
+                    )
+                    if (isLessScore) {
+                        QrizCard(
+                            modifier = Modifier
+                                .padding(start = 12.dp),
+                            elevation = 0.dp,
+                            border = null,
+                            cornerRadius = 4.dp,
+                            color = Red20
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(
+                                        horizontal = 8.dp,
+                                        vertical = 4.dp
+                                    ),
+                                text = stringResource(R.string.low_score),
+                                style = QrizTheme.typography.caption
+                                    .copy(
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false
+                                        ),
+                                        fontWeight = SemiBold,
+
+                                    ),
+                                color = Red800,
+                            )
+                        }
+                    }
+                }
+            }
+
             AnimatedDonutChart(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally),

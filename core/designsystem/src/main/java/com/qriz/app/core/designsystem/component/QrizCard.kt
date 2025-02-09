@@ -23,6 +23,7 @@ fun QrizCard(
             width = 1.dp,
             color = Gray200
         ),
+    cornerRadius: Dp = 12.dp,
     content: @Composable () -> Unit,
 ) {
     Surface(
@@ -31,7 +32,7 @@ fun QrizCard(
         enabled = onClick != null,
         shadowElevation = elevation,
         color = color,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(cornerRadius),
         border = border,
         content = content
     )

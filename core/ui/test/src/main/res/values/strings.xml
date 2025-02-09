@@ -12,4 +12,5 @@
 
     <!--TestResult-->
     <string name="test_result_score">%1$s점</string>
+    <string name="low_score">점수 미달</string>
 </resources>
