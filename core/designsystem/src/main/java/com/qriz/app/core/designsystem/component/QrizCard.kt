@@ -26,14 +26,25 @@ fun QrizCard(
     cornerRadius: Dp = 12.dp,
     content: @Composable () -> Unit,
 ) {
-    Surface(
-        modifier = modifier,
-        onClick = onClick ?: {},
-        enabled = onClick != null,
-        shadowElevation = elevation,
-        color = color,
-        shape = RoundedCornerShape(cornerRadius),
-        border = border,
-        content = content
-    )
+    if (onClick != null) {
+        Surface(
+            modifier = modifier,
+            onClick = onClick,
+            shadowElevation = elevation,
+            color = color,
+            shape = RoundedCornerShape(cornerRadius),
+            border = border,
+            content = content
+        )
+    } else {
+        Surface(
+            modifier = modifier,
+            shadowElevation = elevation,
+            color = color,
+            shape = RoundedCornerShape(cornerRadius),
+            border = border,
+            content = content
+        )
+    }
+
 }
