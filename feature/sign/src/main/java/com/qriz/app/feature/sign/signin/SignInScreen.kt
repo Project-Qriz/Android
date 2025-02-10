@@ -37,7 +37,7 @@ import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Gray500
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red800
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.sign.R
 import com.qriz.app.core.designsystem.R as DSR
@@ -170,7 +170,7 @@ private fun SignInContent(
                 Text(
                     text = loginErrorMessage,
                     style = QrizTheme.typography.body2,
-                    color = Red800,
+                    color = Red700,
                     modifier = Modifier.padding(bottom = 12.dp),
                 )
             }

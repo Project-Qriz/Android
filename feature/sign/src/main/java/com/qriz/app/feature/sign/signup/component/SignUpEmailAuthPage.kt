@@ -21,7 +21,7 @@ import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Mint800
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red800
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.feature.sign.R
 
 @Composable
@@ -54,7 +54,7 @@ fun SignUpEmailAuthPage(
         if (errorMessage.isBlank()) null
         else SupportingText(
             message = errorMessage,
-            color = Red800,
+            color = Red700,
         )
     }
 

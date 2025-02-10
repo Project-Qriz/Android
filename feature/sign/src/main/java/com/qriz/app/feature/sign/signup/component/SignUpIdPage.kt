@@ -18,7 +18,7 @@ import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Mint800
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red800
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.feature.sign.R
 import com.quiz.app.core.data.user.user_api.model.ID_MAX_LENGTH
 
@@ -39,7 +39,7 @@ fun SignUpIdPage(
 
         errorMessage.isNotBlank() -> SupportingText(
             message = errorMessage,
-            color = Red800
+            color = Red700
         )
 
         else -> SupportingText(

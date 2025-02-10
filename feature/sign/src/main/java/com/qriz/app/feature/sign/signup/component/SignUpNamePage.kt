@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.SupportingText
-import com.qriz.app.core.designsystem.theme.Red800
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.feature.sign.R
 import com.quiz.app.core.data.user.user_api.model.USER_NAME_MAX_LENGTH
 
@@ -22,7 +22,7 @@ fun SignUpNamePage(
 ) {
     val supportingText: SupportingText? = if (errorMessage.isNotBlank()) SupportingText(
         message = errorMessage,
-        color = Red800
+        color = Red700
     ) else null
 
     SignUpBasePage(

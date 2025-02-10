@@ -24,8 +24,8 @@ import com.qriz.app.core.designsystem.theme.Blue100
 import com.qriz.app.core.designsystem.theme.Blue500
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red50
-import com.qriz.app.core.designsystem.theme.Red800
+import com.qriz.app.core.designsystem.theme.Red700Opacity14
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.designsystem.theme.White
 
 @Composable
@@ -53,7 +53,7 @@ fun QuestionOptionCard(
 
         TestOptionState.SelectedAndIncorrect -> {
             Modifier.background(
-                color = Red800,
+                color = Red700,
                 shape = CircleShape,
             )
         }
@@ -62,7 +62,7 @@ fun QuestionOptionCard(
     val backgroundColor = when (state) {
         TestOptionState.None -> White
         TestOptionState.SelectedOrCorrect -> Blue100
-        TestOptionState.SelectedAndIncorrect -> Red50
+        TestOptionState.SelectedAndIncorrect -> Red700Opacity14
     }
 
     val numTextColor = when (state) {
@@ -71,7 +71,7 @@ fun QuestionOptionCard(
         TestOptionState.SelectedAndIncorrect -> White
     }
 
-    val optionDescriptionColor =when (state) {
+    val optionDescriptionColor = when (state) {
         TestOptionState.None -> Gray800
         TestOptionState.SelectedOrCorrect -> Blue500
         TestOptionState.SelectedAndIncorrect -> Gray800

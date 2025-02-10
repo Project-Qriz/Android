@@ -9,7 +9,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.SupportingText
-import com.qriz.app.core.designsystem.theme.Red800
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.feature.sign.R
 import com.quiz.app.core.data.user.user_api.model.PW_MAX_LENGTH
 
@@ -27,7 +27,7 @@ fun SignUpPasswordPage(
     val passwordSupportingText = if (passwordErrorMessage.isNotEmpty()) {
         SupportingText(
             message = passwordErrorMessage,
-            color = Red800,
+            color = Red700,
         )
     } else {
         null
@@ -36,7 +36,7 @@ fun SignUpPasswordPage(
     val passwordCheckSupportingText = if (passwordCheckErrorMessage.isNotEmpty()) {
         SupportingText(
             message = passwordCheckErrorMessage,
-            color = Red800,
+            color = Red700,
         )
     } else {
         null

@@ -19,7 +19,7 @@ import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red800
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.designsystem.theme.White
 
 @Composable
@@ -52,7 +52,7 @@ fun TestTopBar(
                         }
                         withStyle(
                             QrizTheme.typography.subhead.toSpanStyle()
-                                .copy(color = Red800)
+                                .copy(color = Red700)
                         ) {
                             append("  $remainTimeText")
                         }

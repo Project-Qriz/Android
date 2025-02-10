@@ -41,8 +41,8 @@ import com.qriz.app.core.designsystem.theme.Gray600
 import com.qriz.app.core.designsystem.theme.Gray700
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red20
-import com.qriz.app.core.designsystem.theme.Red800
+import com.qriz.app.core.designsystem.theme.Red700Opacity14
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.ui.test.model.TestResultItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
@@ -93,7 +93,7 @@ fun TestResultDonutChartCard(
                             elevation = 0.dp,
                             border = null,
                             cornerRadius = 4.dp,
-                            color = Red20
+                            color = Red700Opacity14
                         ) {
                             Text(
                                 modifier = Modifier
@@ -110,7 +110,7 @@ fun TestResultDonutChartCard(
                                         fontWeight = SemiBold,
 
                                     ),
-                                color = Red800,
+                                color = Red700,
                             )
                         }
                     }

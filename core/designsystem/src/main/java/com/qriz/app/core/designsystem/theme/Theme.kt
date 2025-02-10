@@ -29,7 +29,7 @@ private val QrizColorScheme = lightColorScheme(
     onSurfaceVariant = Gray500,
     outline = Blue600,
     background = Blue50,
-    error = Red800,
+    error = Red700,
 )
 
 @Composable
