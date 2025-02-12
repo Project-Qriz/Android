@@ -9,14 +9,13 @@ import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
 class FindPasswordAuthViewModelTest {
     @get:Rule
-    val testDispatcher = MainDispatcherRule(testDispatcher = StandardTestDispatcher())
+    val testDispatcher = MainDispatcherRule()
 
     private val mockUserRepository = mockk<UserRepository>()
     private val viewModel = FindPasswordAuthViewModel(mockUserRepository)
