@@ -36,16 +36,28 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizCard
 import com.qriz.app.core.designsystem.theme.Blue100
+import com.qriz.app.core.designsystem.theme.Blue200
+import com.qriz.app.core.designsystem.theme.Blue400
+import com.qriz.app.core.designsystem.theme.Blue700
 import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.Gray600
 import com.qriz.app.core.designsystem.theme.Gray700
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red700Opacity14
 import com.qriz.app.core.designsystem.theme.Red700
+import com.qriz.app.core.designsystem.theme.Red700Opacity14
 import com.qriz.app.core.ui.test.model.TestResultItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
+
+//TODO : 디자인 색상 추가 예정 (수정 대기중)
+private val TEST_RESULT_COLORS = listOf(
+    Blue700, Blue400, Blue200
+)
+
+fun getTestResultColor(index: Int): Color =
+    if (index > TEST_RESULT_COLORS.lastIndex) TEST_RESULT_COLORS.last()
+    else TEST_RESULT_COLORS[index]
 
 @Composable
 fun TestResultDonutChartCard(
@@ -108,7 +120,6 @@ fun TestResultDonutChartCard(
                                             includeFontPadding = false
                                         ),
                                         fontWeight = SemiBold,
-
                                     ),
                                 color = Red700,
                             )
@@ -154,12 +165,12 @@ fun AnimatedDonutChart(
         .div(totalAnimationAngle)
 
     var currentSum = 0
-    val arcs = testResultItems.map {
-        currentSum += it.score
+    val arcs = testResultItems.mapIndexed { index, testResultItem ->
+        currentSum += testResultItem.score
         ArcData(
             animation = Animatable(0f),
             targetSweepAngle = -(currentSum / total),
-            color = it.color
+            color = getTestResultColor(index)
         )
     }
 
@@ -237,7 +248,7 @@ fun BottomScoreRow(
             testResultItems.forEachIndexed { index, testResult ->
                 BottomScoreRowItem(
                     scoreName = testResult.scoreName,
-                    scoreColor = testResult.color,
+                    scoreColor = getTestResultColor(index),
                     score = testResult.score
                 )
 

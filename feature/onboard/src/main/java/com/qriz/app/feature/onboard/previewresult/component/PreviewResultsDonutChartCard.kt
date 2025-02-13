@@ -8,8 +8,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import com.qriz.app.core.designsystem.theme.Blue200
-import com.qriz.app.core.designsystem.theme.Blue400
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.ui.test.TestResultDonutChartCard
@@ -62,12 +60,10 @@ private fun PreviewResultDonutChartCardPreview() {
                 TestResultItem(
                     scoreName = "1과목",
                     score = 50,
-                    color = Blue400
                 ),
                 TestResultItem(
                     scoreName = "2과목",
                     score = 50,
-                    color = Blue200
                 )
             )
         )
