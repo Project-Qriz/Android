@@ -1,10 +1,5 @@
 package com.qriz.app.feature.sign.findPassword.auth
 
-import com.qriz.app.core.designsystem.theme.Gray200
-import com.qriz.app.core.designsystem.theme.Gray300
-import com.qriz.app.core.designsystem.theme.Gray800
-import com.qriz.app.core.designsystem.theme.Mint800
-import com.qriz.app.core.designsystem.theme.Red500
 import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
@@ -27,25 +22,6 @@ data class FindPasswordAuthUiState(
 
     val isValidAuthNumberFormat = authNumber.length == 6
 
-    val emailSupportingTextColor = when(emailSupportingTextResId) {
-        else -> Red500
-    }
-
-    val emailBorderColor = when(emailSupportingTextResId) {
-        else -> Gray200
-    }
-
-    val authNumberSupportingTextColor = when(authNumberSupportingTextResId) {
-        R.string.success_send_email_auth_number,
-        R.string.success_verify_auth_number -> Mint800
-        else -> Red500
-    }
-
-    val authNumberBorderColor = when(authNumberSupportingTextResId) {
-        R.string.fail_verify_auth_number -> Red500
-        else -> Gray200
-    }
-
     val authNumberVerifiedFail: Boolean =
         authNumberSupportingTextResId == R.string.fail_verify_auth_number
 
@@ -56,8 +32,6 @@ data class FindPasswordAuthUiState(
             val seconds = remainedSeconds % 60
             return "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
         }
-
-    val emailButtonTextColor = if (showAuthNumberLayout) Gray800 else Gray300
 
     companion object {
         val DEFAULT = FindPasswordAuthUiState(

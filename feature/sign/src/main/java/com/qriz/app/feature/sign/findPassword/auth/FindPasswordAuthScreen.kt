@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -42,6 +41,7 @@ import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.Mint800
 import com.qriz.app.core.designsystem.theme.QrizTheme
+import com.qriz.app.core.designsystem.theme.Red500
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.sign.R
@@ -71,12 +71,7 @@ fun FindPasswordAuthScreen(
         enableInputAuthNumber = uiState.enableInputAuthNumber,
         verifiedAuthNumber = uiState.verifiedAuthNumber,
         emailSupportingTextResId = uiState.emailSupportingTextResId,
-        emailSupportingTextColor = uiState.emailSupportingTextColor,
-        emailBorderColor = uiState.emailBorderColor,
         authNumberSupportingTextResId = uiState.authNumberSupportingTextResId,
-        authNumberSupportingTextColor = uiState.authNumberSupportingTextColor,
-        authNumberBorderColor = uiState.authNumberBorderColor,
-        emailButtonTextColor = uiState.emailButtonTextColor,
         onEmailChanged = {
             viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = it))
         },
@@ -104,12 +99,7 @@ private fun FindPasswordAuthContent(
     verifiedAuthNumber: Boolean,
     enableInputAuthNumber: Boolean,
     emailSupportingTextResId: Int,
-    emailSupportingTextColor: Color,
-    emailBorderColor: Color,
     authNumberSupportingTextResId: Int,
-    authNumberSupportingTextColor: Color,
-    authNumberBorderColor: Color,
-    emailButtonTextColor: Color,
     onBack: () -> Unit,
     onEmailChanged: (String) -> Unit,
     onSendAuthNumberEmail: () -> Unit,
@@ -118,6 +108,19 @@ private fun FindPasswordAuthContent(
     onNavigateReset: () -> Unit,
 ) {
     //TODO: Dialog 작업
+
+    val authNumberSupportingTextColor = when(authNumberSupportingTextResId) {
+        R.string.success_send_email_auth_number,
+        R.string.success_verify_auth_number -> Mint800
+        else -> Red500
+    }
+
+    val authNumberBorderColor = when(authNumberSupportingTextResId) {
+        R.string.fail_verify_auth_number -> Red500
+        else -> Gray200
+    }
+
+    val emailButtonTextColor = if (showAuthNumberLayout) Gray800 else Gray300
 
     Column(
         modifier = Modifier
@@ -149,7 +152,7 @@ private fun FindPasswordAuthContent(
                     supportingText = if (emailSupportingTextResId != R.string.empty) {
                         SupportingText(
                             message = stringResource(emailSupportingTextResId),
-                            color = emailSupportingTextColor,
+                            color = Red500,
                             isBorderColorRequired = false,
                         )
                     } else {
@@ -157,7 +160,7 @@ private fun FindPasswordAuthContent(
                     },
                     borderStroke = BorderStroke(
                         width = 1.dp,
-                        color = emailBorderColor,
+                        color = Gray200,
                     ),
                     containerColor = White,
                     singleLine = true,
@@ -210,7 +213,7 @@ private fun FindPasswordAuthContent(
                         borderStroke = if (authTimerText == "00:00" && verifiedAuthNumber.not()) null
                         else BorderStroke(
                             width = 1.dp,
-                            color = authNumberBorderColor,
+                            color = authNumberBorderColor
                         ),
                         containerColor = if (authTimerText == "00:00" && verifiedAuthNumber.not()) Blue200
                         else White,
@@ -296,12 +299,7 @@ private fun FindPasswordAuthContentPreview() {
             verifiedAuthNumber = true,
             enableInputAuthNumber = true,
             emailSupportingTextResId = R.string.empty,
-            emailBorderColor = Gray200,
-            emailSupportingTextColor = Mint800,
             authNumberSupportingTextResId = R.string.empty,
-            authNumberSupportingTextColor = Mint800,
-            authNumberBorderColor = Gray200,
-            emailButtonTextColor = Gray800,
             onEmailChanged = {},
             onAuthNumberChanged = {},
             onSendAuthNumberEmail = {},
