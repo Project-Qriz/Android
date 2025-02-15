@@ -35,6 +35,20 @@
     <string name="check_email_to_find_id">입력하신 이메일 주소로 비밀번호가 발송되었습니다. 메일함을 확인해주세요.</string>
     <string name="email_sample_hint">qriz@gmail.com</string>
 
+    <!--FindPasswordAuth-->
+    <string name="find_password">비밀번호 찾기</string>
+    <string name="success_send_email_auth_number">인증번호가 이메일로 전송됐습니다!</string>
+    <string name="invalid_auth_number_format">인증번호는 6자리 입니다.</string>
+    <string name="fail_verify_auth_number">인증번호가 올바르지 않습니다.</string>
+    <string name="time_over_auth_number_verify">인증 시간이 만료되었어요. 재전송을 눌러주세요.</string>
+    <string name="success_verify_auth_number">인증 완료되었습니다.</string>
+    <string name="find_password_auth_title">비밀번호를 잊으셨나요?</string>
+    <string name="find_password_auth_guide">이메일로 인증과정을 거친 후,\n재설정 할 수 있도록 도와드릴게요.</string>
+    <string name="reset_password">재설정 하기</string>
+    <string name="send">전송</string>
+    <string name="resend">재전송</string>
+    <string name="verify">확인</string>
+
     <!--ScreenTitle-->
     <string name="screen_title_enter_name">이름 입력</string>
     <string name="screen_title_email_auth">이메일 인증</string>

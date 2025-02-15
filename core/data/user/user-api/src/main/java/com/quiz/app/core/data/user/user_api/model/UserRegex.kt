@@ -31,3 +31,6 @@ val PW_REGEX =
 /** 한글/영문 1~20자 이내 */
 const val USER_NAME_MAX_LENGTH = 20
 val USER_NAME_REGEX = "^[a-zA-Z가-힣]{1,$USER_NAME_MAX_LENGTH}\$".toRegex()
+
+/** 인증번호 */
+const val AUTH_NUMBER_MAX_LENGTH = 6

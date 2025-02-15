@@ -32,25 +32,27 @@ internal fun SignUpBasePage(
             )
             .imePadding()
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.W600
-            ),
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.W600
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
 
-        Text(
-            text = subTitle,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSecondary,
-            modifier = Modifier.padding(bottom = 32.dp),
-        )
+            Text(
+                text = subTitle,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSecondary,
+                modifier = Modifier.padding(bottom = 32.dp),
+            )
 
-        content()
-
-        Spacer(modifier = Modifier.weight(1f))
+            content()
+        }
 
         QrizButton(
             enable = buttonEnabled,
