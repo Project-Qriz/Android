@@ -114,26 +114,14 @@ fun FrequentMistakeConceptCard(
             )
         }
     ) {
-        Column(
+        Text(
+            text = stringResource(R.string.total_number_of_question, questionsCount),
+            color = Gray500,
+            style = QrizTheme.typography.label2,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.total_number_of_question),
-                color = Gray600,
-                style = QrizTheme.typography.headline1.copy(
-                    fontWeight = FontWeight.Normal
-                )
-            )
-
-            Text(
-                text = stringResource(R.string.counting, questionsCount),
-                color = Blue500,
-                style = QrizTheme.typography.title2
-            )
-        }
+                .padding(bottom = 20.dp),
+        )
 
         if (frequentMistakeConcepts.size > 1) {
             BarChart(
