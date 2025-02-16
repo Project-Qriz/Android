@@ -59,7 +59,7 @@ fun FindPasswordAuthScreen(
 
     viewModel.collectSideEffect {
         when (it) {
-            FindPasswordAuthUiEffect.VerifiedAuthNumber -> onNavigateReset()
+            FindPasswordAuthUiEffect.NavigateToResetPassword -> onNavigateReset()
         }
     }
 
@@ -256,7 +256,7 @@ private fun FindPasswordAuthContent(
 
                                 if (verifiedAuthNumber) {
                                     Icon(
-                                        imageVector = ImageVector.vectorResource(R.drawable.complete_icon),
+                                        imageVector = ImageVector.vectorResource(R.drawable.check_icon),
                                         contentDescription = null,
                                         tint = Mint800
                                     )
