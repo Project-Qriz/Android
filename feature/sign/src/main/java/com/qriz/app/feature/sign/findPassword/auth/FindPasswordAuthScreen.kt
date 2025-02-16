@@ -72,6 +72,7 @@ fun FindPasswordAuthScreen(
         verifiedAuthNumber = uiState.verifiedAuthNumber,
         emailSupportingTextResId = uiState.emailSupportingTextResId,
         authNumberSupportingTextResId = uiState.authNumberSupportingTextResId,
+        onBack = onBack,
         onEmailChanged = {
             viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = it))
         },
@@ -84,8 +85,9 @@ fun FindPasswordAuthScreen(
         onVerifyAuthNumber = {
             viewModel.process(FindPasswordAuthUiAction.VerifyAuthNumber)
         },
-        onBack = onBack,
-        onNavigateReset = onNavigateReset,
+        onNavigateReset = {
+            viewModel.process(FindPasswordAuthUiAction.ClickReset)
+        },
     )
 
 }

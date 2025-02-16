@@ -22,9 +22,6 @@ data class FindPasswordAuthUiState(
 
     val isValidAuthNumberFormat = authNumber.length == 6
 
-    val authNumberVerifiedFail: Boolean =
-        authNumberSupportingTextResId == R.string.fail_verify_auth_number
-
     val authTimerText: String
         get() {
             val remainedSeconds = authTimerMs / 1000
@@ -56,8 +53,10 @@ sealed interface FindPasswordAuthUiAction : UiAction {
     data object SendAuthNumberEmail : FindPasswordAuthUiAction
 
     data object VerifyAuthNumber : FindPasswordAuthUiAction
+
+    data object ClickReset : FindPasswordAuthUiAction
 }
 
 sealed interface FindPasswordAuthUiEffect: UiEffect {
-    data object VerifiedAuthNumber : FindPasswordAuthUiEffect
+    data object NavigateToResetPassword : FindPasswordAuthUiEffect
 }

@@ -39,6 +39,12 @@ class FindPasswordAuthViewModel @Inject constructor(
             is FindPasswordAuthUiAction.VerifyAuthNumber -> {
                 verifyAuthNumber()
             }
+
+            is FindPasswordAuthUiAction.ClickReset -> {
+                if (uiState.value.verifiedAuthNumber) {
+                    sendEffect(FindPasswordAuthUiEffect.NavigateToResetPassword)
+                }
+            }
         }
     }
 
