@@ -54,6 +54,7 @@ class FindPasswordAuthViewModelTest {
                 enableInputAuthNumber shouldBe true
                 showAuthNumberLayout shouldBe true
                 verifiedAuthNumber shouldBe false
+                viewModel.isTimerJobNonNull() shouldBe true
             }
         }
     }
@@ -91,6 +92,7 @@ class FindPasswordAuthViewModelTest {
             with(awaitItem()) {
                 authNumberSupportingTextResId shouldBe R.string.success_verify_auth_number
                 verifiedAuthNumber shouldBe true
+                viewModel.isTimerJobNull() shouldBe true
             }
         }
     }
