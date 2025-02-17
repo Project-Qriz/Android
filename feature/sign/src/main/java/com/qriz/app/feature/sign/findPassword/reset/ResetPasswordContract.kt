@@ -13,7 +13,6 @@ import com.quiz.app.core.data.user.user_api.model.PW_REGEX
 data class ResetPasswordUiState(
     val password: String,
     val passwordConfirm: String,
-    val passwordConfirmSupportingTextResId: Int,
     val visiblePassword: Boolean,
     val visiblePasswordConfirm: Boolean,
     val isFocusedPassword: Boolean,
@@ -44,7 +43,6 @@ data class ResetPasswordUiState(
         val DEFAULT = ResetPasswordUiState(
             password = "",
             passwordConfirm = "",
-            passwordConfirmSupportingTextResId = 0,
             visiblePassword = false,
             visiblePasswordConfirm = false,
             isFocusedPassword = false,
