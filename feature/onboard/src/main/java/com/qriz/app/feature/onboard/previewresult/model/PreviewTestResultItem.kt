@@ -9,6 +9,7 @@ import kotlinx.collections.immutable.persistentListOf
 @Immutable
 data class PreviewTestResultItem(
     val totalScore: Int,
+    val estimatedScore: Float,
     val testResultItems: ImmutableList<TestResultItem>,
     val weakAreas: ImmutableList<WeakAreaItem>,
     val topConceptsToImprove: ImmutableList<SQLDConcept>,
@@ -17,6 +18,7 @@ data class PreviewTestResultItem(
     companion object {
         val Default = PreviewTestResultItem(
             totalScore = 0,
+            estimatedScore = 0F,
             totalQuestions = 0,
             testResultItems = persistentListOf(),
             weakAreas = persistentListOf(),
@@ -27,6 +29,13 @@ data class PreviewTestResultItem(
 
 @Immutable
 data class WeakAreaItem(
+    val ranking: Ranking,
     val topic: SQLDConcept,
     val incorrectCount: Int,
 )
+
+enum class Ranking {
+    FIRST,
+    SECOND,
+    THIRD,
+}

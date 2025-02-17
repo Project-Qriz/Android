@@ -21,6 +21,7 @@ fun PreviewResultDonutChartCard(
     modifier: Modifier = Modifier,
     userName: String,
     totalScore: Int,
+    estimatedScore: Float,
     testResultItems: ImmutableList<TestResultItem>
 ) {
     TestResultDonutChartCard(
@@ -44,7 +45,8 @@ fun PreviewResultDonutChartCard(
             )
         },
         subTitle = stringResource(R.string.test_result_expected_score),
-        expectedScore = totalScore,
+        totalScore = totalScore,
+        estimatedScore = estimatedScore,
         testResultItems = testResultItems,
     )
 }
@@ -56,6 +58,7 @@ private fun PreviewResultDonutChartCardPreview() {
         PreviewResultDonutChartCard(
             userName = "Qriz",
             totalScore = 100,
+            estimatedScore = 50.0F,
             testResultItems = persistentListOf(
                 TestResultItem(
                     scoreName = "1과목",
@@ -65,7 +68,7 @@ private fun PreviewResultDonutChartCardPreview() {
                     scoreName = "2과목",
                     score = 50,
                 )
-            )
+            ),
         )
     }
 }

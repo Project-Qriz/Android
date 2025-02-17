@@ -2,26 +2,26 @@ package com.qriz.app.core.ui.test
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,16 +29,21 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
+import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.component.QrizCard
+import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Blue100
-import com.qriz.app.core.designsystem.theme.Blue200
-import com.qriz.app.core.designsystem.theme.Blue400
-import com.qriz.app.core.designsystem.theme.Blue700
+import com.qriz.app.core.designsystem.theme.Blue300
+import com.qriz.app.core.designsystem.theme.Blue500
+import com.qriz.app.core.designsystem.theme.Blue800
+import com.qriz.app.core.designsystem.theme.Gray100
 import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.Gray600
 import com.qriz.app.core.designsystem.theme.Gray700
@@ -50,9 +55,8 @@ import com.qriz.app.core.ui.test.model.TestResultItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 
-//TODO : 디자인 색상 추가 예정 (수정 대기중)
 private val TEST_RESULT_COLORS = listOf(
-    Blue700, Blue400, Blue200
+    Blue800, Blue500, Blue300, Blue100, Gray300
 )
 
 fun getTestResultColor(index: Int): Color =
@@ -66,7 +70,8 @@ fun TestResultDonutChartCard(
     subTitle: String,
     chartTitle: String? = null,
     isLessScore: Boolean = false,
-    expectedScore: Int,
+    totalScore: Int,
+    estimatedScore: Float,
     testResultItems: ImmutableList<TestResultItem>
 ) {
     TestResultBaseCard(
@@ -115,12 +120,7 @@ fun TestResultDonutChartCard(
                                     ),
                                 text = stringResource(R.string.low_score),
                                 style = QrizTheme.typography.caption
-                                    .copy(
-                                        platformStyle = PlatformTextStyle(
-                                            includeFontPadding = false
-                                        ),
-                                        fontWeight = SemiBold,
-                                    ),
+                                    .copy(fontWeight = SemiBold),
                                 color = Red700,
                             )
                         }
@@ -131,14 +131,49 @@ fun TestResultDonutChartCard(
             AnimatedDonutChart(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally),
-                totalScore = expectedScore,
+                totalScore = totalScore,
                 testResultItems = testResultItems
             )
 
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.expected_score, estimatedScore.toInt()),
+                    modifier = Modifier
+                        .padding(end = 4.dp),
+                )
+                IconButton(
+                    modifier = Modifier
+                        .size(13.dp),
+                    onClick = {}, //TODO: 다이얼로그 노출 디자인 추가 예정
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.exclamation_mark_icon),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(13.dp),
+                        tint = Gray300
+                    )
+                }
+            }
+
             BottomScoreRow(
                 modifier = Modifier
-                    .padding(top = 12.dp),
+                    .padding(top = 32.dp),
                 testResultItems = testResultItems
+            )
+
+            QrizButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 24.dp),
+                text = stringResource(R.string.view_details_by_concept),
+                containerColor = Blue500,
+                onClick = {}
             )
         }
     }
@@ -165,13 +200,15 @@ fun AnimatedDonutChart(
         .div(totalAnimationAngle)
 
     var currentSum = 0
-    val arcs = testResultItems.mapIndexed { index, testResultItem ->
-        currentSum += testResultItem.score
-        ArcData(
-            animation = Animatable(0f),
-            targetSweepAngle = -(currentSum / total),
-            color = getTestResultColor(index)
-        )
+    val arcs = remember(testResultItems) {
+        testResultItems.mapIndexed { index, testResultItem ->
+            currentSum += testResultItem.score
+            ArcData(
+                animation = Animatable(0f),
+                targetSweepAngle = -(currentSum / total),
+                color = getTestResultColor(index)
+            )
+        }
     }
 
     LaunchedEffect(key1 = arcs) {
@@ -181,7 +218,6 @@ fun AnimatedDonutChart(
                     targetValue = it.targetSweepAngle,
                     animationSpec = tween(
                         durationMillis = animationDurationMillis,
-                        easing = FastOutSlowInEasing,
                     )
                 )
             }
@@ -224,11 +260,21 @@ fun AnimatedDonutChart(
             }
         }
 
-        Text(
-            text = stringResource(R.string.test_result_score, totalScore),
-            style = QrizTheme.typography.heading2,
-            color = Gray800
-        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.total_score),
+                style = QrizTheme.typography.body2,
+                color = Gray800
+            )
+            Text(
+                text = stringResource(R.string.test_result_score, totalScore),
+                style = QrizTheme.typography.heading2,
+                color = Gray800
+            )
+        }
+
     }
 }
 
@@ -237,30 +283,25 @@ fun BottomScoreRow(
     modifier: Modifier,
     testResultItems: List<TestResultItem>
 ) {
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
     ) {
-        Row(
-            modifier = Modifier.height(IntrinsicSize.Min),
-        ) {
-            testResultItems.forEachIndexed { index, testResult ->
-                BottomScoreRowItem(
-                    scoreName = testResult.scoreName,
-                    scoreColor = getTestResultColor(index),
-                    score = testResult.score
-                )
+        testResultItems.forEachIndexed { index, testResult ->
+            BottomScoreRowItem(
+                scoreName = testResult.scoreName,
+                scoreColor = getTestResultColor(index),
+                score = testResult.score
+            )
 
-                if (index != testResultItems.lastIndex) {
-                    VerticalDivider(
-                        color = Blue100,
-                        thickness = 1.dp,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(horizontal = 16.dp)
-                    )
-                }
+            if (index != testResultItems.lastIndex) {
+                HorizontalDivider(
+                    color = Gray100,
+                    thickness = 1.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                )
             }
         }
     }
@@ -272,30 +313,31 @@ fun BottomScoreRowItem(
     scoreColor: Color,
     score: Int,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+    Row(
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier.padding(bottom = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .size(14.dp)
-                    .clip(CircleShape)
-                    .background(scoreColor),
-            )
-            Text(
-                text = scoreName,
-                style = QrizTheme.typography.label2,
-                color = Gray600
-            )
-        }
+        Box(
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .size(14.dp)
+                .clip(CircleShape)
+                .background(scoreColor),
+        )
+        Text(
+            text = scoreName,
+            style = QrizTheme.typography.body2,
+            color = Black
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
         Text(
             text = stringResource(R.string.test_result_score, score),
-            style = QrizTheme.typography.subhead,
+            style = QrizTheme.typography.body2.copy(
+                fontWeight = FontWeight.Bold
+            ),
             color = Gray700
         )
     }
+
 }
