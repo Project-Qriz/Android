@@ -113,7 +113,7 @@ private fun ResetPasswordContent(
                 ),
                 visualTransformation = if (uiState.visiblePassword) VisualTransformation.None else PasswordVisualTransformation(),
                 trailing = {
-                    IconButton(onClick = { onPasswordVisibilityChange(!uiState.visiblePassword) }) {
+                    IconButton(onClick = { onPasswordVisibilityChange(uiState.visiblePassword.not()) }) {
                         Icon(
                             painter = if (uiState.visiblePassword) painterResource(DSR.drawable.ic_visible_password)
                             else painterResource(DSR.drawable.ic_invisible_password),
@@ -174,7 +174,7 @@ private fun ResetPasswordContent(
                             )
                         }
 
-                        IconButton(onClick = { onPasswordConfirmVisibilityChange(!uiState.visiblePasswordConfirm) }) {
+                        IconButton(onClick = { onPasswordConfirmVisibilityChange(uiState.visiblePasswordConfirm.not()) }) {
                             Icon(
                                 painter = if (uiState.visiblePasswordConfirm) painterResource(DSR.drawable.ic_visible_password)
                                 else painterResource(DSR.drawable.ic_invisible_password),
