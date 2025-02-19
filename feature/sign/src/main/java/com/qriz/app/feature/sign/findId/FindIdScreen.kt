@@ -25,7 +25,7 @@ import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.component.SupportingText
 import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red500
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.component.QrizAlertDialog
@@ -120,7 +120,7 @@ private fun FindIdContent(
                 supportingText = if (errorMessageResId != R.string.empty) {
                     SupportingText(
                         message = stringResource(errorMessageResId),
-                        color = Red500,
+                        color = Red700,
                     )
                 } else {
                     null

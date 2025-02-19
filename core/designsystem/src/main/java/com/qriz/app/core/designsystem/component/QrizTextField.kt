@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.qriz.app.core.designsystem.theme.Blue200
+import com.qriz.app.core.designsystem.theme.Blue100
 import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.Gray700
 import com.qriz.app.core.designsystem.theme.QrizTheme
@@ -48,7 +48,7 @@ fun QrizTextFiled(
     cornerShape: RoundedCornerShape = RoundedCornerShape(10.dp),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     borderStroke: BorderStroke? = null,
-    containerColor: Color = Blue200,
+    containerColor: Color = Blue100,
     trailing: (@Composable () -> Unit)? = null,
 ) {
     BasicTextField(

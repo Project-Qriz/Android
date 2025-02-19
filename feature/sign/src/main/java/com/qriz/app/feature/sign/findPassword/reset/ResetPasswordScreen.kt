@@ -30,7 +30,7 @@ import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Blue500
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red500
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.sign.R
@@ -137,7 +137,7 @@ private fun ResetPasswordContent(
             )
 
             val passwordConfirmBorderColor = when {
-                uiState.passwordConfirmErrorMessageResId != R.string.empty -> Red500
+                uiState.passwordConfirmErrorMessageResId != R.string.empty -> Red700
                 uiState.isFocusedPasswordConfirm -> Black
                 else -> Gray200
             }
@@ -160,7 +160,7 @@ private fun ResetPasswordContent(
                 ),
                 supportingText = SupportingText(
                     message = stringResource(uiState.passwordConfirmErrorMessageResId),
-                    color = Red500,
+                    color = Red700,
                 ),
                 trailing = {
                     Row(

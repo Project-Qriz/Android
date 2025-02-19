@@ -16,15 +16,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.qriz.app.core.navigation.route.MainNavigator
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.core.navigation.route.SplashRoute
 import com.qriz.app.feature.concept_book.navigation.conceptBookNavGraph
 import com.qriz.app.feature.home.navigation.homeNavGraph
 import com.qriz.app.feature.incorrect_answers_note.navigation.incorrectAnswersNoteNavGraph
 import com.qriz.app.feature.main.component.MainBottomBar
+import com.qriz.app.feature.main.navigation.MainNavigator
 import com.qriz.app.feature.main.navigation.rememberMainNavigator
 import com.qriz.app.feature.mypage.navigation.myPageNavGraph
 import com.qriz.app.feature.onboard.navigation.navigateConceptCheckGuide
@@ -46,7 +45,6 @@ import kotlinx.coroutines.launch
 internal fun QrizApp(
     mainNavigator: MainNavigator = rememberMainNavigator(),
 ) {
-    val navController = rememberNavController()
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val onShowSnackbar: (String) -> Unit = { message ->
@@ -117,20 +115,7 @@ private fun QrizNavHost(
             moveToHome = { mainNavigator.navigateMainTabClearingStack(MainTab.HOME) },
             moveToConceptCheckGuide = navController::navigateConceptCheckGuide,
             moveToResetPw = navController::navigateResetPassword,
-            moveToSignIn = {
-                //TODO : 코드 정리 필요
-                navController.navigateSignIn(
-                    navOptions = navOptions {
-                        popUpTo(navController.graph.id) {
-                            inclusive = true
-                            saveState = true
-                        }
-
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                )
-            },
+            moveToSignIn = navController::navigateSignIn
         )
 
         onboardNavGraph(

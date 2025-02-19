@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import com.qriz.app.core.navigation.route.SignRoute
 import com.qriz.app.feature.sign.findId.FindIdScreen
 import com.qriz.app.feature.sign.findPassword.auth.FindPasswordAuthScreen
@@ -14,7 +15,15 @@ import com.qriz.app.feature.sign.signup.SignUpScreen
 fun NavHostController.navigateSignIn(navOptions: NavOptions? = null) {
     navigate(
         route = SignRoute.SignIn,
-        navOptions = navOptions,
+        navOptions = navOptions {
+            popUpTo(graph.id) {
+                inclusive = true
+                saveState = true
+            }
+
+            launchSingleTop = true
+            restoreState = true
+        },
     )
 }
 
