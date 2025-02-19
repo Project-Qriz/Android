@@ -1,42 +1,41 @@
 package com.qriz.app.core.ui.test
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.qriz.app.core.designsystem.component.QrizCard
-import com.qriz.app.core.designsystem.theme.Blue100
+import com.qriz.app.core.designsystem.theme.White
 
 @Composable
 fun TestResultBaseCard(
     modifier: Modifier = Modifier,
+    backgroundColor: Color = White,
     title: @Composable () -> Unit,
-    content: @Composable () -> Unit,
+    content: @Composable ColumnScope.() -> Unit
 ) {
-    QrizCard(
+    Column(
         modifier = modifier
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(24.dp)
-        ) {
-            title()
-
-            HorizontalDivider(
-                color = Blue100,
-                thickness = 1.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = 8.dp,
-                        bottom = 16.dp
-                    )
+            .background(backgroundColor)
+            .padding(
+                vertical = 24.dp,
+                horizontal = 18.dp
             )
+    ) {
+        title()
 
-            content()
-        }
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(16.dp)
+        )
+
+        content()
     }
 }

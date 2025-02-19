@@ -31,9 +31,9 @@ import com.qriz.app.feature.onboard.R
 import com.qriz.app.feature.onboard.previewresult.component.FrequentMistakeConceptCard
 import com.qriz.app.feature.onboard.previewresult.component.PreviewResultDonutChartCard
 import com.qriz.app.feature.onboard.previewresult.component.RecommendedConceptsTop2
+import com.qriz.app.feature.onboard.previewresult.model.PreviewTestResultItem
 import com.qriz.app.feature.onboard.previewresult.model.Ranking
 import com.qriz.app.feature.onboard.previewresult.model.WeakAreaItem
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -57,12 +57,7 @@ fun PreviewResultScreen(
 
     PreviewResultContent(
         userName = uiState.userName,
-        totalScore = uiState.previewTestResultItem.totalScore,
-        estimatedScore = uiState.previewTestResultItem.estimatedScore,
-        testResultItems = uiState.previewTestResultItem.testResultItems,
-        questionsCount = uiState.previewTestResultItem.totalQuestions,
-        frequentMistakeConcepts = uiState.previewTestResultItem.weakAreas,
-        topConceptsToImprove = uiState.previewTestResultItem.topConceptsToImprove,
+        previewTestResultItem = uiState.previewTestResultItem,
         onInit = { viewModel.process(PreviewResultUiAction.LoadPreviewResult) },
         onClickClose = { viewModel.process(PreviewResultUiAction.ClickClose) },
     )
@@ -71,12 +66,7 @@ fun PreviewResultScreen(
 @Composable
 private fun PreviewResultContent(
     userName: String,
-    totalScore: Int,
-    estimatedScore :Float,
-    testResultItems: ImmutableList<TestResultItem>,
-    questionsCount: Int,
-    frequentMistakeConcepts: ImmutableList<WeakAreaItem>,
-    topConceptsToImprove: ImmutableList<SQLDConcept>,
+    previewTestResultItem : PreviewTestResultItem,
     onInit: () -> Unit,
     onClickClose: () -> Unit
 ) {
@@ -104,34 +94,31 @@ private fun PreviewResultContent(
             modifier = Modifier
                 .weight(1f)
                 .background(Blue50)
-                .padding(horizontal = 18.dp)
                 .verticalScroll(scrollState),
         ) {
             PreviewResultDonutChartCard(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 32.dp),
+                    .fillMaxWidth(),
                 userName = userName,
-                totalScore = totalScore,
-                estimatedScore = estimatedScore,
-                testResultItems = testResultItems
+                totalScore = previewTestResultItem.totalScore,
+                estimatedScore = previewTestResultItem.estimatedScore,
+                testResultItems = previewTestResultItem.testResultItems
             )
 
-            if (frequentMistakeConcepts.isNotEmpty()) {
+            if (previewTestResultItem.weakAreas.isNotEmpty()) {
                 FrequentMistakeConceptCard(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 20.dp),
+                        .padding(top = 16.dp),
                     userName = userName,
-                    questionsCount = questionsCount,
-                    frequentMistakeConcepts = frequentMistakeConcepts,
+                    totalQuestionsCount = previewTestResultItem.totalQuestionsCount,
+                    frequentMistakeConcepts = previewTestResultItem.weakAreas,
+                    isExistOthersRanking = previewTestResultItem.isExistOthersRanking
                 )
             }
             RecommendedConceptsTop2(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 30.dp),
-                topConceptsToImprove = topConceptsToImprove
+                modifier = Modifier.fillMaxWidth(),
+                topConceptsToImprove = previewTestResultItem.topConceptsToImprove
             )
         }
     }
@@ -144,42 +131,45 @@ private fun PreviewResultContentPreview() {
     QrizTheme {
         PreviewResultContent(
             userName = "Qriz",
-            totalScore = 100,
-            estimatedScore = 60.0F,
-            testResultItems = persistentListOf(
-                TestResultItem(
-                    scoreName = "1과목",
-                    score = 50,
+            previewTestResultItem = PreviewTestResultItem(
+                totalScore = 100,
+                estimatedScore = 60.0F,
+                testResultItems = persistentListOf(
+                    TestResultItem(
+                        scoreName = "1과목",
+                        score = 50,
+                    ),
+                    TestResultItem(
+                        scoreName = "2과목",
+                        score = 50,
+                    )
                 ),
-                TestResultItem(
-                    scoreName = "2과목",
-                    score = 50,
-                )
-            ),
-            questionsCount = 20,
-            frequentMistakeConcepts = persistentListOf(
-                WeakAreaItem(
-                    ranking = Ranking.FIRST,
-                    topic = SQLDConcept.GROUP_BY_AND_HAVING,
-                    incorrectCount = 5
+                weakAreas = persistentListOf(
+                    WeakAreaItem(
+                        ranking = Ranking.FIRST,
+                        topic = SQLDConcept.GROUP_BY_AND_HAVING,
+                        incorrectCount = 5
+                    ),
+                    WeakAreaItem(
+                        ranking = Ranking.SECOND,
+                        topic = SQLDConcept.RELATIONAL_DATABASE_OVERVIEW,
+                        incorrectCount = 3
+                    ),
+                    WeakAreaItem(
+                        ranking = Ranking.THIRD,
+                        topic = SQLDConcept.UNDERSTANDING_TRANSACTIONS,
+                        incorrectCount = 1
+                    )
                 ),
-                WeakAreaItem(
-                    ranking = Ranking.SECOND,
-                    topic = SQLDConcept.RELATIONAL_DATABASE_OVERVIEW,
-                    incorrectCount = 3
+                topConceptsToImprove = persistentListOf(
+                    SQLDConcept.RELATIONAL_DATABASE_OVERVIEW,
+                    SQLDConcept.UNDERSTANDING_TRANSACTIONS,
                 ),
-                WeakAreaItem(
-                    ranking = Ranking.THIRD,
-                    topic = SQLDConcept.UNDERSTANDING_TRANSACTIONS,
-                    incorrectCount = 1
-                )
+                totalQuestionsCount = 20,
             ),
             onInit = {},
             onClickClose = {},
-            topConceptsToImprove = persistentListOf(
-                SQLDConcept.RELATIONAL_DATABASE_OVERVIEW,
-                SQLDConcept.UNDERSTANDING_TRANSACTIONS,
-            )
+
         )
     }
 }

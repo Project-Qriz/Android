@@ -36,7 +36,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
-import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.component.QrizCard
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Blue100
@@ -67,7 +66,6 @@ fun getTestResultColor(index: Int): Color =
 fun TestResultDonutChartCard(
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
-    subTitle: String,
     chartTitle: String? = null,
     isLessScore: Boolean = false,
     totalScore: Int,
@@ -82,13 +80,6 @@ fun TestResultDonutChartCard(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Text(
-                text = subTitle,
-                style = QrizTheme.typography.subhead,
-                color = Gray600,
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
-            )
 
             if (chartTitle != null) {
                 Row(
@@ -167,14 +158,6 @@ fun TestResultDonutChartCard(
                 testResultItems = testResultItems
             )
 
-            QrizButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 24.dp),
-                text = stringResource(R.string.view_details_by_concept),
-                containerColor = Blue500,
-                onClick = {}
-            )
         }
     }
 }

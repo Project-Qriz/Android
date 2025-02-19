@@ -69,6 +69,24 @@ internal class FakeOnBoardRepository @Inject constructor() : OnBoardRepository {
             ),
             /**여러 개념 오답*/
             PreviewTestResult(
+                estimatedScore = 77.0F,
+                totalScore = 55,
+                part1Score = 25,
+                part2Score = 30,
+                totalQuestions = 21,
+                weakAreas = listOf(
+                    WeakArea(
+                        topic = SQLDConcept.SELECT,
+                        incorrectCount = 3
+                    ),
+                    WeakArea(
+                        topic = SQLDConcept.ATTRIBUTION,
+                        incorrectCount = 5
+                    )
+                ),
+                topConceptsToImprove = listOf(SQLDConcept.SELECT, SQLDConcept.JOIN),
+            ),
+            PreviewTestResult(
                 estimatedScore = 78.0F,
                 totalScore = 60,
                 part1Score = 20,
@@ -93,8 +111,49 @@ internal class FakeOnBoardRepository @Inject constructor() : OnBoardRepository {
                     SQLDConcept.GROUP_BY_AND_HAVING
                 ),
             ),
+            PreviewTestResult(
+                estimatedScore = 78.0F,
+                totalScore = 60,
+                part1Score = 20,
+                part2Score = 40,
+                totalQuestions = 21,
+                weakAreas = listOf(
+                    WeakArea(
+                        topic = SQLDConcept.UNDERSTANDING_THE_DATA_MODEL,
+                        incorrectCount = 4
+                    ),
+                    WeakArea(
+                        topic = SQLDConcept.GROUP_BY_AND_HAVING,
+                        incorrectCount = 4
+                    ),
+                    WeakArea(
+                        topic = SQLDConcept.GROUP_FUNCTION,
+                        incorrectCount = 4
+                    ),
+                    WeakArea(
+                        topic = SQLDConcept.UNDERSTANDING_TRANSACTIONS,
+                        incorrectCount = 3
+                    ),
+                    WeakArea(
+                        topic = SQLDConcept.DDL,
+                        incorrectCount = 3
+                    ),
+                    WeakArea(
+                        topic = SQLDConcept.ATTRIBUTION,
+                        incorrectCount = 2
+                    ),
+                    WeakArea(
+                        topic = SQLDConcept.JOIN,
+                        incorrectCount = 1
+                    ),
+                ),
+                topConceptsToImprove = listOf(
+                    SQLDConcept.UNDERSTANDING_THE_DATA_MODEL,
+                    SQLDConcept.GROUP_BY_AND_HAVING
+                ),
+            ),
         )
-        val index = (0..2).random()
+        val index = (0..dataList.lastIndex).random()
         return dataList[index]
     }
 }

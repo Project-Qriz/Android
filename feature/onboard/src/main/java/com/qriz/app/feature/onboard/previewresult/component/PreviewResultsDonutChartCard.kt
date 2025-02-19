@@ -44,7 +44,6 @@ fun PreviewResultDonutChartCard(
                 color = Gray800
             )
         },
-        subTitle = stringResource(R.string.test_result_expected_score),
         totalScore = totalScore,
         estimatedScore = estimatedScore,
         testResultItems = testResultItems,

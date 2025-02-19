@@ -13,13 +13,16 @@ data class PreviewTestResultItem(
     val testResultItems: ImmutableList<TestResultItem>,
     val weakAreas: ImmutableList<WeakAreaItem>,
     val topConceptsToImprove: ImmutableList<SQLDConcept>,
-    val totalQuestions: Int,
+    val totalQuestionsCount: Int,
 ) {
+    val isExistOthersRanking: Boolean
+        get() = weakAreas.any { it.ranking == Ranking.OTHERS }
+
     companion object {
         val Default = PreviewTestResultItem(
             totalScore = 0,
             estimatedScore = 0F,
-            totalQuestions = 0,
+            totalQuestionsCount = 0,
             testResultItems = persistentListOf(),
             weakAreas = persistentListOf(),
             topConceptsToImprove = persistentListOf()
@@ -38,4 +41,5 @@ enum class Ranking {
     FIRST,
     SECOND,
     THIRD,
+    OTHERS
 }

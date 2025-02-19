@@ -28,7 +28,15 @@
     <string name="test_result">시험 결과</string>
     <string name="test_result_title_user_name">%1$s님의\n</string>
     <string name="test_result_title_tail">프리뷰 결과에요!</string>
-    <string name="test_result_expected_score">예상 점수</string>
     <string name="test_result_score">%1$s점</string>
+    <string name="mistake_concept_card_user_name">%1$s님이</string>
+    <string name="wrong_question">틀린 문제</string>
+    <string name="on">에</string>
+    <string name="concepts_that_appear_frequently">자주 등장하는 개념</string>
+    <string name="total_number_of_question">총 문제 개수: %1$s문제</string>
+    <string name="first">1위</string>
+    <string name="second">2위</string>
+    <string name="question_count">%1$s문제</string>
 
+    <string name="recommended_concepts_top2">보충하면 좋은 개념 top2</string>
 </resources>

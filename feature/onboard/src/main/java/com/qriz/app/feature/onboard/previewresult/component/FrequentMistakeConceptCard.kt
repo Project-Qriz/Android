@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,8 +33,10 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -74,8 +75,9 @@ fun getTestResultColor(index: Int): Color =
 fun FrequentMistakeConceptCard(
     modifier: Modifier = Modifier,
     userName: String,
-    questionsCount: Int,
+    totalQuestionsCount: Int,
     frequentMistakeConcepts: ImmutableList<WeakAreaItem>,
+    isExistOthersRanking: Boolean,
 ) {
     TestResultBaseCard(
         modifier = modifier,
@@ -112,10 +114,10 @@ fun FrequentMistakeConceptCard(
                 },
                 color = Gray800
             )
-        }
+        },
     ) {
         Text(
-            text = stringResource(R.string.total_number_of_question, questionsCount),
+            text = stringResource(R.string.total_number_of_question, totalQuestionsCount),
             color = Gray500,
             style = QrizTheme.typography.label2,
             modifier = Modifier
@@ -123,42 +125,48 @@ fun FrequentMistakeConceptCard(
                 .padding(bottom = 20.dp),
         )
 
-        if (frequentMistakeConcepts.size > 1) {
+        val isAllFirst = remember {
+            frequentMistakeConcepts.all { it.ranking == Ranking.FIRST }
+        }
+
+        if (frequentMistakeConcepts.size > 1 && isAllFirst.not()) {
             BarChart(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
+                    .padding(bottom = 16.dp),
                 frequentMistakeConcepts = frequentMistakeConcepts,
             )
         }
 
-        //TODO : 동점인 경우 아래 추가되는 방식으로 표현해야함 (상하 패딩 수정 필요)
-        frequentMistakeConcepts.forEachIndexed { index, weakAreaItem ->
+        for ((index, weakAreaItem) in frequentMistakeConcepts.withIndex()) {
+            if (weakAreaItem.ranking == Ranking.OTHERS) break
             val isHeaderRankingItem =
                 if (index == 0) true
                 else frequentMistakeConcepts[index - 1].ranking != weakAreaItem.ranking
 
-            val rowTopPadding = if (isHeaderRankingItem) 8.dp else 6.dp
-            val rowBottomPadding = if (isHeaderRankingItem) 8.dp else 6.dp
+            val nextIsHeaderRankingItem =
+                if (index == frequentMistakeConcepts.lastIndex) false
+                else frequentMistakeConcepts[index + 1].ranking != weakAreaItem.ranking
+            val rowBottomPadding = if (nextIsHeaderRankingItem) 16.dp else 6.dp
 
             WrongQuestionRankingItem(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(
-                        top = rowTopPadding,
-                        bottom = rowBottomPadding
-                    ),
+                    .padding(bottom = rowBottomPadding),
                 ranking = weakAreaItem.ranking,
                 isHeaderRankingItem = isHeaderRankingItem,
                 sqldConcept = weakAreaItem.topic,
                 incorrectCount = weakAreaItem.incorrectCount
             )
         }
-        if (frequentMistakeConcepts.size > 3) {
+
+        if (isExistOthersRanking) {
             VerticalDotsIcon(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
             )
         }
+
     }
 }
 
@@ -186,20 +194,29 @@ private fun BarChart(
 ) {
     val density = LocalDensity.current
     val upperValue = remember { (frequentMistakeConcepts.maxOfOrNull { it.incorrectCount }) ?: 0 }
-    val textHeight = remember { with(density) { 12.sp.toDp() } } //TODO : 다시 수정 필요
+    val textHeight = remember { with(density) { barTextSize.toDp() } }
     val barMaxHeight = remember {
         with(density) { (height - (textHeight + spaceBetweenTextAndGraph)).toPx() }
     }
     val bars = remember(frequentMistakeConcepts) {
-        frequentMistakeConcepts.mapIndexed { index, weakAreaItem ->
-            BarData(
-                animation = Animatable(0f),
-                targetHeight = (weakAreaItem.incorrectCount.toFloat() / upperValue) * barMaxHeight,
-                color = getTestResultColor(index),
-                title = weakAreaItem.topic.title,
-                value = weakAreaItem.incorrectCount,
-            )
-        }
+        frequentMistakeConcepts
+            .groupBy { it.ranking }
+            .map { it.value.first() to it.value.size - 1 }
+            .mapIndexed { index, (weakAreaItem, sameRankingCount) ->
+                var textDisplayed = weakAreaItem.topic.title
+                if (textDisplayed.length > 3) {
+                    textDisplayed = textDisplayed.take(3) + "⋯"
+                }
+                if (sameRankingCount != 0) textDisplayed += " + ${sameRankingCount}개"
+
+                BarData(
+                    animation = Animatable(0f),
+                    targetHeight = (weakAreaItem.incorrectCount.toFloat() / upperValue) * barMaxHeight,
+                    color = getTestResultColor(index),
+                    title = textDisplayed,
+                    value = weakAreaItem.incorrectCount,
+                )
+            }
     }
 
     LaunchedEffect(bars) {
@@ -225,10 +242,6 @@ private fun BarChart(
         val barGraphWidthPx = with(density) { barGraphWidth.toPx() }
         val axisWidthPx = with(density) { axisWidth.toPx() }
         val spaceBetweenTextAndGraphPx = with(density) { spaceBetweenTextAndGraph.toPx() }
-
-        //TODO: 화면 크기가 큰 경우 좌우 여백이 많이 남을텐데 보여줄 수 있으면 보여주는게 맞는지 여쭤보기
-//        val maxVisibleGraphsCount = (canvasWidthPx / barGraphWidthPx).toInt()
-//        val visibleGraphsCount = min(bars.size, maxVisibleGraphsCount)
         val visibleGraphsCount = min(bars.size, 3)
 
         val canvasWidthExceptBarWidthPx = (canvasWidthPx - visibleGraphsCount * barGraphWidthPx)
@@ -257,52 +270,46 @@ private fun BarChart(
         )
 
         //BarGraph
-        bars.take(visibleGraphsCount)
-            .forEachIndexed { index, barData ->
-                val barStartX =
-                    spacingFromLeft + (barGraphWidthPx * index) + (spacePerGraphPx * index)
-                val cornerRadiusPx = with(density) { barGraphCornerRadius.toPx() }
-                val cornerRadius = CornerRadius(cornerRadiusPx, cornerRadiusPx)
-                val path = Path().apply {
-                    addRoundRect(
-                        RoundRect(
-                            rect = Rect(
-                                offset = Offset(
-                                    x = barStartX,
-                                    y = canvasHeightPx
-                                ),
-                                size = Size(
-                                    width = barGraphWidthPx,
-                                    height = -barData.animation.value
-                                )
+        bars.forEachIndexed { index, barData ->
+            val barStartX =
+                spacingFromLeft + (barGraphWidthPx * index) + (spacePerGraphPx * index)
+            val cornerRadiusPx = with(density) { barGraphCornerRadius.toPx() }
+            val cornerRadius = CornerRadius(cornerRadiusPx, cornerRadiusPx)
+            val path = Path().apply {
+                addRoundRect(
+                    RoundRect(
+                        rect = Rect(
+                            offset = Offset(
+                                x = barStartX,
+                                y = canvasHeightPx
                             ),
-                            topLeft = cornerRadius,
-                            topRight = cornerRadius,
-                        )
+                            size = Size(
+                                width = barGraphWidthPx,
+                                height = -barData.animation.value
+                            )
+                        ),
+                        topLeft = cornerRadius,
+                        topRight = cornerRadius,
                     )
-                }
-                drawPath(path, color = barData.color)
-
-                //BarGraph Top Text
-                drawContext.canvas.nativeCanvas.apply {
-                    var displayText = barData.title
-                    if (displayText.length > 3) {
-                        displayText = displayText.take(3) + "..."
-                    }
-
-                    drawText(
-                        displayText,
-                        barStartX + (barGraphWidthPx / 2),
-                        canvasHeightPx - barData.animation.value - spaceBetweenTextAndGraphPx,
-                        Paint().apply {
-                            color = getTestResultColor(index).toArgb()
-                            textAlign = Paint.Align.CENTER
-                            textSize = with(density) { barTextSize.toPx() }
-                            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-                        }
-                    )
-                }
+                )
             }
+            drawPath(path, color = barData.color)
+
+            //BarGraph Top Text
+            drawContext.canvas.nativeCanvas.apply {
+                drawText(
+                    barData.title,
+                    barStartX + (barGraphWidthPx / 2),
+                    canvasHeightPx - barData.animation.value - spaceBetweenTextAndGraphPx,
+                    Paint().apply {
+                        color = getTestResultColor(index).toArgb()
+                        textAlign = Paint.Align.CENTER
+                        textSize = with(density) { barTextSize.toPx() }
+                        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -317,26 +324,30 @@ private fun WrongQuestionRankingItem(
     val rankingText = when (ranking) {
         Ranking.FIRST -> stringResource(R.string.first)
         Ranking.SECOND -> stringResource(R.string.second)
-        Ranking.THIRD -> ""
+        Ranking.THIRD,
+        Ranking.OTHERS -> ""
     }
 
     val rankingColor = when (ranking) {
         Ranking.FIRST -> Blue500
-        Ranking.SECOND,
-        Ranking.THIRD -> Gray500
+        Ranking.SECOND -> Gray500
+        Ranking.THIRD,
+        Ranking.OTHERS -> Color.Transparent
     }
 
     val conceptColor = when (ranking) {
         Ranking.FIRST -> Gray800
         Ranking.SECOND -> Gray600
         Ranking.THIRD -> Gray500
+        Ranking.OTHERS -> Color.Transparent
     }
 
     val conceptWeight = when (ranking) {
         Ranking.FIRST,
         Ranking.SECOND -> FontWeight.Bold
 
-        Ranking.THIRD -> FontWeight.Normal
+        Ranking.THIRD,
+        Ranking.OTHERS -> FontWeight.Normal
     }
 
     Row(
@@ -373,17 +384,15 @@ private fun WrongQuestionRankingItem(
             style = QrizTheme.typography.headline2.copy(
                 fontWeight = conceptWeight
             ),
-            color = conceptColor
-        )
-
-        Spacer(
+            color = conceptColor,
             modifier = Modifier.weight(1f)
         )
 
         Text(
             text = stringResource(R.string.question_count, incorrectCount),
             style = QrizTheme.typography.body2,
-            color = Gray800
+            color = Gray800,
+            modifier = Modifier.padding(start = 8.dp)
         )
     }
 }
@@ -412,26 +421,35 @@ fun VerticalDotsIcon(
 @Composable
 private fun FrequentMistakeConceptCardPreview() {
     QrizTheme {
+        val frequentMistakeConcepts = persistentListOf(
+            WeakAreaItem(
+                ranking = Ranking.FIRST,
+                topic = SQLDConcept.GROUP_BY_AND_HAVING,
+                incorrectCount = 5
+            ),
+            WeakAreaItem(
+                ranking = Ranking.SECOND,
+                topic = SQLDConcept.RELATIONAL_DATABASE_OVERVIEW,
+                incorrectCount = 3
+            ),
+            WeakAreaItem(
+                ranking = Ranking.THIRD,
+                topic = SQLDConcept.UNDERSTANDING_TRANSACTIONS,
+                incorrectCount = 2
+            ),
+            WeakAreaItem(
+                ranking = Ranking.OTHERS,
+                topic = SQLDConcept.UNDERSTANDING_TRANSACTIONS,
+                incorrectCount = 1
+            ),
+        )
         FrequentMistakeConceptCard(
             userName = "Qriz",
-            questionsCount = 20,
-            frequentMistakeConcepts = persistentListOf(
-                WeakAreaItem(
-                    ranking = Ranking.FIRST,
-                    topic = SQLDConcept.GROUP_BY_AND_HAVING,
-                    incorrectCount = 5
-                ),
-                WeakAreaItem(
-                    ranking = Ranking.SECOND,
-                    topic = SQLDConcept.RELATIONAL_DATABASE_OVERVIEW,
-                    incorrectCount = 3
-                ),
-                WeakAreaItem(
-                    ranking = Ranking.THIRD,
-                    topic = SQLDConcept.UNDERSTANDING_TRANSACTIONS,
-                    incorrectCount = 1
-                ),
-            )
+            totalQuestionsCount = 20,
+            frequentMistakeConcepts = frequentMistakeConcepts,
+            isExistOthersRanking = frequentMistakeConcepts.any {
+                it.ranking == Ranking.OTHERS
+            }
         )
     }
 }
@@ -440,31 +458,35 @@ private fun FrequentMistakeConceptCardPreview() {
 @Composable
 private fun FrequentMistakeConceptCardSameCountPreview() {
     QrizTheme {
+        val frequentMistakeConcepts = persistentListOf(
+            WeakAreaItem(
+                ranking = Ranking.FIRST,
+                topic = SQLDConcept.GROUP_BY_AND_HAVING,
+                incorrectCount = 3
+            ),
+            WeakAreaItem(
+                ranking = Ranking.FIRST,
+                topic = SQLDConcept.RELATIONAL_DATABASE_OVERVIEW,
+                incorrectCount = 3
+            ),
+            WeakAreaItem(
+                ranking = Ranking.FIRST,
+                topic = SQLDConcept.DCL,
+                incorrectCount = 3
+            ),
+            WeakAreaItem(
+                ranking = Ranking.SECOND,
+                topic = SQLDConcept.TOP_N_QUERIES,
+                incorrectCount = 2
+            ),
+        )
         FrequentMistakeConceptCard(
             userName = "Qriz",
-            questionsCount = 20,
-            frequentMistakeConcepts = persistentListOf(
-                WeakAreaItem(
-                    ranking = Ranking.FIRST,
-                    topic = SQLDConcept.GROUP_BY_AND_HAVING,
-                    incorrectCount = 3
-                ),
-                WeakAreaItem(
-                    ranking = Ranking.FIRST,
-                    topic = SQLDConcept.RELATIONAL_DATABASE_OVERVIEW,
-                    incorrectCount = 3
-                ),
-                WeakAreaItem(
-                    ranking = Ranking.FIRST,
-                    topic = SQLDConcept.DCL,
-                    incorrectCount = 3
-                ),
-                WeakAreaItem(
-                    ranking = Ranking.SECOND,
-                    topic = SQLDConcept.TOP_N_QUERIES,
-                    incorrectCount = 2
-                ),
-            )
+            totalQuestionsCount = 20,
+            frequentMistakeConcepts = frequentMistakeConcepts,
+            isExistOthersRanking = frequentMistakeConcepts.any {
+                it.ranking == Ranking.OTHERS
+            }
         )
     }
 }
@@ -473,21 +495,25 @@ private fun FrequentMistakeConceptCardSameCountPreview() {
 @Composable
 private fun FrequentMistakeConceptCard2Preview() {
     QrizTheme {
+        val frequentMistakeConcepts = persistentListOf(
+            WeakAreaItem(
+                ranking = Ranking.FIRST,
+                topic = SQLDConcept.GROUP_BY_AND_HAVING,
+                incorrectCount = 3
+            ),
+            WeakAreaItem(
+                ranking = Ranking.FIRST,
+                topic = SQLDConcept.RELATIONAL_DATABASE_OVERVIEW,
+                incorrectCount = 3
+            ),
+        )
         FrequentMistakeConceptCard(
             userName = "Qriz",
-            questionsCount = 20,
-            frequentMistakeConcepts = persistentListOf(
-                WeakAreaItem(
-                    ranking = Ranking.FIRST,
-                    topic = SQLDConcept.GROUP_BY_AND_HAVING,
-                    incorrectCount = 3
-                ),
-                WeakAreaItem(
-                    ranking = Ranking.FIRST,
-                    topic = SQLDConcept.RELATIONAL_DATABASE_OVERVIEW,
-                    incorrectCount = 3
-                ),
-            )
+            totalQuestionsCount = 20,
+            frequentMistakeConcepts = frequentMistakeConcepts,
+            isExistOthersRanking = frequentMistakeConcepts.any {
+                it.ranking == Ranking.OTHERS
+            }
         )
     }
 }
@@ -496,16 +522,20 @@ private fun FrequentMistakeConceptCard2Preview() {
 @Composable
 private fun FrequentMistakeConceptCard3Preview() {
     QrizTheme {
+        val frequentMistakeConcepts = persistentListOf(
+            WeakAreaItem(
+                ranking = Ranking.FIRST,
+                topic = SQLDConcept.GROUP_BY_AND_HAVING,
+                incorrectCount = 3
+            ),
+        )
         FrequentMistakeConceptCard(
             userName = "Qriz",
-            questionsCount = 20,
-            frequentMistakeConcepts = persistentListOf(
-                WeakAreaItem(
-                    ranking = Ranking.FIRST,
-                    topic = SQLDConcept.GROUP_BY_AND_HAVING,
-                    incorrectCount = 3
-                ),
-            )
+            totalQuestionsCount = 20,
+            frequentMistakeConcepts = frequentMistakeConcepts,
+            isExistOthersRanking = frequentMistakeConcepts.any {
+                it.ranking == Ranking.OTHERS
+            }
         )
     }
 }
