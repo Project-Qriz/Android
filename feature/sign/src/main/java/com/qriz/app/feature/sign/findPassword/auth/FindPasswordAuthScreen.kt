@@ -59,7 +59,7 @@ fun FindPasswordAuthScreen(
 
     viewModel.collectSideEffect {
         when (it) {
-            FindPasswordAuthUiEffect.VerifiedAuthNumber -> onNavigateReset()
+            FindPasswordAuthUiEffect.NavigateToResetPassword -> onNavigateReset()
         }
     }
 
@@ -72,6 +72,7 @@ fun FindPasswordAuthScreen(
         verifiedAuthNumber = uiState.verifiedAuthNumber,
         emailSupportingTextResId = uiState.emailSupportingTextResId,
         authNumberSupportingTextResId = uiState.authNumberSupportingTextResId,
+        onBack = onBack,
         onEmailChanged = {
             viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = it))
         },
@@ -84,8 +85,9 @@ fun FindPasswordAuthScreen(
         onVerifyAuthNumber = {
             viewModel.process(FindPasswordAuthUiAction.VerifyAuthNumber)
         },
-        onBack = onBack,
-        onNavigateReset = onNavigateReset,
+        onNavigateReset = {
+            viewModel.process(FindPasswordAuthUiAction.ClickReset)
+        },
     )
 
 }
@@ -256,7 +258,7 @@ private fun FindPasswordAuthContent(
 
                                 if (verifiedAuthNumber) {
                                     Icon(
-                                        imageVector = ImageVector.vectorResource(R.drawable.complete_icon),
+                                        imageVector = ImageVector.vectorResource(R.drawable.check_icon),
                                         contentDescription = null,
                                         tint = Mint800
                                     )

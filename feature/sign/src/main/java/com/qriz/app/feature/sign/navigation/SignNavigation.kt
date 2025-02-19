@@ -2,15 +2,20 @@ package com.qriz.app.feature.sign.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.feature.sign.findId.FindIdScreen
 import com.qriz.app.feature.sign.findPassword.auth.FindPasswordAuthScreen
+import com.qriz.app.feature.sign.findPassword.reset.ResetPasswordScreen
 import com.qriz.app.feature.sign.signin.SignInScreen
 import com.qriz.app.feature.sign.signup.SignUpScreen
 
-fun NavHostController.navigateSignIn() {
-    navigate(Route.SignIn)
+fun NavHostController.navigateSignIn(navOptions: NavOptions? = null) {
+    navigate(
+        route = Route.SignIn,
+        navOptions = navOptions,
+    )
 }
 
 fun NavHostController.navigateSignUp() {
@@ -25,6 +30,10 @@ fun NavHostController.navigateFindPasswordAuth() {
     navigate(Route.FindPasswordAuth)
 }
 
+fun NavHostController.navigateResetPassword() {
+    navigate(Route.ResetPassword)
+}
+
 fun NavGraphBuilder.signNavGraph(
     onBack: () -> Unit,
     moveToSignUp: () -> Unit,
@@ -33,6 +42,8 @@ fun NavGraphBuilder.signNavGraph(
     moveToHome: () -> Unit,
     onSignUpComplete: () -> Unit,
     onShowSnackbar: (String) -> Unit,
+    moveToResetPw: () -> Unit,
+    moveToSignIn: () -> Unit,
 ) {
     composable<Route.SignIn> {
         SignInScreen(
@@ -59,7 +70,14 @@ fun NavGraphBuilder.signNavGraph(
     composable<Route.FindPasswordAuth> {
         FindPasswordAuthScreen(
             onBack = onBack,
-            onNavigateReset = {}
+            onNavigateReset = moveToResetPw
+        )
+    }
+
+    composable<Route.ResetPassword> {
+        ResetPasswordScreen(
+            onBack = onBack,
+            moveToSignIn = moveToSignIn
         )
     }
 }

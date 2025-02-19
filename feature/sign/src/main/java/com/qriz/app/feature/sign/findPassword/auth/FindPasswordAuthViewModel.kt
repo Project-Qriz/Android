@@ -1,6 +1,6 @@
 package com.qriz.app.feature.sign.findPassword.auth
 
-import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.sign.R
@@ -38,6 +38,12 @@ class FindPasswordAuthViewModel @Inject constructor(
 
             is FindPasswordAuthUiAction.VerifyAuthNumber -> {
                 verifyAuthNumber()
+            }
+
+            is FindPasswordAuthUiAction.ClickReset -> {
+                if (uiState.value.verifiedAuthNumber) {
+                    sendEffect(FindPasswordAuthUiEffect.NavigateToResetPassword)
+                }
             }
         }
     }
@@ -138,6 +144,12 @@ class FindPasswordAuthViewModel @Inject constructor(
         timerJob = null
         updateState { copy(authTimerMs = 0) }
     }
+
+    @VisibleForTesting
+    internal fun isTimerJobNull() = timerJob == null
+
+    @VisibleForTesting
+    internal fun isTimerJobNonNull() = timerJob != null
 
     companion object {
         const val AUTH_TIME_LIMIT_MILS = 180000L
