@@ -23,10 +23,10 @@ val ID_REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,$ID_MAX_LENGTH}\$".toRegex
  * 3. 숫자 포함 : 하나 이상의 숫자 포함
  * 4. 특수 문자 포함 : 하나 이상의 특수 문자 포함
  */
-val PW_REGEX =
-    "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[\\W_]).+\$".toRegex()
 const val PW_MIN_LENGTH = 8
 const val PW_MAX_LENGTH = 16
+val PW_REGEX =
+    "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#\$%^&+=*!])(?=\\S+\$).{$PW_MIN_LENGTH,$PW_MAX_LENGTH}".toRegex()
 
 /** 한글/영문 1~20자 이내 */
 const val USER_NAME_MAX_LENGTH = 20
