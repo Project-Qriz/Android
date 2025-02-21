@@ -1,8 +1,10 @@
 package com.qriz.app.core.designsystem.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,9 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.qriz.app.core.designsystem.R
 import com.qriz.app.core.designsystem.theme.Blue500
 import com.qriz.app.core.designsystem.theme.Gray500
 import com.qriz.app.core.designsystem.theme.Gray800
@@ -23,10 +28,10 @@ import com.qriz.app.core.designsystem.theme.White
 fun QrizDialog(
     title: String,
     description: String,
+    confirmText: String = stringResource(R.string.confirmation),
     cancelText: String? = null,
-    confirmText: String,
-    onCancelClick: () -> Unit,
     onConfirmClick: () -> Unit,
+    onCancelClick: () -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
     Dialog(onDismissRequest = onDismissRequest) {
@@ -65,14 +70,25 @@ fun QrizDialog(
                         strokeColor = Blue500,
                         onClick = onCancelClick,
                     )
-                }
 
-                QrizButton(
-                    text = confirmText,
-                    modifier = Modifier
-                        .weight(1f),
-                    onClick = onConfirmClick,
-                )
+                    QrizButton(
+                        text = confirmText,
+                        modifier = Modifier
+                            .weight(1f),
+                        onClick = onConfirmClick,
+                    )
+                } else {
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = confirmText,
+                        style = QrizTheme.typography.headline2
+                            .copy(fontWeight = FontWeight.SemiBold),
+                        color = Blue500,
+                        modifier = Modifier
+                            .clickable(onClick = onConfirmClick)
+                    )
+                }
             }
 
         }
@@ -103,7 +119,7 @@ private fun QrizDialog2Preview() {
         QrizDialog(
             title = "네트워크 오류 발생",
             description = "인터넷에 연결되어 있지 않는 것 같습니다. \n다시 시도해 주세요.",
-            confirmText = "재시도 하기",
+            confirmText = "확인",
             onCancelClick = { },
             onConfirmClick = { },
             onDismissRequest = { }
