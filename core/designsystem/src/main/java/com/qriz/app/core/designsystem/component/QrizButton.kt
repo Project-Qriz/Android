@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.theme.Blue500
 import com.qriz.app.core.designsystem.theme.Gray200
@@ -25,7 +26,12 @@ fun QrizButton(
     text: String,
     enable: Boolean = true,
     modifier: Modifier = Modifier,
+    textModifier: Modifier = Modifier.padding(
+        vertical = 12.dp,
+        horizontal = 5.dp
+    ),
     onClick: () -> Unit,
+    cornerRadiusDp : Dp = 8.dp,
     containerColor: Color? = null,
     strokeColor: Color? = null,
     textColor: Color? = null,
@@ -39,26 +45,23 @@ fun QrizButton(
             .border(
                 width = 1.dp,
                 color = borderColor,
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(cornerRadiusDp)
             )
             .background(
                 color = backgroundColor,
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(cornerRadiusDp)
             )
             .clickable(
                 enabled = enable,
                 onClick = onClick,
-            )
-            .padding(
-                vertical = 12.dp,
-                horizontal = 5.dp
             ),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = text,
             style = QrizTheme.typography.headline2,
-            color = selectedTextColor
+            color = selectedTextColor,
+            modifier = textModifier
         )
     }
 }
