@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.designsystem.component.NavigationType
+import com.qriz.app.core.designsystem.component.QrizDialog
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.component.SupportingText
@@ -28,7 +29,6 @@ import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.sign.R
-import com.qriz.app.feature.sign.component.QrizAlertDialog
 import com.qriz.app.feature.sign.signup.component.SignUpBasePage
 
 @Composable
@@ -48,6 +48,8 @@ fun FindIdScreen(
 
     FindIdContent(
         email = uiState.email,
+        //내가 하고자 하는대로 수정하면, Network에러 같은 다이얼로그 Flag도 따로 만들어서 사용해야하는 문제가 있음
+        // + 서버에서 던져주는 에러값을 다이얼로그에서 보여주지 못함
         successDialogState = uiState.successDialogState,
         errorDialogState = uiState.errorDialogState,
         errorMessageResId = uiState.errorMessageResId,
@@ -80,23 +82,24 @@ private fun FindIdContent(
     onConfirmErrorDialog: () -> Unit,
 ) {
     if (successDialogState.shouldShow) {
-        QrizAlertDialog(
+        QrizDialog(
             title = stringResource(R.string.send_email_success),
-            message = stringResource(R.string.check_email_to_find_id),
-            onConfirmRequest = onConfirmSuccessDialog
+            description = stringResource(R.string.check_email_to_find_id),
+            onConfirmClick = onConfirmSuccessDialog
         )
     }
 
     if (errorDialogState.shouldShow) {
-        QrizAlertDialog(
+        QrizDialog(
             title = errorDialogState.title,
-            message = errorDialogState.message,
-            onConfirmRequest = onConfirmErrorDialog,
+            description = errorDialogState.message,
+            onConfirmClick = onConfirmErrorDialog,
         )
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(White)
     ) {
         QrizTopBar(
