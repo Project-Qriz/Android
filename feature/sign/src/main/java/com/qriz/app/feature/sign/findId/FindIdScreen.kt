@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.designsystem.component.NavigationType
-import com.qriz.app.core.designsystem.component.QrizDialog
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.component.SupportingText
@@ -28,6 +27,8 @@ import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.designsystem.theme.White
+import com.qriz.app.core.ui.common.const.ErrorDialog
+import com.qriz.app.core.ui.common.const.NetworkErrorDialog
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.component.SignUpBasePage
 
@@ -46,12 +47,26 @@ fun FindIdScreen(
         }
     }
 
+    if (uiState.isVisibleSuccessDialog) {
+        EmailTransferSuccessDialog(
+            onConfirmClick = { viewModel.process(FindIdUiAction.ConfirmSuccessDialog) }
+        )
+    }
+    if (uiState.isVisibleNetworkErrorDialog) {
+        NetworkErrorDialog(
+            onConfirmClick = { viewModel.process(FindIdUiAction.ConfirmNetworkErrorDialog) }
+        )
+    }
+
+    if (uiState.errorDialogMessage.isNullOrBlank().not()) {
+        ErrorDialog(
+            description = uiState.errorDialogMessage,
+            onConfirmClick = { viewModel.process(FindIdUiAction.ConfirmErrorDialog) }
+        )
+    }
+
     FindIdContent(
         email = uiState.email,
-        //내가 하고자 하는대로 수정하면, Network에러 같은 다이얼로그 Flag도 따로 만들어서 사용해야하는 문제가 있음
-        // + 서버에서 던져주는 에러값을 다이얼로그에서 보여주지 못함
-        successDialogState = uiState.successDialogState,
-        errorDialogState = uiState.errorDialogState,
         errorMessageResId = uiState.errorMessageResId,
         moveToBack = onBack,
         onEmailChanged = { email ->
@@ -60,42 +75,17 @@ fun FindIdScreen(
         onSendEmail = {
             viewModel.process(FindIdUiAction.SendEmailToFindId)
         },
-        onConfirmSuccessDialog = {
-            viewModel.process(FindIdUiAction.ConfirmSuccessDialog)
-        },
-        onConfirmErrorDialog = {
-            viewModel.process(FindIdUiAction.ConfirmErrorDialog)
-        },
     )
 }
 
 @Composable
 private fun FindIdContent(
     email: String,
-    successDialogState: DialogState,
-    errorDialogState: DialogState,
     errorMessageResId: Int,
     onEmailChanged: (String) -> Unit,
     moveToBack: () -> Unit,
     onSendEmail: () -> Unit,
-    onConfirmSuccessDialog: () -> Unit,
-    onConfirmErrorDialog: () -> Unit,
 ) {
-    if (successDialogState.shouldShow) {
-        QrizDialog(
-            title = stringResource(R.string.send_email_success),
-            description = stringResource(R.string.check_email_to_find_id),
-            onConfirmClick = onConfirmSuccessDialog
-        )
-    }
-
-    if (errorDialogState.shouldShow) {
-        QrizDialog(
-            title = errorDialogState.title,
-            description = errorDialogState.message,
-            onConfirmClick = onConfirmErrorDialog,
-        )
-    }
 
     Column(
         modifier = Modifier
@@ -161,14 +151,10 @@ private fun FindIdContentPreview() {
     QrizTheme {
         FindIdContent(
             email = "",
-            successDialogState = DialogState.EMPTY,
-            errorDialogState = DialogState.EMPTY,
             errorMessageResId = R.string.empty,
             onEmailChanged = {},
             moveToBack = {},
             onSendEmail = {},
-            onConfirmSuccessDialog = {},
-            onConfirmErrorDialog = {},
         )
     }
 }
