@@ -21,10 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.designsystem.component.NavigationType
+import com.qriz.app.core.designsystem.component.QrizLoading
 import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.theme.Blue50
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
+import com.qriz.app.core.ui.common.const.NetworkErrorScreen
 import com.qriz.app.core.ui.test.model.TestResultItem
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.onboard.R
@@ -58,17 +60,24 @@ fun PreviewResultScreen(
     PreviewResultContent(
         userName = uiState.userName,
         previewTestResultItem = uiState.previewTestResultItem,
-        onInit = { viewModel.process(PreviewResultUiAction.LoadPreviewResult) },
+        state = uiState.state,
+        onInit = {
+            viewModel.process(PreviewResultUiAction.ObserveClient)
+            viewModel.process(PreviewResultUiAction.LoadPreviewResult)
+        },
         onClickClose = { viewModel.process(PreviewResultUiAction.ClickClose) },
+        onClickRetry = { viewModel.process(PreviewResultUiAction.LoadPreviewResult) },
     )
 }
 
 @Composable
 private fun PreviewResultContent(
     userName: String,
-    previewTestResultItem : PreviewTestResultItem,
+    previewTestResultItem: PreviewTestResultItem,
+    state: PreviewResultUiState.State,
     onInit: () -> Unit,
-    onClickClose: () -> Unit
+    onClickClose: () -> Unit,
+    onClickRetry: () -> Unit
 ) {
     val isInitialized = rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()
@@ -90,40 +99,55 @@ private fun PreviewResultContent(
             background = White,
             title = stringResource(R.string.test_result)
         )
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .background(Blue50)
-                .verticalScroll(scrollState),
-        ) {
-            PreviewResultDonutChartCard(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                userName = userName,
-                totalScore = previewTestResultItem.totalScore,
-                estimatedScore = previewTestResultItem.estimatedScore,
-                testResultItems = previewTestResultItem.testResultItems
-            )
 
-            if (previewTestResultItem.weakAreas.isNotEmpty()) {
-                FrequentMistakeConceptCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    userName = userName,
-                    totalQuestionsCount = previewTestResultItem.totalQuestionsCount,
-                    frequentMistakeConcepts = previewTestResultItem.weakAreas,
-                    isExistOthersRanking = previewTestResultItem.isExistOthersRanking
+        when (state) {
+            PreviewResultUiState.State.LOADING -> {
+                QrizLoading()
+            }
+
+            PreviewResultUiState.State.FAILURE -> {
+                NetworkErrorScreen(
+                    onClickRetry = onClickRetry
                 )
             }
-            RecommendedConceptsTop2(
-                modifier = Modifier.fillMaxWidth(),
-                topConceptsToImprove = previewTestResultItem.topConceptsToImprove
-            )
+
+            PreviewResultUiState.State.SUCCESS -> {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(Blue50)
+                        .verticalScroll(scrollState),
+                ) {
+                    PreviewResultDonutChartCard(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        userName = userName,
+                        totalScore = previewTestResultItem.totalScore,
+                        estimatedScore = previewTestResultItem.estimatedScore,
+                        testResultItems = previewTestResultItem.testResultItems
+                    )
+
+                    if (previewTestResultItem.weakAreas.isNotEmpty()) {
+                        FrequentMistakeConceptCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            userName = userName,
+                            totalQuestionsCount = previewTestResultItem.totalQuestionsCount,
+                            frequentMistakeConcepts = previewTestResultItem.weakAreas,
+                            isExistOthersRanking = previewTestResultItem.isExistOthersRanking
+                        )
+                    }
+                    RecommendedConceptsTop2(
+                        modifier = Modifier.fillMaxWidth(),
+                        topConceptsToImprove = previewTestResultItem.topConceptsToImprove
+                    )
+                }
+            }
         }
     }
-}
 
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -131,6 +155,7 @@ private fun PreviewResultContentPreview() {
     QrizTheme {
         PreviewResultContent(
             userName = "Qriz",
+            state = PreviewResultUiState.State.SUCCESS,
             previewTestResultItem = PreviewTestResultItem(
                 totalScore = 100,
                 estimatedScore = 60.0F,
@@ -169,7 +194,7 @@ private fun PreviewResultContentPreview() {
             ),
             onInit = {},
             onClickClose = {},
-
+            onClickRetry = {},
         )
     }
 }

@@ -3,6 +3,7 @@ package com.qriz.app.feature.onboard.previewresult
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.feature.base.BaseViewModel
+import com.qriz.app.feature.onboard.previewresult.PreviewResultUiState.State
 import com.qriz.app.feature.onboard.previewresult.mapper.toPreviewTestResultItem
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,9 +19,9 @@ class PreviewResultViewModel @Inject constructor(
 ) {
     override fun process(action: PreviewResultUiAction) = viewModelScope.launch {
         when (action) {
-            PreviewResultUiAction.LoadPreviewResult -> loadPreviewResult()
-            PreviewResultUiAction.ObserveClient -> observeClient()
-            PreviewResultUiAction.ClickClose -> onClickClose()
+            is PreviewResultUiAction.LoadPreviewResult -> loadPreviewResult()
+            is PreviewResultUiAction.ObserveClient -> observeClient()
+            is PreviewResultUiAction.ClickClose -> onClickClose()
         }
     }
 
@@ -29,17 +30,17 @@ class PreviewResultViewModel @Inject constructor(
     }
 
     private fun loadPreviewResult() = viewModelScope.launch {
-        updateState { copy(isLoading = true) }
+        updateState { copy(state = State.LOADING) }
         runCatching { onBoardRepository.getPreviewTestResult() }
             .onSuccess { result ->
                 updateState {
                     copy(
-                        isLoading = false,
-                        previewTestResultItem = result.toPreviewTestResultItem()
+                        previewTestResultItem = result.toPreviewTestResultItem(),
+                        state = State.SUCCESS
                     )
                 }
             }
-            .onFailure { updateState { copy(isLoading = false) } }
+            .onFailure { updateState { copy(state = State.FAILURE) } }
     }
 
     private fun observeClient() = viewModelScope.launch {

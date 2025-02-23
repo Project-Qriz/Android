@@ -11,14 +11,20 @@ import com.qriz.app.feature.onboard.previewresult.model.PreviewTestResultItem
 data class PreviewResultUiState(
     val userName: String,
     val previewTestResultItem: PreviewTestResultItem,
-    val isLoading: Boolean,
+    val state: State
 ) : UiState {
+
+    enum class State {
+        LOADING,
+        SUCCESS,
+        FAILURE
+    }
 
     companion object {
         val Default = PreviewResultUiState(
             userName = "",
             previewTestResultItem = PreviewTestResultItem.Default,
-            isLoading = false
+            state = State.LOADING
         )
     }
 }
