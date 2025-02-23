@@ -1,11 +1,12 @@
 package com.qriz.app.core.data.onboard.onboard.repository
 
-import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.onboard.onboard_api.model.PreviewTestResult
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.data.test.test_api.model.Option
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.test.test_api.model.Test
 import com.qriz.app.core.data.test.test_api.model.TestCategory
+import com.qriz.app.core.network.common.util.verifyResponseCode
 import com.qriz.app.core.network.onboard.api.OnBoardApi
 import com.qriz.app.core.network.onboard.mapper.toPreviewTestResult
 import com.qriz.app.core.network.onboard.mapper.toTest
@@ -20,16 +21,14 @@ internal class OnBoardRepositoryImpl @Inject constructor(
 ) : OnBoardRepository {
 
     override fun submitSurvey(concepts: Collection<SQLDConcept>) {
-        val response = onBoardApi.submitSurvey(
+        onBoardApi.submitSurvey(
             SurveyRequest(keyConcept = concepts.map { it.title })
-        )
-        if (response.isFailure) throw Exception(response.message)
+        ).verifyResponseCode()
     }
 
     override suspend fun getPreviewTest(): Test {
-        val response = onBoardApi.getPreviewTest()
-        if (response.isFailure) throw Exception(response.message)
-        return onBoardApi.getPreviewTest().data.toTest()
+        val response = onBoardApi.getPreviewTest().verifyResponseCode()
+        return response.data.toTest()
     }
 
     override suspend fun submitPreviewTest(answer: Map<Long, Option>) {
@@ -45,13 +44,11 @@ internal class OnBoardRepositoryImpl @Inject constructor(
                 )
             }
         )
-        val response = onBoardApi.submitPreviewTest(request)
-        if (response.isFailure) throw Exception(response.message)
+        onBoardApi.submitPreviewTest(request).verifyResponseCode()
     }
 
     override suspend fun getPreviewTestResult(): PreviewTestResult {
-        val response = onBoardApi.getPreviewTestResult()
-        if (response.isFailure) throw Exception(response.message)
+        val response = onBoardApi.getPreviewTestResult().verifyResponseCode()
         return response.data.toPreviewTestResult()
     }
 
