@@ -45,6 +45,7 @@ class RetrofitTest {
                         "username": "test",
                         "nickname" : "nickname"
                         "createdAt": "2024-12-31 15:34:47"
+                        "previewTestStatus": "NOT_STARTED"
                     }
                 }
             """.trimIndent()
