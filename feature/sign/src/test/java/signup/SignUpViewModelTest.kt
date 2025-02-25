@@ -100,7 +100,7 @@ class SignUpViewModelTest {
                     with(awaitItem()) {
                         email shouldBe testData.contents
                         isValidEmail shouldBe testData.expectedValidResult
-                        emailErrorMessageResId shouldBe testData.expectedErrorResId
+                        emailSupportingTextResId shouldBe testData.expectedErrorResId
                     }
                 }
             }
@@ -161,7 +161,7 @@ class SignUpViewModelTest {
                 uiState.test {
                     with(awaitItem()) {
                         emailAuthState shouldBe AuthenticationState.REJECTED
-                        emailAuthNumberErrorMessageResId shouldBe R.string.email_auth_num_is_different
+                        authNumberSupportingTextResId shouldBe R.string.email_auth_num_is_different
                     }
                 }
             }
@@ -263,7 +263,7 @@ class SignUpViewModelTest {
                     with(awaitItem()) {
                         emailAuthNumber shouldBe fakeEmailAuthNum
                         emailAuthState shouldBe AuthenticationState.NONE
-                        emailAuthNumberErrorMessageResId shouldBe R.string.empty
+                        authNumberSupportingTextResId shouldBe R.string.empty
                     }
                 }
                 coVerify { fakeUserRepository.verifyEmailAuthNumber(any()) }
@@ -283,7 +283,7 @@ class SignUpViewModelTest {
                     with(awaitItem()) {
                         emailAuthNumber shouldBe fakeEmailAuthNum
                         emailAuthState shouldBe AuthenticationState.NONE
-                        emailAuthNumberErrorMessageResId shouldBe R.string.empty
+                        authNumberSupportingTextResId shouldBe R.string.empty
                     }
                 }
                 coVerify { fakeUserRepository.verifyEmailAuthNumber(fakeEmailAuthNum) }
@@ -509,7 +509,7 @@ class SignUpViewModelTest {
             uiState.test {
                 with(awaitItem()) {
                     emailAuthState shouldBe AuthenticationState.SEND_FAILED
-                    emailAuthNumberErrorMessageResId shouldBe R.string.email_auth_sent_fail
+                    authNumberSupportingTextResId shouldBe R.string.email_auth_sent_fail
                 }
             }
         }
@@ -668,7 +668,7 @@ class SignUpViewModelTest {
                 with(awaitItem()) {
                     emailAuthTime shouldBe 0
                     emailAuthState shouldBe AuthenticationState.TIME_EXPIRED
-                    emailAuthNumberErrorMessageResId shouldBe R.string.email_auth_time_has_expired
+                    authNumberSupportingTextResId shouldBe R.string.email_auth_time_has_expired
                 }
             }
         }

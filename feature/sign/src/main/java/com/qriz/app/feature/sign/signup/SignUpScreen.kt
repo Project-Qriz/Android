@@ -1,6 +1,7 @@
 package com.qriz.app.feature.sign.signup
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.pager.HorizontalPager
@@ -19,15 +20,14 @@ import com.qriz.app.core.designsystem.component.NavigationType
 import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
+import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage
-import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.EMAIL
-import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.EMAIL_AUTH
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.ID
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.NAME
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.PW
-import com.qriz.app.feature.sign.signup.component.SignUpEmailAuthPage
-import com.qriz.app.feature.sign.signup.component.SignUpEmailPage
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.AUTH
+import com.qriz.app.feature.sign.signup.component.SignUpAuthPage
 import com.qriz.app.feature.sign.signup.component.SignUpIdPage
 import com.qriz.app.feature.sign.signup.component.SignUpNamePage
 import com.qriz.app.feature.sign.signup.component.SignUpPasswordPage
@@ -43,12 +43,11 @@ fun SignUpScreen(
     val context = LocalContext.current
     viewModel.collectSideEffect {
         when (it) {
-            SignUpUiEffect.SignUpUiComplete -> onSignUpComplete()
+            is SignUpUiEffect.SignUpUiComplete -> onSignUpComplete()
             is SignUpUiEffect.ShowSnackBer -> onShowSnackbar(
                 it.message ?: context.getString(it.defaultResId)
             )
-
-            SignUpUiEffect.MoveToBack -> onBack()
+            is SignUpUiEffect.MoveToBack -> onBack()
         }
     }
 
@@ -63,13 +62,14 @@ fun SignUpScreen(
         onClickEmailAuthNumSend = { viewModel.process(SignUpUiAction.ClickEmailAuthNumSend) },
         onClickIdDuplicateCheck = { viewModel.process(SignUpUiAction.ClickIdDuplicateCheck) },
         onClickSignUp = { viewModel.process(SignUpUiAction.ClickSignUp) },
+        onClickVerifyAuthNumber = { viewModel.process(SignUpUiAction.ClickVerifyAuthNum) },
+        onChangeFocus = { viewModel.process(SignUpUiAction.ChangeFocusState(it)) },
         onChangeUserName = { viewModel.process(SignUpUiAction.ChangeUserName(it)) },
         onChangeUserId = { viewModel.process(SignUpUiAction.ChangeUserId(it)) },
         onChangeUserPw = { viewModel.process(SignUpUiAction.ChangeUserPw(it)) },
         onChangeUserPwCheck = { viewModel.process(SignUpUiAction.ChangeUserPwCheck(it)) },
         onChangeEmail = { viewModel.process(SignUpUiAction.ChangeEmail(it)) },
         onChangeEmailAuthNum = { viewModel.process(SignUpUiAction.ChangeEmailAuthNum(it)) },
-        onSignUpEmailAuthPageInit = { viewModel.process(SignUpUiAction.RequestEmailAuthNumber) },
     )
 }
 
@@ -79,15 +79,16 @@ private fun SignUpContent(
     onClickPreviousPage: () -> Unit,
     onClickNextPage: () -> Unit,
     onClickEmailAuthNumSend: () -> Unit,
+    onClickVerifyAuthNumber: () -> Unit,
     onClickIdDuplicateCheck: () -> Unit,
     onClickSignUp: () -> Unit,
+    onChangeFocus: (SignUpUiState.FocusState) -> Unit,
     onChangeUserName: (String) -> Unit,
     onChangeUserId: (String) -> Unit,
     onChangeUserPw: (String) -> Unit,
     onChangeUserPwCheck: (String) -> Unit,
     onChangeEmail: (String) -> Unit,
     onChangeEmailAuthNum: (String) -> Unit,
-    onSignUpEmailAuthPageInit: () -> Unit,
 ) {
     val pagerState = rememberPagerState { SignUpPage.entries.size }
     val currentPage = uiState.page
@@ -112,33 +113,34 @@ private fun SignUpContent(
         HorizontalPager(
             state = pagerState,
             userScrollEnabled = false,
+            modifier = Modifier.background(color = White)
         ) { page ->
             when (page) {
+                AUTH.index -> SignUpAuthPage(
+                    email = uiState.email,
+                    authNumber = uiState.emailAuthNumber,
+                    authTimerText = uiState.timerText,
+                    showAuthNumberLayout = uiState.showAuthNumberLayout,
+                    verifiedAuthNumber = uiState.isVerifiedEmailAuth,
+                    focusState = uiState.focusState,
+                    enableInputAuthNumber = uiState.isTimeExpiredEmailAuth.not(),
+                    emailSupportingTextResId = uiState.emailSupportingTextResId,
+                    authNumberSupportingTextResId = uiState.authNumberSupportingTextResId,
+                    isTimeExpiredEmailAuth = uiState.isTimeExpiredEmailAuth,
+                    onEmailChanged = onChangeEmail,
+                    onAuthNumberChanged = onChangeEmailAuthNum,
+                    onSendAuthNumberEmail = onClickEmailAuthNumSend,
+                    onClickNextPage = onClickNextPage,
+                    onChangeFocus = onChangeFocus,
+                    onVerifyAuthNumber = onClickVerifyAuthNumber,
+                )
+
                 NAME.index -> SignUpNamePage(
                     name = uiState.name,
                     isValidName = uiState.isValidName,
                     errorMessage = stringResource(uiState.nameErrorMessageResId),
                     onChangeUserName = onChangeUserName,
                     onClickNextPage = onClickNextPage,
-                )
-
-                EMAIL.index -> SignUpEmailPage(
-                    email = uiState.email,
-                    errorMessage = stringResource(uiState.emailErrorMessageResId),
-                    isValidEmail = uiState.isValidEmail,
-                    onChangeEmail = onChangeEmail,
-                    onClickNextPage = onClickNextPage,
-                )
-
-                EMAIL_AUTH.index -> SignUpEmailAuthPage(
-                    emailAuthNumber = uiState.emailAuthNumber,
-                    isVerifiedEmailAuth = uiState.isVerifiedEmailAuth,
-                    timer = uiState.timerText,
-                    errorMessage = stringResource(uiState.emailAuthNumberErrorMessageResId),
-                    onChangeEmailAuthNum = onChangeEmailAuthNum,
-                    onClickNextPage = onClickNextPage,
-                    onClickEmailAuthNumSend = onClickEmailAuthNumSend,
-                    onSignUpEmailAuthPageInit = onSignUpEmailAuthPageInit,
                 )
 
                 ID.index -> SignUpIdPage(

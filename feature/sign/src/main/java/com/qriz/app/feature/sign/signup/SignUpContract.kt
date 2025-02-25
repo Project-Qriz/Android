@@ -68,6 +68,10 @@ data class SignUpUiState(
     val enableAuthNumVerifyButton: Boolean
         get() = emailAuthNumber.length == AUTH_NUMBER_MAX_LENGTH
 
+    val showAuthNumberLayout: Boolean
+        get() = emailAuthState != AuthenticationState.NONE &&
+                emailAuthState != AuthenticationState.SEND_FAILED
+
     enum class AuthenticationState {
         SEND_SUCCESS, SEND_FAILED, NONE, VERIFIED, REJECTED, TIME_EXPIRED;
     }
