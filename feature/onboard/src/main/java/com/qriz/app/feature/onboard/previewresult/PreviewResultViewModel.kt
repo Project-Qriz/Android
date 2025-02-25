@@ -44,7 +44,7 @@ class PreviewResultViewModel @Inject constructor(
     }
 
     private fun observeClient() = viewModelScope.launch {
-        userRepository.getClientFlow()
+        userRepository.getUserFlow()
             .collect { user -> updateState { copy(userName = user.name) } }
     }
 }

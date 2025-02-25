@@ -33,10 +33,8 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -67,7 +65,7 @@ private val BAR_CHART_COLORS = listOf(
     Blue500, Gray600, Gray400
 )
 
-fun getTestResultColor(index: Int): Color =
+private fun getTestResultColor(index: Int): Color =
     if (index > BAR_CHART_COLORS.lastIndex) BAR_CHART_COLORS.last()
     else BAR_CHART_COLORS[index]
 

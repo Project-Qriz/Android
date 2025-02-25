@@ -84,7 +84,7 @@ class PreviewResultViewModelTest {
         // given
         val fakeUserName = "TestUser"
         val fakeUser = User.Default.copy(name = fakeUserName)
-        coEvery { fakeUserRepository.getClientFlow() } returns flowOf(fakeUser)
+        coEvery { fakeUserRepository.getUserFlow() } returns flowOf(fakeUser)
 
         with(previewResultViewModel()) {
             // when

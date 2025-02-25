@@ -9,9 +9,9 @@ interface UserRepository {
         password: String,
     ): User
 
-    fun getClientFlow(): Flow<User>
+    fun getUserFlow(): Flow<User>
 
-    suspend fun getClient(): User
+    suspend fun getUser(): User
 
     suspend fun requestEmailAuthNumber(email: String)
 

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 //TODO : 서버 스펙 정해지면 수정 예정
 @Serializable
-data class ClientProfileResponse(
+data class UserProfileResponse(
     @SerialName("id") val id: Long,
     @SerialName("username") val username: String,
     @SerialName("name") val name: String,

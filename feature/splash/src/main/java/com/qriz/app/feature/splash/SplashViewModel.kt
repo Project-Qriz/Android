@@ -30,7 +30,7 @@ class SplashViewModel @Inject constructor(
     }
 
     private fun loadClientProfile() = viewModelScope.launch {
-        runCatching { userRepository.getClient() }
+        runCatching { userRepository.getUser() }
             .onSuccess { client ->
                 if (client.isSurveyNeeded) {
                     sendEffect(SplashUiEffect.MoveToSurvey)

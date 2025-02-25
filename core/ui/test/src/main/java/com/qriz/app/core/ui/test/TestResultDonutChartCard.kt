@@ -38,10 +38,6 @@ import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizCard
 import com.qriz.app.core.designsystem.theme.Black
-import com.qriz.app.core.designsystem.theme.Blue100
-import com.qriz.app.core.designsystem.theme.Blue300
-import com.qriz.app.core.designsystem.theme.Blue500
-import com.qriz.app.core.designsystem.theme.Blue800
 import com.qriz.app.core.designsystem.theme.Gray100
 import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.Gray600
@@ -54,14 +50,6 @@ import com.qriz.app.core.ui.test.model.TestResultItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 
-private val TEST_RESULT_COLORS = listOf(
-    Blue800, Blue500, Blue300, Blue100, Gray300
-)
-
-fun getTestResultColor(index: Int): Color =
-    if (index > TEST_RESULT_COLORS.lastIndex) TEST_RESULT_COLORS.last()
-    else TEST_RESULT_COLORS[index]
-
 @Composable
 fun TestResultDonutChartCard(
     modifier: Modifier = Modifier,
@@ -70,8 +58,10 @@ fun TestResultDonutChartCard(
     isLessScore: Boolean = false,
     totalScore: Int,
     estimatedScore: Float,
-    testResultItems: ImmutableList<TestResultItem>
+    testResultItems: ImmutableList<TestResultItem>,
+    getTestResultColor: (index: Int) -> Color
 ) {
+
     TestResultBaseCard(
         modifier = modifier,
         title = title,
@@ -123,7 +113,8 @@ fun TestResultDonutChartCard(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally),
                 totalScore = totalScore,
-                testResultItems = testResultItems
+                testResultItems = testResultItems,
+                getTestResultColor = getTestResultColor
             )
 
             Row(
@@ -155,7 +146,8 @@ fun TestResultDonutChartCard(
             BottomScoreRow(
                 modifier = Modifier
                     .padding(top = 32.dp),
-                testResultItems = testResultItems
+                testResultItems = testResultItems,
+                getTestResultColor = getTestResultColor
             )
 
         }
@@ -175,7 +167,8 @@ fun AnimatedDonutChart(
     testResultItems: ImmutableList<TestResultItem>,
     animationDurationMillis: Int = 2000,
     strokeWidthDp: Int = 37,
-    chartBackgroundColor: Color = Gray300
+    chartBackgroundColor: Color = Gray300,
+    getTestResultColor: (index: Int) -> Color
 ) {
     val totalAnimationAngle = (totalScore / 100F) * 360
     val total = testResultItems
@@ -264,7 +257,8 @@ fun AnimatedDonutChart(
 @Composable
 fun BottomScoreRow(
     modifier: Modifier,
-    testResultItems: List<TestResultItem>
+    testResultItems: List<TestResultItem>,
+    getTestResultColor: (index: Int) -> Color
 ) {
     Column(
         modifier = modifier

@@ -45,7 +45,7 @@ class SplashViewModelTest {
         with(splashViewModel()) {
             // given
             coEvery { fakeTokenRepository.isTokenExist() } returns true
-            coEvery { fakeUserRepository.getClient() } returns User.Default.copy(
+            coEvery { fakeUserRepository.getUser() } returns User.Default.copy(
                 previewTestStatus = NOT_STARTED
             )
             // when
@@ -62,7 +62,7 @@ class SplashViewModelTest {
             with(splashViewModel()) {
                 // given
                 coEvery { fakeTokenRepository.isTokenExist() } returns true
-                coEvery { fakeUserRepository.getClient() } returns User.Default.copy(
+                coEvery { fakeUserRepository.getUser() } returns User.Default.copy(
                     previewTestStatus = previewTestStatus
                 )
                 // when
@@ -78,7 +78,7 @@ class SplashViewModelTest {
         with(splashViewModel()) {
             // given
             coEvery { fakeTokenRepository.isTokenExist() } returns true
-            coEvery { fakeUserRepository.getClient() } throws Exception()
+            coEvery { fakeUserRepository.getUser() } throws Exception()
             // when
             process(SplashUiAction.StartLogin)
             // then

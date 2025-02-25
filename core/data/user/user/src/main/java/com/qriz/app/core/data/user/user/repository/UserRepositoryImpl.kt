@@ -19,11 +19,11 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-//TODO : getClientProfile 함수 서버 수정 대기
+//TODO : getUserProfile 함수 서버 수정 대기
 internal class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
 ) : UserRepository {
-    private val client = MutableStateFlow<User?>(null)
+    private val user = MutableStateFlow<User?>(null)
 
     override suspend fun login(id: String, password: String): User {
         val response = userApi.login(
@@ -32,23 +32,23 @@ internal class UserRepositoryImpl @Inject constructor(
                 password = password
             )
         )
-        val newClient = response.data.toDataModel()
-        client.update { newClient }
-        return newClient
+        val newUser = response.data.toDataModel()
+        user.update { newUser }
+        return newUser
     }
 
-    override fun getClientFlow(): Flow<User> {
-        return client.asStateFlow().filterNotNull()
+    override fun getUserFlow(): Flow<User> {
+        return user.asStateFlow().filterNotNull()
     }
 
-    override suspend fun getClient(): User {
-        return client.firstOrNull()
-            ?: getClientProfileFromServer()
+    override suspend fun getUser(): User {
+        return user.firstOrNull()
+            ?: getUserProfileFromServer()
     }
 
-    private suspend fun getClientProfileFromServer(): User {
-        return userApi.getClientProfile().data.toDataModel()
-            .also { newClient -> client.update { newClient } }
+    private suspend fun getUserProfileFromServer(): User {
+        return userApi.getUserProfile().data.toDataModel()
+            .also { newUser -> user.update { newUser } }
     }
 
     /* TODO: 주소 값 나오면 실제 API 연결 */

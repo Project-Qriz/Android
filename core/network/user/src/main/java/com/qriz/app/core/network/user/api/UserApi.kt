@@ -7,7 +7,7 @@ import com.qriz.app.core.network.user.model.request.JoinRequest
 import com.qriz.app.core.network.user.model.request.LoginRequest
 import com.qriz.app.core.network.user.model.request.ResetPwdRequest
 import com.qriz.app.core.network.user.model.request.VerifyPwdResetRequest
-import com.qriz.app.core.network.user.model.response.ClientProfileResponse
+import com.qriz.app.core.network.user.model.response.UserProfileResponse
 import com.qriz.app.core.network.user.model.response.JoinResponse
 import com.qriz.app.core.network.user.model.response.LoginResponse
 import retrofit2.http.Body
@@ -22,8 +22,8 @@ interface UserApi {
 
     //TODO : 서버 수정 대기 중
     @GET("")
-    suspend fun getClientProfile(
-    ): NetworkResponse<ClientProfileResponse>
+    suspend fun getUserProfile(
+    ): NetworkResponse<UserProfileResponse>
 
     @POST("/api/join")
     suspend fun signUp(
