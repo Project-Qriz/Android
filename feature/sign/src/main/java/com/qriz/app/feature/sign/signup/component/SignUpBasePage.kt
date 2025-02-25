@@ -1,7 +1,6 @@
 package com.qriz.app.feature.sign.signup.component
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -17,9 +16,9 @@ import com.qriz.app.core.designsystem.component.QrizButton
 @Composable
 internal fun SignUpBasePage(
     title: String,
-    subTitle: String,
     buttonText: String,
     buttonEnabled: Boolean,
+    subTitle: String? = null,
     onButtonClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -35,21 +34,25 @@ internal fun SignUpBasePage(
         Column(
             modifier = Modifier.weight(1f)
         ) {
+            val titleBottomPadding = if (subTitle != null) 8.dp else 32.dp
+
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.W600
                 ),
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 8.dp),
+                modifier = Modifier.padding(bottom = titleBottomPadding),
             )
 
-            Text(
-                text = subTitle,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSecondary,
-                modifier = Modifier.padding(bottom = 32.dp),
-            )
+            if (subTitle != null) {
+                Text(
+                    text = subTitle,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    modifier = Modifier.padding(bottom = 32.dp),
+                )
+            }
 
             content()
         }
