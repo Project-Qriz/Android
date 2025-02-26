@@ -1,5 +1,6 @@
 package com.qriz.app.core.data.onboard.onboard.repository
 
+import com.qriz.app.core.data.onboard.onboard.mapper.toPreviewTestResult
 import com.qriz.app.core.data.onboard.onboard_api.model.PreviewTestResult
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.data.test.test_api.model.Option
@@ -8,8 +9,7 @@ import com.qriz.app.core.data.test.test_api.model.Test
 import com.qriz.app.core.data.test.test_api.model.TestCategory
 import com.qriz.app.core.network.common.util.verifyResponseCode
 import com.qriz.app.core.network.onboard.api.OnBoardApi
-import com.qriz.app.core.network.onboard.mapper.toPreviewTestResult
-import com.qriz.app.core.network.onboard.mapper.toTest
+import com.qriz.app.core.data.onboard.onboard.mapper.toTest
 import com.qriz.app.core.network.onboard.model.request.SurveyRequest
 import com.qriz.app.core.network.onboard.model.request.TestSubmitActivity
 import com.qriz.app.core.network.onboard.model.request.TestSubmitQuestion

@@ -1,4 +1,4 @@
-package com.qriz.app.core.network.onboard.mapper
+package com.qriz.app.core.data.onboard.onboard.mapper
 
 import com.qriz.app.core.data.onboard.onboard_api.model.PreviewTestResult
 import com.qriz.app.core.data.onboard.onboard_api.model.WeakArea

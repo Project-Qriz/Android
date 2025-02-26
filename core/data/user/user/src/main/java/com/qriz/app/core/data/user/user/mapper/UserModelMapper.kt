@@ -1,4 +1,4 @@
-package com.qriz.app.core.network.user.mapper
+package com.qriz.app.core.data.user.user.mapper
 
 import com.qriz.app.core.network.user.model.response.UserProfileResponse
 import com.qriz.app.core.network.user.model.response.JoinResponse

@@ -1,4 +1,4 @@
-package com.qriz.app.core.network.onboard.mapper
+package com.qriz.app.core.data.onboard.onboard.mapper
 
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Question

@@ -2,7 +2,7 @@ package com.qriz.app.core.data.user.user.repository
 
 import com.qriz.app.core.network.common.util.verifyResponseCode
 import com.qriz.app.core.network.user.api.UserApi
-import com.qriz.app.core.network.user.mapper.toDataModel
+import com.qriz.app.core.data.user.user.mapper.toDataModel
 import com.qriz.app.core.network.user.model.request.FindIdRequest
 import com.qriz.app.core.network.user.model.request.FindPwdRequest
 import com.qriz.app.core.network.user.model.request.JoinRequest
