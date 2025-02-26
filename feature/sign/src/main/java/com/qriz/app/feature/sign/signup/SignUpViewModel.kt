@@ -24,8 +24,7 @@ open class SignUpViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : BaseViewModel<SignUpUiState, SignUpUiEffect, SignUpUiAction>(SignUpUiState.Default) {
 
-    @VisibleForTesting
-    var timerJob: Job? = null
+    private var timerJob: Job? = null
 
     final override fun process(action: SignUpUiAction): Job = viewModelScope.launch {
         when (action) {
@@ -178,13 +177,6 @@ open class SignUpViewModel @Inject constructor(
                 currentTime -= interval
                 updateState { copy(emailAuthTime = currentTime) }
             }
-
-            updateState {
-                copy(
-                    emailAuthState = AuthenticationState.TIME_EXPIRED,
-                    authNumberSupportingTextResId = R.string.email_auth_time_has_expired
-                )
-            }
         }
     }
 
@@ -335,6 +327,18 @@ open class SignUpViewModel @Inject constructor(
             // 수정 후 테스트 케이스 추가
         }
     }
+
+    /*
+    * ******************************************
+    * FOR TEST
+    * ******************************************
+    */
+
+    @VisibleForTesting
+    val isTimerJobNull = timerJob == null
+
+    @VisibleForTesting
+    val isTimerJobNotNull = timerJob != null
 
     companion object {
         val AUTHENTICATION_LIMIT_MILS = 3.minutes.inWholeMilliseconds
