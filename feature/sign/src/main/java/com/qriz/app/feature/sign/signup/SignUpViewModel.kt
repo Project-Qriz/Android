@@ -41,7 +41,6 @@ open class SignUpViewModel @Inject constructor(
             is SignUpUiAction.ClickEmailAuthNumSend -> onClickEmailAuthNumSend()
             is SignUpUiAction.ClickIdDuplicateCheck -> onClickIdDuplicateCheck()
             is SignUpUiAction.ClickSignUp -> onClickSignUp()
-            is SignUpUiAction.RequestEmailAuthNumber -> requestEmailAuthNumber()
             is SignUpUiAction.StartEmailAuthTimer -> startEmailAuthTimer()
             is SignUpUiAction.ClickVerifyAuthNum -> verifyEmailAuthNumber()
         }

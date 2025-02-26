@@ -131,7 +131,6 @@ sealed interface SignUpUiAction : UiAction {
     data object ClickIdDuplicateCheck : SignUpUiAction
     data object ClickSignUp : SignUpUiAction
     data object ClickVerifyAuthNum : SignUpUiAction
-    data object RequestEmailAuthNumber : SignUpUiAction
     data object StartEmailAuthTimer : SignUpUiAction
 }
 
