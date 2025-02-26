@@ -118,6 +118,7 @@ private fun SignUpContent(
             when (page) {
                 AUTH.index -> SignUpAuthPage(
                     email = uiState.email,
+                    isValidEmail = uiState.isValidEmail,
                     authNumber = uiState.emailAuthNumber,
                     authTimerText = uiState.timerText,
                     showAuthNumberLayout = uiState.showAuthNumberLayout,

@@ -54,7 +54,11 @@ open class SignUpViewModel @Inject constructor(
     */
     private fun onChangeEmail(email: String) {
         updateState {
-            copy(email = email)
+            copy(
+                email = email,
+                emailSupportingTextResId = if (EMAIL_REGEX.matches(email) || email.isEmpty()) R.string.empty
+                else R.string.email_is_invalid_format
+            )
         }
     }
 

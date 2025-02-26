@@ -47,6 +47,7 @@ import com.quiz.app.core.data.user.user_api.model.ID_MAX_LENGTH
 @Composable
 fun SignUpAuthPage(
     email: String,
+    isValidEmail: Boolean,
     authNumber: String,
     authTimerText: String,
     showAuthNumberLayout: Boolean,
@@ -64,6 +65,12 @@ fun SignUpAuthPage(
     onClickNextPage: () -> Unit,
 ) {
     val emailFocusRequester = remember { FocusRequester() }
+
+    val emailBorderColor = when {
+        isValidEmail -> Mint800
+        focusState == SignUpUiState.FocusState.EMAIL -> Gray800
+        else -> Gray200
+    }
 
     val authNumberSupportingTextColor = when (authNumberSupportingTextResId) {
         R.string.success_send_email_auth_number, R.string.success_verify_auth_number -> Mint800
@@ -105,7 +112,7 @@ fun SignUpAuthPage(
                 },
                 borderStroke = BorderStroke(
                     width = 1.dp,
-                    color = if (focusState == SignUpUiState.FocusState.EMAIL) Gray800 else Gray200,
+                    color = emailBorderColor
                 ),
                 containerColor = White,
                 singleLine = true,
@@ -266,6 +273,7 @@ fun SignUpEmailAuthPagePreview() {
             email = "",
             authNumber = "",
             authTimerText = "00:00",
+            isValidEmail = true,
             showAuthNumberLayout = true,
             verifiedAuthNumber = false,
             enableInputAuthNumber = true,
