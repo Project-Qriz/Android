@@ -1,12 +1,17 @@
 package com.quiz.app.core.data.user.user_api.repository
 
 import com.quiz.app.core.data.user.user_api.model.User
+import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     suspend fun login(
         id: String,
         password: String,
     ): User
+
+    fun getUserFlow(): Flow<User>
+
+    suspend fun getUser(): User
 
     suspend fun requestEmailAuthNumber(email: String)
 

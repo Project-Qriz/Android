@@ -11,15 +11,4 @@ interface BaseActivityNavigator {
     )
 }
 
-interface MainNavigator {
-    fun navigate(
-        currentActivity: Activity,
-        intentAction: Intent.() -> Intent = { this },
-        shouldFinish: Boolean = false,
-        isLogin: Boolean,
-    )
-
-    companion object {
-        const val EXTRA_IS_LOGIN = "EXTRA_IS_LOGIN"
-    }
-}
+interface MainActivityNavigator : BaseActivityNavigator

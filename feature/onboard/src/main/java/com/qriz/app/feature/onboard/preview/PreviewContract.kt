@@ -17,6 +17,8 @@ data class PreviewUiState(
     val remainTimeMs: Long,
     val totalTimeLimitMs: Long,
     val currentIndex: Int,
+    val isVisibleTestSubmitWarningDialog: Boolean,
+    val isVisibleTestEndWarningDialog: Boolean,
 ) : UiState {
     val progressPercent: Float = when {
         (totalTimeLimitMs == 0L) -> 0f
@@ -38,6 +40,8 @@ data class PreviewUiState(
             remainTimeMs = 0,
             totalTimeLimitMs = 0,
             currentIndex = 0,
+            isVisibleTestSubmitWarningDialog = false,
+            isVisibleTestEndWarningDialog = false,
         )
     }
 }
@@ -53,11 +57,15 @@ sealed interface PreviewUiAction : UiAction {
     data object ClickPreviousPage : PreviewUiAction
     data object ClickSubmit : PreviewUiAction
     data object ClickCancel : PreviewUiAction
+    data object ClickConfirmTestSubmitWarningDialog : PreviewUiAction
+    data object ClickDismissTestSubmitWarningDialog : PreviewUiAction
+    data object ClickConfirmTestEndWarningDialog : PreviewUiAction
+    data object ClickDismissTestEndWarningDialog : PreviewUiAction
 }
 
 sealed interface PreviewUiEffect : UiEffect {
-    data object MoveToGuide : PreviewUiEffect
-    data object MoveToBack : PreviewUiEffect
+    data object MoveToResult : PreviewUiEffect
+    data object MoveToHome : PreviewUiEffect
     data class ShowSnackBar(
         @StringRes val defaultResId: Int,
         val message: String? = null

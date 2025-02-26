@@ -1,17 +1,20 @@
 package com.qriz.app.feature.sign.signup.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizButton
+import com.qriz.app.core.designsystem.theme.Gray500
+import com.qriz.app.core.designsystem.theme.Gray800
+import com.qriz.app.core.designsystem.theme.QrizTheme
+import com.qriz.app.core.designsystem.theme.White
 
 @Composable
 internal fun SignUpBasePage(
@@ -24,6 +27,7 @@ internal fun SignUpBasePage(
 ) {
     Column(
         modifier = Modifier
+            .background(White)
             .fillMaxSize()
             .padding(
                 vertical = 24.dp,
@@ -38,18 +42,16 @@ internal fun SignUpBasePage(
 
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.W600
-                ),
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = titleBottomPadding),
+                style = QrizTheme.typography.heading1,
+                color = Gray800,
+                modifier = Modifier.padding(bottom = 8.dp),
             )
 
             if (subTitle != null) {
                 Text(
                     text = subTitle,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSecondary,
+                    style = QrizTheme.typography.body1,
+                    color = Gray500,
                     modifier = Modifier.padding(bottom = 32.dp),
                 )
             }

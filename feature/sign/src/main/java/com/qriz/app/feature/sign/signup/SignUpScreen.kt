@@ -35,7 +35,7 @@ import com.qriz.app.feature.sign.signup.component.SignUpPasswordPage
 @Composable
 fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel(),
-    onSignUpComplete: () -> Unit,
+    moveToConceptCheckGuide: () -> Unit,
     onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
 ) {
@@ -43,7 +43,7 @@ fun SignUpScreen(
     val context = LocalContext.current
     viewModel.collectSideEffect {
         when (it) {
-            is SignUpUiEffect.SignUpUiComplete -> onSignUpComplete()
+            SignUpUiEffect.SignUpUiComplete -> moveToConceptCheckGuide()
             is SignUpUiEffect.ShowSnackBer -> onShowSnackbar(
                 it.message ?: context.getString(it.defaultResId)
             )

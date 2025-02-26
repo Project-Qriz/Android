@@ -4,100 +4,86 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.qriz.app.core.navigation.route.OnBoardRoute
 import com.qriz.app.core.navigation.route.Route
-import com.qriz.app.feature.onboard.survey.ConceptCheckScreen
-import com.qriz.app.feature.onboard.guide.GuideScreen
-import com.qriz.app.feature.onboard.R
+import com.qriz.app.feature.onboard.guide.ConceptCheckGuideScreen
+import com.qriz.app.feature.onboard.guide.PreviewGuideScreen
+import com.qriz.app.feature.onboard.guide.WelcomeGuideScreen
 import com.qriz.app.feature.onboard.preview.PreviewScreen
+import com.qriz.app.feature.onboard.previewresult.PreviewResultScreen
+import com.qriz.app.feature.onboard.survey.ConceptCheckScreen
 
-//TODO : Text 리소스 혹은 상수 처리
-fun NavHostController.navigateCheckGuide() {
-    navigate(
-        Route.Guide(
-            title = """SQLD를 어느정도
-                |알고 계시나요?""".trimMargin(),
-            subTitle = """선택하신 체크사항을 기반으로
-                |맞춤 프리뷰 테스트를 제공해 드려요!""".trimMargin(),
-            image = R.drawable.img_onboard_check,
-            route = GuideType.CONCEPT_CHECK.route,
-            buttonText = "시작하기",
-        )
-    ) { popUpTo<Route.SignIn>() }
+fun NavHostController.navigateConceptCheckGuide() {
+    navigate(OnBoardRoute.ConceptCheckGuide)
+}
+
+fun NavHostController.navigatePreviewGuide() {
+    navigate(OnBoardRoute.PreviewGuide) {
+        popUpTo(graph.id)
+    }
+}
+
+fun NavHostController.navigatePreviewResult() {
+    navigate(OnBoardRoute.PreviewResult) {
+        popUpTo(graph.id)
+    }
+}
+
+fun NavHostController.navigateWelcomeGuide(userName: String) {
+    navigate(OnBoardRoute.WelcomeGuide(userName)) {
+        popUpTo(graph.id)
+    }
 }
 
 fun NavGraphBuilder.onboardNavGraph(
     onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
     onNavigate: (Route) -> Unit,
+    moveToPreviewGuide: () -> Unit,
+    moveToPreviewResult: () -> Unit,
+    moveToWelcomeGuide: (String) -> Unit,
+    moveToHome: () -> Unit,
 ) {
-    composable<Route.Guide> {
-        val route = it.toRoute<Route.Guide>()
-        GuideScreen(
-            title = route.title,
-            subTitle = route.subTitle,
-            image = route.image,
-            buttonText = route.buttonText,
-            onNext = {
-                val guideType = GuideType
-                    .entries
-                    .find { guideType ->  guideType.route == route.route }
-
-                when(guideType) {
-                    GuideType.CONCEPT_CHECK -> { onNavigate(Route.ConceptCheck) }
-                    GuideType.PREVIEW -> { onNavigate(Route.Preview) }
-                    GuideType.WELCOME -> {} //TODO : 연결 필요
-                    null -> {
-                        //TODO: Snackbar 띄우기
-                    }
-                }
-            }
+    composable<OnBoardRoute.ConceptCheckGuide> {
+        ConceptCheckGuideScreen(
+            onNext = { onNavigate(OnBoardRoute.ConceptCheck) }
         )
     }
 
-    composable<Route.ConceptCheck> {
+    composable<OnBoardRoute.ConceptCheck> {
         ConceptCheckScreen(
-            moveToGuide = {
-                onNavigate(
-                    Route.Guide(
-                        title = """테스트를
-                            |진행해볼까요?""".trimMargin(),
-                        subTitle = """간단한 프리뷰 테스트로 실력을 점검하고
-                            |이후 맞춤형 개념과 데일리 테스트를 경험해 보세요!""".trimMargin(),
-                        image = R.drawable.img_onboard_test,
-                        route = GuideType.PREVIEW.route,
-                        buttonText = "간단한 테스트 시작",
-                    )
-                )
-            },
-            moveToBack = onBack,
+            moveToPreviewGuide = moveToPreviewGuide,
             onShowSnackBar = onShowSnackbar,
         )
     }
 
-    composable<Route.Preview> {
+    composable<OnBoardRoute.PreviewGuide> {
+        PreviewGuideScreen(
+            onNext = { onNavigate(OnBoardRoute.Preview) },
+            moveToHome = moveToHome,
+        )
+    }
+
+    composable<OnBoardRoute.Preview> {
         PreviewScreen(
-            moveToBack = onBack,
-            moveToGuide = {
-                onNavigate(
-                    //환영 페이지 데이터 변경하기
-                    Route.Guide(
-                        title = """테스트를
-                            |진행해볼까요?""".trimMargin(),
-                        subTitle = """간단한 프리뷰 테스트로 실력을 점검하고
-                            |이후 맞춤형 개념과 데일리 테스트를 경험해 보세요!""".trimMargin(),
-                        image = R.drawable.img_onboard_test,
-                        route = GuideType.WELCOME.route,
-                        buttonText = "간단한 테스트 시작",
-                    )
-                )
-            },
+            moveToPreviewResult = moveToPreviewResult,
+            moveToHome = moveToHome,
             onShowSnackBar = onShowSnackbar,
         )
     }
-}
 
-enum class GuideType(val route: String) {
-    CONCEPT_CHECK("concept_check"),
-    PREVIEW("preview"),
-    WELCOME("welcome");
+    composable<OnBoardRoute.PreviewResult> {
+        PreviewResultScreen(
+            moveToWelcomeGuide = moveToWelcomeGuide,
+            onShowSnackBar = onShowSnackbar,
+        )
+    }
+
+    composable<OnBoardRoute.WelcomeGuide> { navBackStackEntry ->
+        val userName = navBackStackEntry.toRoute<OnBoardRoute.WelcomeGuide>().userName
+        WelcomeGuideScreen(
+            userName = userName,
+            moveToHome = moveToHome
+        )
+    }
 }

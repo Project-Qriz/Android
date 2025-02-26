@@ -17,7 +17,8 @@ fun QuestionDescriptionCard(
 ) {
     QrizCard(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        elevation = 0.dp
     ) {
         Text(
             text = description,
@@ -31,7 +32,7 @@ fun QuestionDescriptionCard(
 
 @Preview
 @Composable
-fun TestDescriptionCardPreview() {
+private fun TestDescriptionCardPreview() {
     QrizTheme {
         QuestionDescriptionCard("다음 중 GROUP BY 절의 특징으로 올바르지 않은 것은?")
     }

@@ -1,8 +1,6 @@
 package com.qriz.app.feature.sign.findId
 
 import androidx.lifecycle.viewModelScope
-import com.qriz.app.core.ui.common.const.NETWORK_DISABLE
-import com.qriz.app.core.ui.common.const.UNKNOWN_ERROR
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.sign.R
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
@@ -22,7 +20,7 @@ class FindIdViewModel @Inject constructor(
     override fun process(action: FindIdUiAction): Job = viewModelScope.launch {
         when (action) {
             is FindIdUiAction.ConfirmSuccessDialog -> {
-                updateState { copy(successDialogState = DialogState.EMPTY) }
+                updateState { copy(isVisibleSuccessDialog = false) }
                 sendEffect(FindIdEffect.Complete)
             }
 
@@ -35,7 +33,11 @@ class FindIdViewModel @Inject constructor(
             }
 
             is FindIdUiAction.ConfirmErrorDialog -> {
-                updateState { copy(errorDialogState = DialogState.EMPTY) }
+                updateState { copy(errorDialogMessage = null) }
+            }
+
+            FindIdUiAction.ConfirmNetworkErrorDialog -> {
+                updateState { copy(isVisibleNetworkErrorDialog = false) }
             }
         }
     }
@@ -61,10 +63,7 @@ class FindIdViewModel @Inject constructor(
             updateState {
                 copy(
                     errorMessageResId = R.string.empty,
-                    successDialogState = DialogState(
-                        title = SUCCESS_DIALOG_TITLE,
-                        message = SUCCESS_DIALOG_MESSAGE,
-                    ),
+                    isVisibleSuccessDialog = true,
                 )
             }
         }.onFailure { exception ->
@@ -74,10 +73,7 @@ class FindIdViewModel @Inject constructor(
                     updateState {
                         copy(
                             errorMessageResId = R.string.empty,
-                            errorDialogState = DialogState(
-                                title = FAIL_DIALOG_TITLE,
-                                message = NETWORK_DISABLE
-                            )
+                            isVisibleNetworkErrorDialog = true,
                         )
                     }
                 }
@@ -86,20 +82,11 @@ class FindIdViewModel @Inject constructor(
                     updateState {
                         copy(
                             errorMessageResId = R.string.empty,
-                            errorDialogState = DialogState(
-                                title = FAIL_DIALOG_TITLE,
-                                message = exception.message ?: UNKNOWN_ERROR
-                            )
+                            errorDialogMessage = exception.message ?: "",
                         )
                     }
                 }
             }
         }
-    }
-
-    companion object {
-        const val SUCCESS_DIALOG_TITLE = "이메일 발송 완료"
-        const val SUCCESS_DIALOG_MESSAGE = "입력하신 이메일 주소로 비밀번호가 발송되었습니다. 메일함을 확인해주세요."
-        const val FAIL_DIALOG_TITLE = "이메일 전송 실패"
     }
 }
