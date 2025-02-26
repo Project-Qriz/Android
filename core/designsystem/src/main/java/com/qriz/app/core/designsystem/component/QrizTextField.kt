@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -26,7 +25,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.qriz.app.core.designsystem.theme.Blue200
+import com.qriz.app.core.designsystem.theme.Blue100
 import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.Gray700
 import com.qriz.app.core.designsystem.theme.QrizTheme
@@ -37,7 +36,9 @@ fun QrizTextFiled(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     maxLength: Int = Int.MAX_VALUE,
-    style: TextStyle = MaterialTheme.typography.bodyMedium.copy(color = Gray700),
+    style: TextStyle = QrizTheme.typography.body1,
+    textColor: Color = Gray700,
+    hintColor: Color = Gray300,
     enabled: Boolean = true,
     singleLine: Boolean = false,
     hint: String? = null,
@@ -47,7 +48,7 @@ fun QrizTextFiled(
     cornerShape: RoundedCornerShape = RoundedCornerShape(10.dp),
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     borderStroke: BorderStroke? = null,
-    containerColor: Color = Blue200,
+    containerColor: Color = Blue100,
     trailing: (@Composable () -> Unit)? = null,
 ) {
     BasicTextField(
@@ -66,7 +67,8 @@ fun QrizTextFiled(
             lineHeightStyle = LineHeightStyle(
                 alignment = LineHeightStyle.Alignment.Center,
                 trim = LineHeightStyle.Trim.None
-            )
+            ),
+            color = textColor,
         ),
         keyboardOptions = keyboardOptions,
         visualTransformation = visualTransformation,
@@ -83,7 +85,7 @@ fun QrizTextFiled(
                                 color = containerColor,
                                 shape = cornerShape,
                             )
-                            then(
+                            .then(
                                 if (borderStroke != null) Modifier.border(
                                     border = borderStroke,
                                     shape = cornerShape,
@@ -93,7 +95,8 @@ fun QrizTextFiled(
                             .padding(contentPadding),
                     ) {
                         Box(
-                            modifier = Modifier.height(style.lineHeight.value.toInt().dp)
+                            modifier = Modifier
+                                .height(style.lineHeight.value.toInt().dp)
                         ) {
                             innerTextField()
                         }
@@ -101,28 +104,30 @@ fun QrizTextFiled(
                         if (hint != null && value.isEmpty()) {
                             Text(
                                 text = hint,
-                                style = style.copy(color = Gray300)
+                                style = style,
+                                color = hintColor
                             )
                         }
                     }
 
                     val trailingPadding = contentPadding.calculateEndPadding(LayoutDirection.Ltr)
-                    if (trailing != null) Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .padding(end = trailingPadding)
-                            .height(24.dp)
-                            .align(Alignment.CenterEnd)
-                    ) {
-                        trailing()
+                    if (trailing != null) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .padding(end = trailingPadding)
+                                .height(24.dp)
+                                .align(Alignment.CenterEnd)
+                        ) {
+                            trailing()
+                        }
                     }
                 }
                 if (supportingText != null) {
                     Text(
                         text = supportingText.message,
-                        style = QrizTheme.typography.body2.copy(
-                            color = supportingText.color,
-                        ),
+                        style = QrizTheme.typography.body2,
+                        color = supportingText.color,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }

@@ -1,10 +1,12 @@
 package com.qriz.app.core.designsystem.theme
 
 import android.app.Activity
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalView
@@ -26,27 +28,27 @@ private val QrizColorScheme = lightColorScheme(
     surfaceVariant = Gray600,
     onSurfaceVariant = Gray500,
     outline = Blue600,
-    background = Blue100,
-    error = Red500,
+    background = Blue50,
+    error = Red700,
 )
 
 @Composable
 fun QrizTheme(
-    darkTheme: Boolean = false,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = QrizColorScheme
-
-    if (!LocalInspectionMode.current) {
+    if (LocalInspectionMode.current.not()) {
         val view = LocalView.current
         val activity = view.context as Activity
         val window = activity.window
-        WindowCompat.getInsetsController(window, activity.window.decorView).apply {
-            isAppearanceLightStatusBars = darkTheme.not()
-            isAppearanceLightNavigationBars = darkTheme.not()
+        SideEffect {
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = true
+                isAppearanceLightNavigationBars = true
+            }
+            window.statusBarColor = Blue50.toArgb()
+            window.navigationBarColor = Blue50.toArgb()
         }
-        window.statusBarColor = colorScheme.background.toArgb()
-        window.navigationBarColor = colorScheme.background.toArgb()
     }
 
     CompositionLocalProvider(
@@ -63,4 +65,5 @@ object QrizTheme {
     val typography: QrizTypography
         @Composable
         get() = LocalTypography.current
+
 }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,9 +17,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.component.SupportingText
+import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Mint800
 import com.qriz.app.core.designsystem.theme.QrizTheme
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.feature.sign.R
 
 @Composable
@@ -36,6 +37,7 @@ fun SignUpEmailAuthPage(
 ) {
     val isInitialized = rememberSaveable { mutableStateOf(false) }
 
+    //TODO :해당 화면이 이전페이지에서 미리 로드되어서, 이메일이 입력되기도 전에 해당 부분이 호출되느 문제가 있음
     LaunchedEffect(Unit) {
         if (isInitialized.value.not()) {
             onSignUpEmailAuthPageInit()
@@ -52,7 +54,7 @@ fun SignUpEmailAuthPage(
         if (errorMessage.isBlank()) null
         else SupportingText(
             message = errorMessage,
-            color = MaterialTheme.colorScheme.error,
+            color = Red700,
         )
     }
 
@@ -84,7 +86,7 @@ fun SignUpEmailAuthPage(
                         Text(
                             text = timer,
                             style = QrizTheme.typography.body1,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = Blue600,
                         )
                     }
                 },

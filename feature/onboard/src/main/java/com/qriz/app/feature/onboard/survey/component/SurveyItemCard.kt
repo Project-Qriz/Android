@@ -1,5 +1,6 @@
 package com.qriz.app.feature.onboard.survey.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,8 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
-import com.qriz.app.core.designsystem.theme.Gray200
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
+import com.qriz.app.core.designsystem.theme.Blue100
+import com.qriz.app.core.designsystem.theme.Blue500
+import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.onboard.R
@@ -40,25 +42,32 @@ fun SurveyItemCard(
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(
-                horizontal = 24.dp,
-            ),
+            modifier = Modifier
+                .background(White)
+                .padding(
+                    horizontal = 24.dp,
+                ),
         ) {
-            val cardText = when(surveyItem){
+            val cardText = when (surveyItem) {
                 is SurveyListItem.KnowsAll -> stringResource(R.string.know_all_about_concepts)
                 is SurveyListItem.KnowsNothing -> stringResource(R.string.know_nothing_about_concepts)
                 is SurveyListItem.SurveyItem -> surveyItem.concept.title
             }
             Text(
                 text = cardText,
-                style = MaterialTheme.typography.bodyMedium,
+                style = QrizTheme.typography.headline3,
+                color = Gray800,
             )
+            //TODO : 체크되지 않았을때도 흰색 체크 모양이 있어야함
             Checkbox(
                 checked = surveyItem.isChecked,
                 colors = CheckboxDefaults.colors().copy(
-                    uncheckedBoxColor = Gray200,
-                    uncheckedBorderColor = Gray200,
+                    uncheckedBoxColor = Blue100,
+                    uncheckedBorderColor = Blue100,
                     uncheckedCheckmarkColor = White,
+                    checkedBoxColor = Blue500,
+                    checkedBorderColor = Blue500,
+                    checkedCheckmarkColor = White,
                 ),
                 onCheckedChange = { onChecked(surveyItem.isChecked.not()) }
             )
@@ -83,14 +92,14 @@ private fun ConceptCheckOptionCardPreview() {
             )
             SurveyItemCard(
                 surveyItem = SurveyListItem.SurveyItem(
-                    concept = PreCheckConcept.JOIN,
+                    concept = SQLDConcept.JOIN,
                     isChecked = true
                 ),
                 onChecked = {}
             )
             SurveyItemCard(
                 surveyItem = SurveyListItem.SurveyItem(
-                    concept = PreCheckConcept.UNDERSTANDING_NULL_PROPERTIES,
+                    concept = SQLDConcept.UNDERSTANDING_NULL_PROPERTIES,
                     isChecked = true
                 ),
                 onChecked = {}

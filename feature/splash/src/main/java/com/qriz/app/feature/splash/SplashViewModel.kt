@@ -1,40 +1,55 @@
 package com.qriz.app.feature.splash
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.core.data.token.token_api.TokenRepository
+import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val tokenRepository: TokenRepository,
+    private val userRepository: UserRepository,
 ) : BaseViewModel<SplashUiState, SplashUiEffect, SplashUiAction>(SplashUiState) {
-    private val isTest = savedStateHandle.get<Boolean>(IS_TEST_FLAG) ?: false
-
-    init {
-        if (isTest.not()) process(SplashUiAction.CheckLoginState)
-    }
 
     override fun process(action: SplashUiAction): Job = viewModelScope.launch {
         when (action) {
-            is SplashUiAction.CheckLoginState -> checkLoginState()
+            is SplashUiAction.StartLogin -> startLogin()
         }
     }
 
-    private fun checkLoginState() = viewModelScope.launch {
-        delay(2000)
-        val isLoggedIn = tokenRepository.flowTokenExist.first()
-        sendEffect(SplashUiEffect.MoveToMain(isLoggedIn))
+    private fun startLogin() = viewModelScope.launch {
+        delay(SPLASH_DURATION.seconds)
+        if (isTokenExist()) loadClientProfile()
+        else sendEffect(SplashUiEffect.MoveToLogin)
+    }
+
+    private fun loadClientProfile() = viewModelScope.launch {
+        runCatching { userRepository.getUser() }
+            .onSuccess { client ->
+                if (client.isSurveyNeeded) {
+                    sendEffect(SplashUiEffect.MoveToSurvey)
+                    return@launch
+                }
+                sendEffect(SplashUiEffect.MoveToMain())
+            }
+            .onFailure {
+                sendEffect(SplashUiEffect.MoveToLogin)
+                //clearAllData() //TODO : ClearAllDataUseCase 호출
+            }
+    }
+
+    private suspend fun isTokenExist(): Boolean {
+        return tokenRepository.isTokenExist()
     }
 
     companion object {
-        internal const val IS_TEST_FLAG = "IS_TEST_FLAG"
+        private const val SPLASH_DURATION = 2
     }
+
 }

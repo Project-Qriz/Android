@@ -6,27 +6,44 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.qriz.app.core.ui.test.TestScreen
+import com.qriz.app.core.ui.test.TestSubmitWarningDialog
 import com.qriz.app.core.ui.test.TestTimeType
 import com.qriz.app.feature.base.extention.collectSideEffect
+import com.qriz.app.feature.onboard.guide.TestEndWarningDialog
 
 @Composable
 fun PreviewScreen(
     viewModel: PreviewViewModel = hiltViewModel(),
-    moveToBack: () -> Unit,
-    moveToGuide: () -> Unit,
+    moveToPreviewResult: () -> Unit,
+    moveToHome: () -> Unit,
     onShowSnackBar: (String) -> Unit,
 ) {
+
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
     viewModel.collectSideEffect {
         when (it) {
-            PreviewUiEffect.MoveToGuide -> moveToGuide()
-            PreviewUiEffect.MoveToBack -> moveToBack()
+            is PreviewUiEffect.MoveToResult -> moveToPreviewResult()
+            is PreviewUiEffect.MoveToHome -> moveToHome()
             is PreviewUiEffect.ShowSnackBar -> onShowSnackBar(
                 it.message ?: context.getString(it.defaultResId)
             )
         }
+    }
+
+    if (uiState.isVisibleTestSubmitWarningDialog) {
+        TestSubmitWarningDialog(
+            onCancelClick = { viewModel.process(PreviewUiAction.ClickDismissTestSubmitWarningDialog) },
+            onConfirmClick = { viewModel.process(PreviewUiAction.ClickConfirmTestSubmitWarningDialog) },
+        )
+    }
+
+    if (uiState.isVisibleTestEndWarningDialog) {
+        TestEndWarningDialog(
+            onCancelClick = { viewModel.process(PreviewUiAction.ClickDismissTestEndWarningDialog) },
+            onConfirmClick = { viewModel.process(PreviewUiAction.ClickConfirmTestEndWarningDialog) },
+        )
     }
 
     TestScreen(

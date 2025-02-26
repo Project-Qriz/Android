@@ -9,8 +9,9 @@ import com.quiz.app.core.data.user.user_api.model.EMAIL_REGEX
 data class FindIdUiState(
     val email: String,
     val errorMessageResId: Int,
-    val successDialogState: DialogState,
-    val errorDialogState: DialogState,
+    val isVisibleSuccessDialog: Boolean,
+    val isVisibleNetworkErrorDialog: Boolean,
+    val errorDialogMessage: String?,
 ) : UiState {
 
     val isValidEmailFormat = EMAIL_REGEX.matches(email)
@@ -19,8 +20,9 @@ data class FindIdUiState(
         val DEFAULT = FindIdUiState(
             email = "",
             errorMessageResId = R.string.empty,
-            successDialogState = DialogState.EMPTY,
-            errorDialogState = DialogState.EMPTY,
+            isVisibleSuccessDialog = false,
+            isVisibleNetworkErrorDialog = false,
+            errorDialogMessage = null,
         )
     }
 }
@@ -29,6 +31,7 @@ sealed interface FindIdUiAction : UiAction {
     data class OnChangeEmail(val email: String) : FindIdUiAction
     data object SendEmailToFindId : FindIdUiAction
     data object ConfirmSuccessDialog : FindIdUiAction
+    data object ConfirmNetworkErrorDialog : FindIdUiAction
     data object ConfirmErrorDialog : FindIdUiAction
 }
 

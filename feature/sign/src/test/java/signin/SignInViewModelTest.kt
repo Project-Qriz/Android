@@ -83,11 +83,7 @@ class SignInViewModelTest {
             process(SignInUiAction.ChangeUserId(userId))
             process(SignInUiAction.ChangeUserPw(userPw))
 
-            coEvery { fakeUserRepository.login(userId, userPw) } returns User(
-                id = 1L,
-                username = "asf",
-                createdAt = "asfasf"
-            )
+            coEvery { fakeUserRepository.login(userId, userPw) } returns User.Default
             // when
             process(SignInUiAction.ClickLogin)
             // then

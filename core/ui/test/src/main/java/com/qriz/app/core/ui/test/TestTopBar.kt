@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,7 +19,8 @@ import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red500
+import com.qriz.app.core.designsystem.theme.Red700
+import com.qriz.app.core.designsystem.theme.White
 
 @Composable
 fun TestTopBar(
@@ -33,7 +33,7 @@ fun TestTopBar(
         QrizTopBar(
             navigationType = NavigationType.CANCEL,
             onNavigationClick = onCancel,
-            background = MaterialTheme.colorScheme.background,
+            background = White,
             actions = {
 
                 val timeNoticeTitle =
@@ -52,7 +52,7 @@ fun TestTopBar(
                         }
                         withStyle(
                             QrizTheme.typography.subhead.toSpanStyle()
-                                .copy(color = Red500)
+                                .copy(color = Red700)
                         ) {
                             append("  $remainTimeText")
                         }
@@ -79,23 +79,26 @@ enum class TestTimeType {
 
 @Preview(showBackground = true)
 @Composable
-fun TestTopBarTotalTimePreview() {
-    TestTopBar(
-        remainTimeText = "10:45",
-        progressPercent = 0.7f,
-        testTimeType = TestTimeType.TOTAL,
-        onCancel = {}
-    )
+private fun TestTopBarTotalTimePreview() {
+    QrizTheme {
+        TestTopBar(
+            remainTimeText = "10:45",
+            progressPercent = 0.7f,
+            testTimeType = TestTimeType.TOTAL,
+            onCancel = {}
+        )
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun TestTopBarIndividualTimePreview() {
-    TestTopBar(
-        remainTimeText = "10:45",
-        progressPercent = 0.7f,
-        testTimeType = TestTimeType.INDIVIDUAL,
-        onCancel = {}
-    )
+private fun TestTopBarIndividualTimePreview() {
+    QrizTheme {
+        TestTopBar(
+            remainTimeText = "10:45",
+            progressPercent = 0.7f,
+            testTimeType = TestTimeType.INDIVIDUAL,
+            onCancel = {}
+        )
+    }
 }
-

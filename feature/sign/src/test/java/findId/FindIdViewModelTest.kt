@@ -2,9 +2,7 @@ package findId
 
 import app.cash.turbine.test
 import com.qriz.app.core.testing.MainDispatcherRule
-import com.qriz.app.core.ui.common.const.NETWORK_DISABLE
 import com.qriz.app.feature.sign.R
-import com.qriz.app.feature.sign.findId.DialogState
 import com.qriz.app.feature.sign.findId.FindIdUiAction
 import com.qriz.app.feature.sign.findId.FindIdUiState
 import com.qriz.app.feature.sign.findId.FindIdViewModel
@@ -70,14 +68,36 @@ class FindIdViewModelTest {
             //given
             val input = "test@gmail.com"
             coEvery { mockUserRepository.sendEmailToFindId(input) } returns Unit
-            val expectedUiState = FindIdUiState(
+            val expectedUiState = FindIdUiState.DEFAULT.copy(
                 email = input,
                 errorMessageResId = R.string.empty,
-                successDialogState = DialogState(
-                    title = FindIdViewModel.SUCCESS_DIALOG_TITLE,
-                    message = FindIdViewModel.SUCCESS_DIALOG_MESSAGE,
-                ),
-                errorDialogState = DialogState.EMPTY,
+                isVisibleSuccessDialog = true,
+            )
+
+            //when
+            process(FindIdUiAction.OnChangeEmail(email = input))
+            process(FindIdUiAction.SendEmailToFindId)
+
+            //then
+            uiState.test {
+                awaitItem() shouldBe expectedUiState
+            }
+        }
+    }
+
+    @Test
+    fun `Action_SendEmailToFind - 네트워크 오류로 인한 실패 시, 다이얼로그 띄움`() = runTest {
+        with(findIdViewModel()) {
+            //given
+            val input = "test@gmail.com"
+            val errorMessage = "Http 404"
+            coEvery { mockUserRepository.sendEmailToFindId(input) } throws UnknownHostException(
+                errorMessage
+            )
+            val expectedUiState = FindIdUiState.DEFAULT.copy(
+                email = input,
+                errorMessageResId = R.string.empty,
+                isVisibleNetworkErrorDialog = true,
             )
 
             //when
@@ -96,15 +116,12 @@ class FindIdViewModelTest {
         with(findIdViewModel()) {
             //given
             val input = "test@gmail.com"
-            coEvery { mockUserRepository.sendEmailToFindId(input) } throws UnknownHostException(NETWORK_DISABLE)
-            val expectedUiState = FindIdUiState(
+            val errorMessage = "올바르지 않은 접근입니다."
+            coEvery { mockUserRepository.sendEmailToFindId(input) } throws Exception(errorMessage)
+            val expectedUiState = FindIdUiState.DEFAULT.copy(
                 email = input,
                 errorMessageResId = R.string.empty,
-                successDialogState = DialogState.EMPTY,
-                errorDialogState = DialogState(
-                    title = FindIdViewModel.FAIL_DIALOG_TITLE,
-                    message = NETWORK_DISABLE,
-                ),
+                errorDialogMessage = errorMessage,
             )
 
             //when

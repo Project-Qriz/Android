@@ -1,5 +1,6 @@
 package com.qriz.app.feature.onboard.survey
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,20 +9,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.qriz.app.core.data.onboard.onboard_api.model.PreCheckConcept
-import com.qriz.app.core.designsystem.component.NavigationType
+import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.designsystem.component.QrizButton
-import com.qriz.app.core.designsystem.component.QrizTopBar
+import com.qriz.app.core.designsystem.theme.Blue50
+import com.qriz.app.core.designsystem.theme.Gray500
+import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.onboard.survey.component.SurveyItemCard
@@ -34,8 +34,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun ConceptCheckScreen(
-    moveToBack: () -> Unit,
-    moveToGuide: () -> Unit,
+    moveToPreviewGuide: () -> Unit,
     onShowSnackBar: (String) -> Unit,
     viewModel: SurveyViewModel = hiltViewModel(),
 ) {
@@ -43,8 +42,7 @@ fun ConceptCheckScreen(
 
     viewModel.collectSideEffect {
         when (it) {
-            is SurveyUiEffect.MoveToGuide -> moveToGuide()
-            SurveyUiEffect.MoveToBack -> moveToBack()
+            is SurveyUiEffect.MoveToGuide -> moveToPreviewGuide()
             is SurveyUiEffect.ShowSnackBar -> onShowSnackBar(it.message)
         }
     }
@@ -58,16 +56,15 @@ fun ConceptCheckScreen(
         onClickKnowsNothing = { isChecked ->
             viewModel.process(SurveyUiAction.ClickKnowsNothing(isChecked))
         },
-        onClickConcept = { preCheckConcept, isChecked ->
+        onClickConcept = { sqldConcept, isChecked ->
             viewModel.process(
                 SurveyUiAction.ClickConcept(
-                    preCheckConcept = preCheckConcept,
+                    sqldConcept = sqldConcept,
                     isChecked = isChecked
                 )
             )
         },
         onClickSubmit = { viewModel.process(SurveyUiAction.ClickSubmit) },
-        onClickCancel = { viewModel.process(SurveyUiAction.ClickCancel) },
     )
 }
 
@@ -77,27 +74,22 @@ private fun ConceptCheckContent(
     isPossibleSubmit: Boolean,
     onClickKnowsAll: (isChecked: Boolean) -> Unit,
     onClickKnowsNothing: (isChecked: Boolean) -> Unit,
-    onClickConcept: (preCheckConcept: PreCheckConcept, isChecked: Boolean) -> Unit,
+    onClickConcept: (sqldConcept: SQLDConcept, isChecked: Boolean) -> Unit,
     onClickSubmit: () -> Unit,
-    onClickCancel: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .background(Blue50)
+            .fillMaxSize(),
     ) {
-        QrizTopBar(
-            navigationType = NavigationType.CANCEL,
-            onNavigationClick = onClickCancel,
-            background = MaterialTheme.colorScheme.background,
-        )
 
+        //TODO : String res 처리 필요
         Text(
             text = """아는 개념을 체크해주세요!""",
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.W600
-            ),
-            color = MaterialTheme.colorScheme.onSurface,
+            style = QrizTheme.typography.heading1,
+            color = Gray800,
             modifier = Modifier.padding(
-                top = 24.dp,
+                top = 48.dp,
                 bottom = 8.dp,
                 start = 24.dp,
             ),
@@ -106,8 +98,8 @@ private fun ConceptCheckContent(
         Text(
             text = """체크하신 결과를 토대로
                 |추후 진행할 테스트의 레벨이 조정됩니다!""".trimMargin(),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSecondary,
+            style = QrizTheme.typography.body1Long,
+            color = Gray500,
             modifier = Modifier.padding(
                 start = 24.dp,
                 bottom = 32.dp,
@@ -175,7 +167,7 @@ private fun ConceptCheckContent(
     showBackground = true
 )
 @Composable
-fun ConceptCheckContentPreview() {
+private fun ConceptCheckContentPreview() {
     QrizTheme {
         ConceptCheckContent(
             surveyItems = persistentListOf(),
@@ -184,7 +176,6 @@ fun ConceptCheckContentPreview() {
             onClickKnowsNothing = {},
             onClickConcept = { _, _ -> },
             onClickSubmit = {},
-            onClickCancel = {},
         )
     }
 }

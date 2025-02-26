@@ -2,7 +2,7 @@ package com.qriz.app.core.data.user.user.repository
 
 import com.qriz.app.core.network.common.util.verifyResponseCode
 import com.qriz.app.core.network.user.api.UserApi
-import com.qriz.app.core.network.user.mapper.toDataModel
+import com.qriz.app.core.data.user.user.mapper.toDataModel
 import com.qriz.app.core.network.user.model.request.FindIdRequest
 import com.qriz.app.core.network.user.model.request.FindPwdRequest
 import com.qriz.app.core.network.user.model.request.JoinRequest
@@ -11,11 +11,20 @@ import com.qriz.app.core.network.user.model.request.ResetPwdRequest
 import com.qriz.app.core.network.user.model.request.VerifyPwdResetRequest
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+//TODO : getUserProfile 함수 서버 수정 대기
 internal class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
 ) : UserRepository {
+    private val user = MutableStateFlow<User?>(null)
+
     override suspend fun login(id: String, password: String): User {
         val response = userApi.login(
             LoginRequest(
@@ -23,8 +32,23 @@ internal class UserRepositoryImpl @Inject constructor(
                 password = password
             )
         )
+        val newUser = response.data.toDataModel()
+        user.update { newUser }
+        return newUser
+    }
 
-        return response.data.toDataModel()
+    override fun getUserFlow(): Flow<User> {
+        return user.asStateFlow().filterNotNull()
+    }
+
+    override suspend fun getUser(): User {
+        return user.firstOrNull()
+            ?: getUserProfileFromServer()
+    }
+
+    private suspend fun getUserProfileFromServer(): User {
+        return userApi.getUserProfile().data.toDataModel()
+            .also { newUser -> user.update { newUser } }
     }
 
     /* TODO: 주소 값 나오면 실제 API 연결 */
@@ -41,7 +65,10 @@ internal class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signUp(
-        loginId: String, password: String, email: String, nickname: String
+        loginId: String,
+        password: String,
+        email: String,
+        nickname: String
     ): User {
         userApi.signUp(
             JoinRequest(
@@ -53,8 +80,8 @@ internal class UserRepositoryImpl @Inject constructor(
         )
 
         val user = login(
-            loginId,
-            password
+            id = loginId,
+            password = password
         )
         return user
     }

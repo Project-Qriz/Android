@@ -9,6 +9,11 @@ android {
 }
 
 dependencies {
+    implementation(projects.feature.splash)
     implementation(projects.feature.sign)
     implementation(projects.feature.onboard)
+    implementation(projects.feature.home)
+    implementation(projects.feature.conceptBook)
+    implementation(projects.feature.incorrectAnswersNote)
+    implementation(projects.feature.mypage)
 }

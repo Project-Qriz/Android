@@ -5,4 +5,14 @@
     <string name="previous">이전</string>
     <string name="next">다음</string>
     <string name="submit">제출</string>
+    <string name="submit_warning_title">제출하시겠습니까?</string>
+    <string name="submit_warning_sub_title">확인 버튼을 누르면 다시 돌아올 수 없어요.</string>
+    <string name="cancel">취소</string>
+    <string name="confirm">확인</string>
+
+    <!--TestResult-->
+    <string name="total_score">총 점수</string>
+    <string name="expected_score">예측 점수: %1$s점</string>
+    <string name="test_result_score">%1$s점</string>
+    <string name="low_score">점수 미달</string>
 </resources>

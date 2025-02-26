@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.zIndex
 import com.qriz.app.core.designsystem.theme.Blue500
+import com.qriz.app.core.designsystem.theme.QrizTheme
 
 @Composable
 fun QrizLoading(
@@ -27,6 +28,8 @@ fun QrizLoading(
 
 @Composable
 @Preview(showBackground = true)
-fun QrizLoadingPreview() {
-    QrizLoading()
+private fun QrizLoadingPreview() {
+    QrizTheme {
+        QrizLoading()
+    }
 }

@@ -41,7 +41,7 @@ import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.Mint800
 import com.qriz.app.core.designsystem.theme.QrizTheme
-import com.qriz.app.core.designsystem.theme.Red500
+import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.sign.R
@@ -114,11 +114,11 @@ private fun FindPasswordAuthContent(
     val authNumberSupportingTextColor = when(authNumberSupportingTextResId) {
         R.string.success_send_email_auth_number,
         R.string.success_verify_auth_number -> Mint800
-        else -> Red500
+        else -> Red700
     }
 
     val authNumberBorderColor = when(authNumberSupportingTextResId) {
-        R.string.fail_verify_auth_number -> Red500
+        R.string.fail_verify_auth_number -> Red700
         else -> Gray200
     }
 
@@ -154,7 +154,7 @@ private fun FindPasswordAuthContent(
                     supportingText = if (emailSupportingTextResId != R.string.empty) {
                         SupportingText(
                             message = stringResource(emailSupportingTextResId),
-                            color = Red500,
+                            color = Red700,
                             isBorderColorRequired = false,
                         )
                     } else {
