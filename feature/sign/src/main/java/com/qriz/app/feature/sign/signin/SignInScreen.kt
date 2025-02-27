@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -33,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.component.QrizLoading
 import com.qriz.app.core.designsystem.component.QrizTextFiled
+import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Gray500
@@ -111,17 +113,34 @@ private fun SignInContent(
                 .fillMaxSize()
                 .padding(horizontal = 18.dp)
         ) {
-            Image(
-                painter = painterResource(DSR.drawable.qriz_logo),
-                contentDescription = null,
+            Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(
-                        top = 48.dp,
-                        bottom = 24.dp
-                    )
-                    .width(135.dp)
-                    .height(45.dp)
-            )
+                        top = 39.dp,
+                        bottom = 31.dp
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(DSR.drawable.qriz_app_logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .padding(end = 8.dp)
+                        .width(42.dp)
+                        .height(42.dp),
+                )
+                Image(
+                    painter = painterResource(DSR.drawable.qriz_text_logo_white),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Black),
+                    modifier = Modifier
+                        .width(81.dp)
+                        .height(28.dp),
+                )
+            }
 
             QrizTextFiled(
                 value = id,
