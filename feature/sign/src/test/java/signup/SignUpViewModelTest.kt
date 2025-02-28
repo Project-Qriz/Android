@@ -129,8 +129,8 @@ class SignUpViewModelTest {
             effect.test { (awaitItem() is SignUpUiEffect.ShowSnackBer) shouldBe true }
             uiState.test {
                 awaitItem().emailAuthState shouldBe AuthenticationState.SEND_SUCCESS
-                isTimerJobNotNull.shouldBeTrue()
             }
+            isTimerJobNotNull.shouldBeTrue()
         }
     }
 

@@ -335,10 +335,12 @@ open class SignUpViewModel @Inject constructor(
     */
 
     @VisibleForTesting
-    val isTimerJobNull = timerJob == null
+    val isTimerJobNull
+        get() = timerJob == null
 
     @VisibleForTesting
-    val isTimerJobNotNull = timerJob != null
+    val isTimerJobNotNull
+        get() = timerJob != null
 
     companion object {
         val AUTHENTICATION_LIMIT_MILS = 3.minutes.inWholeMilliseconds
