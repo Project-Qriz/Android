@@ -8,4 +8,8 @@
     <string name="register_schedule_now">지금 바로 등록할까요?</string>
     <string name="exam_date">시험일: </string>
     <string name="exam_application_period">접수기간: </string>
+    <string name="preview_exam">프리뷰 시험</string>
+    <string name="test_skill_check">간단한 테스트로 실력을 확인해봐요!</string>
+    <string name="take_mock_exam">모의고사 응시</string>
+    <string name="prepare_like_real_exam">실전처럼 준비하기</string>
 </resources>
