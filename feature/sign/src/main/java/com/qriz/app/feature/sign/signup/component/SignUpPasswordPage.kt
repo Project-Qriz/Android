@@ -44,7 +44,6 @@ fun SignUpPasswordPage(
 
     SignUpBasePage(
         title = stringResource(R.string.sign_up_password_page_title),
-        subTitle = stringResource(R.string.sign_up_password_page_sub_title),
         buttonText = stringResource(R.string.sign_up_password_page_button_text),
         buttonEnabled = canSignUp,
         onButtonClick = onClickSignUp,

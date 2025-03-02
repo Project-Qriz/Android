@@ -6,12 +6,10 @@ import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
 import com.qriz.app.feature.sign.R
-import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.EMAIL
-import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.EMAIL_AUTH
-import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.ID
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.AUTH
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.NAME
-import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.PW
 import com.qriz.app.feature.sign.signup.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
+import com.quiz.app.core.data.user.user_api.model.AUTH_NUMBER_MAX_LENGTH
 import com.quiz.app.core.data.user.user_api.model.EMAIL_REGEX
 import com.quiz.app.core.data.user.user_api.model.ID_REGEX
 import com.quiz.app.core.data.user.user_api.model.PW_REGEX
@@ -26,9 +24,10 @@ data class SignUpUiState(
     val pwCheck: String,
     val emailAuthNumber: String,
     val emailAuthState: AuthenticationState,
+    val focusState: FocusState,
     val nameErrorMessageResId: Int,
-    val emailErrorMessageResId: Int,
-    val emailAuthNumberErrorMessageResId: Int,
+    val emailSupportingTextResId: Int,
+    val authNumberSupportingTextResId: Int,
     val idErrorMessageResId: Int,
     val pwErrorMessageResId: Int,
     val pwCheckErrorMessageResId: Int,
@@ -36,11 +35,7 @@ data class SignUpUiState(
     val isNotDuplicatedId: Boolean,
     val emailAuthTime: Long,
 ) : UiState {
-    val topBarTitleResId: Int = when (page) {
-        NAME -> R.string.screen_title_enter_name
-        EMAIL, EMAIL_AUTH -> R.string.screen_title_email_auth
-        ID, PW -> R.string.screen_title_sign_up
-    }
+    val topBarTitleResId: Int = R.string.screen_title_sign_up
 
     val timerText: String =
         "${(emailAuthTime / 60000)}:${(emailAuthTime % 60000 / 1000).toString().padStart(2, '0')}"
@@ -58,6 +53,9 @@ data class SignUpUiState(
     val isValidName: Boolean
         get() = USER_NAME_REGEX.matches(name)
 
+    val isSendEmailAuthNum: Boolean
+        get() = emailAuthState == AuthenticationState.SEND_SUCCESS
+
     val isVerifiedEmailAuth: Boolean
         get() = emailAuthState == AuthenticationState.VERIFIED
 
@@ -67,16 +65,26 @@ data class SignUpUiState(
     val isSendFailedEmailAuth: Boolean
         get() = emailAuthState == AuthenticationState.SEND_FAILED
 
+    val enableAuthNumVerifyButton: Boolean
+        get() = emailAuthNumber.length == AUTH_NUMBER_MAX_LENGTH
+
+    val showAuthNumberLayout: Boolean
+        get() = emailAuthState != AuthenticationState.NONE &&
+                emailAuthState != AuthenticationState.SEND_FAILED
+
     enum class AuthenticationState {
-        SEND_FAILED, NONE, VERIFIED, REJECTED, TIME_EXPIRED;
+        SEND_SUCCESS, SEND_FAILED, NONE, VERIFIED, REJECTED, TIME_EXPIRED;
+    }
+
+    enum class FocusState {
+        NONE, EMAIL, AUTH_NUM, ID, NAME, PW, PW_CHECK;
     }
 
     enum class SignUpPage(val index: Int) {
-        NAME(0),
-        EMAIL(1),
-        EMAIL_AUTH(2),
-        ID(3),
-        PW(4);
+        AUTH(0),
+        NAME(1),
+        ID(2),
+        PW(3);
 
         val next
             get() = entries[index + 1]
@@ -95,15 +103,16 @@ data class SignUpUiState(
             pwCheck = "",
             emailAuthNumber = "",
             emailAuthState = AuthenticationState.NONE,
-            emailErrorMessageResId = R.string.empty,
-            emailAuthNumberErrorMessageResId = R.string.empty,
+            emailSupportingTextResId = R.string.empty,
+            authNumberSupportingTextResId = R.string.empty,
             idErrorMessageResId = R.string.empty,
             pwErrorMessageResId = R.string.empty,
             nameErrorMessageResId = R.string.empty,
             pwCheckErrorMessageResId = R.string.empty,
-            page = NAME,
+            page = AUTH,
             isNotDuplicatedId = false,
             emailAuthTime = AUTHENTICATION_LIMIT_MILS,
+            focusState = FocusState.NONE,
         )
     }
 }
@@ -115,12 +124,13 @@ sealed interface SignUpUiAction : UiAction {
     data class ChangeUserPwCheck(val pw: String) : SignUpUiAction
     data class ChangeEmail(val email: String) : SignUpUiAction
     data class ChangeEmailAuthNum(val authNum: String) : SignUpUiAction
+    data class ChangeFocusState(val focusState: SignUpUiState.FocusState) : SignUpUiAction
     data object ClickPreviousPage : SignUpUiAction
     data object ClickNextPage : SignUpUiAction
     data object ClickEmailAuthNumSend : SignUpUiAction
     data object ClickIdDuplicateCheck : SignUpUiAction
     data object ClickSignUp : SignUpUiAction
-    data object RequestEmailAuthNumber : SignUpUiAction
+    data object ClickVerifyAuthNum : SignUpUiAction
     data object StartEmailAuthTimer : SignUpUiAction
 }
 

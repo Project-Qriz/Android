@@ -6,14 +6,12 @@ import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiAction
 import com.qriz.app.feature.sign.signup.SignUpUiEffect
 import com.qriz.app.feature.sign.signup.SignUpUiState.AuthenticationState
-import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.EMAIL_AUTH
 import com.qriz.app.feature.sign.signup.SignUpViewModel
 import com.qriz.app.feature.sign.signup.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
-import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.string.shouldBeEmpty
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -33,6 +31,326 @@ class SignUpViewModelTest {
     private fun TestScope.signUpViewModel() = SignUpViewModel(
         userRepository = fakeUserRepository
     )
+
+    @Test
+    fun `Action_ChangeEmail process - email 업데이트, 이메일 정규식 통과 시에만 가능, 부합하는 에러메세지 업데이트`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val testDataList = listOf(
+                VerificationTestData(
+                    contents = "test",
+                    expectedValidResult = false,
+                    expectedErrorResId = R.string.email_is_invalid_format
+                ),
+                VerificationTestData(
+                    contents = "",
+                    expectedValidResult = false,
+                    expectedErrorResId = R.string.empty
+                ),
+                VerificationTestData(
+                    contents = "test@example.com",
+                    expectedValidResult = true,
+                    expectedErrorResId = R.string.empty
+                ),
+                VerificationTestData(
+                    contents = "test1234@example.com",
+                    expectedValidResult = true,
+                    expectedErrorResId = R.string.empty
+                ),
+            )
+            testDataList.forEach { testData ->
+                // when
+                process(SignUpUiAction.ChangeEmail(testData.contents))
+                // then
+                uiState.test {
+                    with(awaitItem()) {
+                        email shouldBe testData.contents
+                        isValidEmail shouldBe testData.expectedValidResult
+                        emailSupportingTextResId shouldBe testData.expectedErrorResId
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickEmailAuthNumSend process - 올바른 이메일 입력 후 인증번호 요청 시 API 호출`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val fakeEmail = "test1234@example.com"
+            process(SignUpUiAction.ChangeEmail(fakeEmail))
+            // when
+            process(SignUpUiAction.ClickEmailAuthNumSend)
+            // then
+            coVerify { fakeUserRepository.requestEmailAuthNumber(fakeEmail) }
+        }
+    }
+
+    @Test
+    fun `Action_ClickEmailAuthNumSend process 이메일 입력되지 않음 - 에러메세지 업데이트`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val emptyEmail = ""
+            process(SignUpUiAction.ChangeEmail(emptyEmail))
+            // when
+            process(SignUpUiAction.ClickEmailAuthNumSend)
+            // then
+            uiState.test {
+                awaitItem().emailSupportingTextResId shouldBe R.string.email_is_empty
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickEmailAuthNumSend process 이메일 형식 맞지 않음 - 에러메세지 업데이트`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val invalidEmail = "invalid-email"
+            process(SignUpUiAction.ChangeEmail(invalidEmail))
+            // when
+            process(SignUpUiAction.ClickEmailAuthNumSend)
+            // then
+            uiState.test {
+                awaitItem().emailSupportingTextResId shouldBe R.string.email_is_invalid_format
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickEmailAuthNumSend process 성공 - 상태 업데이트, Effect_ShowSnackBer 발생, 타이머 시작`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val fakeEmail = "test1234@example.com"
+            coEvery { fakeUserRepository.requestEmailAuthNumber(fakeEmail) } returns Unit
+            process(SignUpUiAction.ChangeEmail(fakeEmail))
+            // when
+            process(SignUpUiAction.ClickEmailAuthNumSend)
+            // then
+            effect.test { (awaitItem() is SignUpUiEffect.ShowSnackBer) shouldBe true }
+            uiState.test {
+                awaitItem().emailAuthState shouldBe AuthenticationState.SEND_SUCCESS
+            }
+            isTimerJobNotNull.shouldBeTrue()
+        }
+    }
+
+    @Test
+    fun `Action_ClickEmailAuthNumSend process 실패 - SEND_FAILED 상태 업데이트, 에러메세지 추가`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val fakeEmail = "test1234@example.com"
+            coEvery { fakeUserRepository.requestEmailAuthNumber(fakeEmail) } throws Exception()
+            process(SignUpUiAction.ChangeEmail(fakeEmail))
+            // when
+            process(SignUpUiAction.ClickEmailAuthNumSend)
+            // then
+            uiState.test {
+                with(awaitItem()) {
+                    emailAuthState shouldBe AuthenticationState.SEND_FAILED
+                    authNumberSupportingTextResId shouldBe R.string.email_auth_sent_fail
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickEmailAuthNumSend process 이미 검증된 경우 - API 호출 X `() = runTest {
+        val signUpViewModel = object : SignUpViewModel(
+            userRepository = fakeUserRepository
+        ) {
+            init {
+                updateState { copy(emailAuthState = AuthenticationState.VERIFIED) }
+            }
+        }
+        with(signUpViewModel) {
+            // given
+            val fakeEmail = "test@example.com"
+            process(SignUpUiAction.ChangeEmail(fakeEmail))
+            // when
+            process(SignUpUiAction.ClickEmailAuthNumSend)
+            // then
+            coVerify(exactly = 0) { fakeUserRepository.requestEmailAuthNumber(any()) }
+        }
+    }
+
+    @Test
+    fun `Action_ChangeEmailAuthNum process 시간 만료 상태 - emailAuthNumber 업데이트 x`() =
+        runTest {
+            val signUpViewModel = object : SignUpViewModel(
+                userRepository = fakeUserRepository
+            ) {
+                init {
+                    updateState { copy(emailAuthState = AuthenticationState.TIME_EXPIRED) }
+                }
+            }
+            with(signUpViewModel) {
+                // given
+                val fakeEmailAuthNum = "123456"
+                // when
+                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
+                // then
+                uiState.test { awaitItem().emailAuthNumber.shouldBeEmpty() }
+            }
+        }
+
+    @Test
+    fun `Action_ChangeEmailAuthNum 이미 검증 완료 상태 - emailAuthNumber 업데이트 x`() =
+        runTest {
+            val signUpViewModel = object : SignUpViewModel(
+                userRepository = fakeUserRepository
+            ) {
+                init {
+                    updateState { copy(emailAuthState = AuthenticationState.VERIFIED) }
+                }
+            }
+            with(signUpViewModel) {
+                // given
+                val fakeEmailAuthNum = "123456"
+                // when
+                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
+                // then
+                uiState.test { awaitItem().emailAuthNumber.shouldBeEmpty() }
+            }
+        }
+
+    @Test
+    fun `Action_ChangeEmailAuthNum 이메일 전송 완료 상태 - emailAuthNumber 업데이트`() =
+        runTest {
+            val signUpViewModel = object : SignUpViewModel(
+                userRepository = fakeUserRepository
+            ) {
+                init {
+                    updateState { copy(emailAuthState = AuthenticationState.SEND_SUCCESS) }
+                }
+            }
+            with(signUpViewModel) {
+                // given
+                val fakeEmailAuthNum = "123456"
+                // when
+                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
+                // then
+                uiState.test { awaitItem().emailAuthNumber shouldBe fakeEmailAuthNum }
+            }
+        }
+
+    @Test
+    fun `Action_ChangeEmailAuthNum 이메일 전송 실패 상태 - emailAuthNumber 업데이트`() =
+        runTest {
+            val signUpViewModel = object : SignUpViewModel(
+                userRepository = fakeUserRepository
+            ) {
+                init {
+                    updateState { copy(emailAuthState = AuthenticationState.SEND_FAILED) }
+                }
+            }
+            with(signUpViewModel) {
+                // given
+                val fakeEmailAuthNum = "123456"
+                // when
+                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
+                // then
+                uiState.test { awaitItem().emailAuthNumber shouldBe fakeEmailAuthNum }
+            }
+        }
+
+    @Test
+    fun `Action_ChangeEmailAuthNum process 인증번호 반려 상태 - emailAuthNumber 업데이트, AuthenticationState 상태 업데이트`() =
+        runTest {
+            val signUpViewModel = object : SignUpViewModel(
+                userRepository = fakeUserRepository
+            ) {
+                init {
+                    updateState { copy(emailAuthState = AuthenticationState.REJECTED) }
+                }
+            }
+            with(signUpViewModel) {
+                // given
+                val fakeEmailAuthNum = "123456"
+                // when
+                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
+                // then
+                uiState.test {
+                    with(awaitItem()) {
+                        emailAuthNumber shouldBe fakeEmailAuthNum
+                        emailAuthState shouldBe AuthenticationState.NONE
+                        authNumberSupportingTextResId shouldBe R.string.empty
+                    }
+                }
+            }
+        }
+
+    @Test
+    fun `Action_ChangeEmailAuthNum process 무인증 상태 - emailAuthNumber 업데이트, AuthenticationState 상태 업데이트`() =
+        runTest {
+            with(signUpViewModel()) {
+                // given
+                val fakeEmailAuthNum = "123456"
+                // when
+                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
+                // then
+                uiState.test {
+                    with(awaitItem()) {
+                        emailAuthNumber shouldBe fakeEmailAuthNum
+                        emailAuthState shouldBe AuthenticationState.NONE
+                        authNumberSupportingTextResId shouldBe R.string.empty
+                    }
+                }
+            }
+        }
+
+    @Test
+    fun `Action_ClickVerifyAuthNum process 검증 API 성공 (번호 유효함) - 타이머 종료, VERIFIED 상태 업데이트`() =
+        runTest {
+            with(signUpViewModel()) {
+                // given
+                val authNum = "123456"
+                process(SignUpUiAction.ChangeEmailAuthNum(authNum))
+                coEvery { fakeUserRepository.verifyEmailAuthNumber(authNum) } returns true
+                // when
+                process(SignUpUiAction.ClickVerifyAuthNum)
+                // then
+                uiState.test {
+                    with(awaitItem()) {
+                        emailAuthState shouldBe AuthenticationState.VERIFIED
+                        authNumberSupportingTextResId shouldBe R.string.success_verify_auth_number
+                    }
+                    isTimerJobNull.shouldBeTrue()
+                }
+            }
+        }
+
+    @Test
+    fun `Action_ClickVerifyAuthNum process 검증 API 성공 (번호 유효 X) - REJECTED 상태, 에러 메세지 업데이트`() =
+        runTest {
+            with(signUpViewModel()) {
+                // given
+                val authNum = "123456"
+                process(SignUpUiAction.ChangeEmailAuthNum(authNum))
+                coEvery { fakeUserRepository.verifyEmailAuthNumber(authNum) } returns false
+                // when
+                process(SignUpUiAction.ClickVerifyAuthNum)
+                // then
+                uiState.test {
+                    with(awaitItem()) {
+                        emailAuthState shouldBe AuthenticationState.REJECTED
+                        authNumberSupportingTextResId shouldBe R.string.email_auth_num_is_different
+                    }
+                }
+            }
+        }
+
+//    @Test
+//    fun `Action_ChangeEmailAuthNum process 검증 API 실패 - 다이얼로그 노출`() = runTest {
+//        with(signUpViewModel()) {
+//            // given
+//            val authNum = "123456"
+//            coEvery { fakeUserRepository.verifyEmailAuthNumber(authNum) } throws Exception()
+//            // when
+//            process(SignUpUiAction.ChangeEmailAuthNum(authNum))
+//            // then
+//
+//        }
+//    }
 
     @Test
     fun `Action_ChangeUserName process - name 업데이트, 특수문자 제외 한글,영문이름 가능`() = runTest {
@@ -65,230 +383,6 @@ class SignUpViewModelTest {
             }
         }
     }
-
-    @Test
-    fun `Action_ChangeEmail process - email 업데이트, 이메일 정규식 통과 시에만 가능, 부합하는 에러메세지 업데이트`() = runTest {
-        with(signUpViewModel()) {
-            // given
-            val testDataList = listOf(
-                VerificationTestData(
-                    contents = "test",
-                    expectedValidResult = false,
-                    expectedErrorResId = R.string.please_check_email_again
-                ),
-                VerificationTestData(
-                    contents = "",
-                    expectedValidResult = false,
-                    expectedErrorResId = R.string.empty
-                ),
-                VerificationTestData(
-                    contents = "test@example.com",
-                    expectedValidResult = true,
-                    expectedErrorResId = R.string.empty
-                ),
-                VerificationTestData(
-                    contents = "test1234@example.com",
-                    expectedValidResult = true,
-                    expectedErrorResId = R.string.empty
-                ),
-            )
-            testDataList.forEach { testData ->
-                // when
-                process(SignUpUiAction.ChangeEmail(testData.contents))
-                // then
-                uiState.test {
-                    with(awaitItem()) {
-                        email shouldBe testData.contents
-                        isValidEmail shouldBe testData.expectedValidResult
-                        emailErrorMessageResId shouldBe testData.expectedErrorResId
-                    }
-                }
-            }
-        }
-    }
-
-    @Test
-    fun `Action_ChangeEmailAuthNum process 입력된 값이 6자리가 되지 않음 - 검증 API 호출하지 않음`() = runTest {
-        with(signUpViewModel()) {
-            // given
-            val authNum = "12"
-            // when
-            process(SignUpUiAction.ChangeEmailAuthNum(authNum))
-            // then
-            coVerify(exactly = 0) { fakeUserRepository.verifyEmailAuthNumber(authNum) }
-        }
-    }
-
-    @Test
-    fun `Action_ChangeEmailAuthNum process 입력된 값이 6자리 됨 - 자동으로 검증 API 호출`() = runTest {
-        with(signUpViewModel()) {
-            // given
-            val authNum = "123456"
-            // when
-            process(SignUpUiAction.ChangeEmailAuthNum(authNum))
-            // then
-            coVerify { fakeUserRepository.verifyEmailAuthNumber(authNum) }
-        }
-    }
-
-    @Test
-    fun `Action_ChangeEmailAuthNum process 검증 API 성공 (번호 유효함) - 타이머 종료, VERIFIED 상태 업데이트`() =
-        runTest {
-            with(signUpViewModel()) {
-                // given
-                val authNum = "123456"
-                coEvery { fakeUserRepository.verifyEmailAuthNumber(authNum) } returns true
-                // when
-                process(SignUpUiAction.ChangeEmailAuthNum(authNum))
-                // then
-                uiState.test {
-                    awaitItem().emailAuthState shouldBe AuthenticationState.VERIFIED
-                    timerJob.shouldBeNull()
-                }
-            }
-        }
-
-    @Test
-    fun `Action_ChangeEmailAuthNum process 검증 API 성공 (번호 유효 X) - REJECTED 상태, 에러 메세지 업데이트`() =
-        runTest {
-            with(signUpViewModel()) {
-                // given
-                val authNum = "123456"
-                coEvery { fakeUserRepository.verifyEmailAuthNumber(authNum) } returns false
-                // when
-                process(SignUpUiAction.ChangeEmailAuthNum(authNum))
-                // then
-                uiState.test {
-                    with(awaitItem()) {
-                        emailAuthState shouldBe AuthenticationState.REJECTED
-                        emailAuthNumberErrorMessageResId shouldBe R.string.email_auth_num_is_different
-                    }
-                }
-            }
-        }
-
-//    @Test
-//    fun `Action_ChangeEmailAuthNum process 검증 API 실패 - 다이얼로그 노출`() = runTest {
-//        with(signUpViewModel()) {
-//            // given
-//            val authNum = "123456"
-//            coEvery { fakeUserRepository.verifyEmailAuthNumber(authNum) } throws Exception()
-//            // when
-//            process(SignUpUiAction.ChangeEmailAuthNum(authNum))
-//            // then
-//
-//        }
-//    }
-
-    @Test
-    fun `Action_ChangeEmailAuthNum process 이미 검증 완료 - emailAuthNumber 업데이트 X, 검증 API 호출 x`() =
-        runTest {
-            val signUpViewModel = object : SignUpViewModel(
-                userRepository = fakeUserRepository
-            ) {
-                init {
-                    updateState { copy(emailAuthState = AuthenticationState.VERIFIED) }
-                }
-            }
-            with(signUpViewModel) {
-                // given
-                val fakeEmailAuthNum = "123456"
-                // when
-                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
-                // then
-                uiState.test { awaitItem().emailAuthNumber shouldNotBe fakeEmailAuthNum }
-                coVerify(exactly = 0) { fakeUserRepository.verifyEmailAuthNumber(any()) }
-            }
-        }
-
-    @Test
-    fun `Action_ChangeEmailAuthNum process 시간 만료 상태 - emailAuthNumber 업데이트, 검증 API 호출 x`() =
-        runTest {
-            val signUpViewModel = object : SignUpViewModel(
-                userRepository = fakeUserRepository
-            ) {
-                init {
-                    updateState { copy(emailAuthState = AuthenticationState.TIME_EXPIRED) }
-                }
-            }
-            with(signUpViewModel) {
-                // given
-                val fakeEmailAuthNum = "123456"
-                // when
-                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
-                // then
-                uiState.test { awaitItem().emailAuthNumber shouldBe fakeEmailAuthNum }
-                coVerify(exactly = 0) { fakeUserRepository.verifyEmailAuthNumber(any()) }
-            }
-        }
-
-    @Test
-    fun `Action_ChangeEmailAuthNum process 이메일 전송 실패 상태 - emailAuthNumber 업데이트, 검증 API 호출 x`() =
-        runTest {
-            val signUpViewModel = object : SignUpViewModel(
-                userRepository = fakeUserRepository
-            ) {
-                init {
-                    updateState { copy(emailAuthState = AuthenticationState.SEND_FAILED) }
-                }
-            }
-            with(signUpViewModel) {
-                // given
-                val fakeEmailAuthNum = "123456"
-                // when
-                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
-                // then
-                uiState.test { awaitItem().emailAuthNumber shouldBe fakeEmailAuthNum }
-                coVerify(exactly = 0) { fakeUserRepository.verifyEmailAuthNumber(any()) }
-            }
-        }
-
-    @Test
-    fun `Action_ChangeEmailAuthNum process 인증번호 반려 상태 - emailAuthNumber 업데이트, AuthenticationState 상태 업데이트, 검증 API 호출 O`() =
-        runTest {
-            val signUpViewModel = object : SignUpViewModel(
-                userRepository = fakeUserRepository
-            ) {
-                init {
-                    updateState { copy(emailAuthState = AuthenticationState.REJECTED) }
-                }
-            }
-            with(signUpViewModel) {
-                // given
-                val fakeEmailAuthNum = "123456"
-                // when
-                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
-                // then
-                uiState.test {
-                    with(awaitItem()) {
-                        emailAuthNumber shouldBe fakeEmailAuthNum
-                        emailAuthState shouldBe AuthenticationState.NONE
-                        emailAuthNumberErrorMessageResId shouldBe R.string.empty
-                    }
-                }
-                coVerify { fakeUserRepository.verifyEmailAuthNumber(any()) }
-            }
-        }
-
-    @Test
-    fun `Action_ChangeEmailAuthNum process 무인증 상태 - emailAuthNumber 업데이트, AuthenticationState 상태 업데이트, 검증 API 호출 O`() =
-        runTest {
-            with(signUpViewModel()) {
-                // given
-                val fakeEmailAuthNum = "123456"
-                // when
-                process(SignUpUiAction.ChangeEmailAuthNum(fakeEmailAuthNum))
-                // then
-                uiState.test {
-                    with(awaitItem()) {
-                        emailAuthNumber shouldBe fakeEmailAuthNum
-                        emailAuthState shouldBe AuthenticationState.NONE
-                        emailAuthNumberErrorMessageResId shouldBe R.string.empty
-                    }
-                }
-                coVerify { fakeUserRepository.verifyEmailAuthNumber(fakeEmailAuthNum) }
-            }
-        }
 
     @Test
     fun `Action_ChangeUserId process 정규식 통과 - 에러메세지 empty`() = runTest {
@@ -455,87 +549,6 @@ class SignUpViewModelTest {
     }
 
     @Test
-    fun `Action_ClickNextPage process 현재 화면 EMAIL_AUTH- uiState page 증가, 타이머 종료`() = runTest {
-        with(signUpViewModel()) {
-            // given
-            (1..EMAIL_AUTH.index).forEach { process(SignUpUiAction.ClickNextPage) }
-            val previousUiState = uiState.value
-            // when
-            process(SignUpUiAction.ClickNextPage)
-            // then
-            uiState.test { awaitItem().page shouldBe previousUiState.page.next }
-            timerJob.shouldBeNull()
-        }
-    }
-
-    @Test
-    fun `Action_ClickEmailAuthNumSend process `() = runTest {
-        with(signUpViewModel()) {
-            // given
-            val fakeEmail = "test1234@example.com"
-            process(SignUpUiAction.ChangeEmail(fakeEmail))
-            // when
-            process(SignUpUiAction.ClickEmailAuthNumSend)
-            // then
-            coVerify { fakeUserRepository.requestEmailAuthNumber(fakeEmail) }
-        }
-    }
-
-    @Test
-    fun `Action_RequestEmailAuthNumber process 성공 - Effect_ShowSnackBer 발생, 타이머 시작`() = runTest {
-        with(signUpViewModel()) {
-            // given
-            val fakeEmail = "test1234@example.com"
-            coEvery { fakeUserRepository.requestEmailAuthNumber(fakeEmail) } returns Unit
-            process(SignUpUiAction.ChangeEmail(fakeEmail))
-            // when
-            process(SignUpUiAction.RequestEmailAuthNumber)
-            // then
-            effect.test { (awaitItem() is SignUpUiEffect.ShowSnackBer) shouldBe true }
-            timerJob.shouldNotBeNull()
-        }
-    }
-
-    @Test
-    fun `Action_RequestEmailAuthNumber process 실패 - SEND_FAILED 상태 업데이트, 에러메세지 추가`() = runTest {
-        with(signUpViewModel()) {
-            // given
-            val fakeEmail = "test1234@example.com"
-            coEvery { fakeUserRepository.requestEmailAuthNumber(fakeEmail) } throws Exception()
-            process(SignUpUiAction.ChangeEmail(fakeEmail))
-            // when
-            process(SignUpUiAction.RequestEmailAuthNumber)
-            // then
-            uiState.test {
-                with(awaitItem()) {
-                    emailAuthState shouldBe AuthenticationState.SEND_FAILED
-                    emailAuthNumberErrorMessageResId shouldBe R.string.email_auth_sent_fail
-                }
-            }
-        }
-    }
-
-    @Test
-    fun `Action_RequestEmailAuthNumber process 이미 검증된 경우 - API 호출 X `() = runTest {
-        val signUpViewModel = object : SignUpViewModel(
-            userRepository = fakeUserRepository
-        ) {
-            init {
-                updateState { copy(emailAuthState = AuthenticationState.VERIFIED) }
-            }
-        }
-        with(signUpViewModel) {
-            // given
-            val fakeEmail = "test@example.com"
-            process(SignUpUiAction.ChangeEmail(fakeEmail))
-            // when
-            process(SignUpUiAction.RequestEmailAuthNumber)
-            // then
-            coVerify(exactly = 0) { fakeUserRepository.requestEmailAuthNumber(any()) }
-        }
-    }
-
-    @Test
     fun `Action_ClickIdDuplicateCheck process 입력된 Id가 없음 - 에러메세지 업데이트`() = runTest {
         with(signUpViewModel()) {
             // given
@@ -668,7 +681,7 @@ class SignUpViewModelTest {
                 with(awaitItem()) {
                     emailAuthTime shouldBe 0
                     emailAuthState shouldBe AuthenticationState.TIME_EXPIRED
-                    emailAuthNumberErrorMessageResId shouldBe R.string.email_auth_time_has_expired
+                    authNumberSupportingTextResId shouldBe R.string.email_auth_time_has_expired
                 }
             }
         }

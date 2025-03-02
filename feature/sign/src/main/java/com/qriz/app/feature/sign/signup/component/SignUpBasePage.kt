@@ -19,9 +19,9 @@ import com.qriz.app.core.designsystem.theme.White
 @Composable
 internal fun SignUpBasePage(
     title: String,
-    subTitle: String,
     buttonText: String,
     buttonEnabled: Boolean,
+    subTitle: String? = null,
     onButtonClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -38,6 +38,8 @@ internal fun SignUpBasePage(
         Column(
             modifier = Modifier.weight(1f)
         ) {
+            val titleBottomPadding = if (subTitle != null) 8.dp else 32.dp
+
             Text(
                 text = title,
                 style = QrizTheme.typography.heading1,
@@ -45,12 +47,14 @@ internal fun SignUpBasePage(
                 modifier = Modifier.padding(bottom = 8.dp),
             )
 
-            Text(
-                text = subTitle,
-                style = QrizTheme.typography.body1,
-                color = Gray500,
-                modifier = Modifier.padding(bottom = 32.dp),
-            )
+            if (subTitle != null) {
+                Text(
+                    text = subTitle,
+                    style = QrizTheme.typography.body1,
+                    color = Gray500,
+                    modifier = Modifier.padding(bottom = 32.dp),
+                )
+            }
 
             content()
         }

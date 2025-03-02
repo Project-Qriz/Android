@@ -51,7 +51,6 @@ fun SignUpIdPage(
 
     SignUpBasePage(
         title = stringResource(R.string.sign_up_id_page_title),
-        subTitle = stringResource(R.string.sign_up_id_page_sub_title),
         buttonText = stringResource(R.string.sign_up_id_page_button_text),
         buttonEnabled = isAvailableId,
         onButtonClick = onClickNextPage,

@@ -27,7 +27,6 @@ fun SignUpNamePage(
 
     SignUpBasePage(
         title = stringResource(R.string.sign_up_name_page_title),
-        subTitle = stringResource(R.string.sign_up_name_page_sub_title),
         buttonEnabled = isValidName,
         buttonText = stringResource(R.string.sign_up_name_page_button_text),
         onButtonClick = onClickNextPage,
