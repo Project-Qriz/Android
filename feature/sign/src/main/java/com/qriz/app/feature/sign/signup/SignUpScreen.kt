@@ -139,9 +139,11 @@ private fun SignUpContent(
                 NAME.index -> SignUpNamePage(
                     name = uiState.name,
                     isValidName = uiState.isValidName,
+                    focusState = uiState.focusState,
                     errorMessage = stringResource(uiState.nameErrorMessageResId),
                     onChangeUserName = onChangeUserName,
                     onClickNextPage = onClickNextPage,
+                    onFocused = { onChangeFocus(SignUpUiState.FocusState.NAME) }
                 )
 
                 ID.index -> SignUpIdPage(
