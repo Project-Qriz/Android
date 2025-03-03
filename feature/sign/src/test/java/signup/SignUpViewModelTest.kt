@@ -6,6 +6,7 @@ import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiAction
 import com.qriz.app.feature.sign.signup.SignUpUiEffect
 import com.qriz.app.feature.sign.signup.SignUpUiState.AuthenticationState
+import com.qriz.app.feature.sign.signup.SignUpUiState.UserIdValidationState.*
 import com.qriz.app.feature.sign.signup.SignUpViewModel
 import com.qriz.app.feature.sign.signup.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
@@ -31,6 +32,12 @@ class SignUpViewModelTest {
     private fun TestScope.signUpViewModel() = SignUpViewModel(
         userRepository = fakeUserRepository
     )
+
+    /*
+    * ******************************************
+    * EMAIL AUTHENTICATION
+    * ******************************************
+    */
 
     @Test
     fun `Action_ChangeEmail process - email 업데이트, 이메일 정규식 통과 시에만 가능, 부합하는 에러메세지 업데이트`() = runTest {
@@ -352,6 +359,12 @@ class SignUpViewModelTest {
 //        }
 //    }
 
+    /*
+    * ******************************************
+    * NAME
+    * ******************************************
+    */
+
     @Test
     fun `Action_ChangeUserName process - name 업데이트, 특수문자 제외 한글,영문이름 가능`() = runTest {
         with(signUpViewModel()) {
@@ -384,6 +397,12 @@ class SignUpViewModelTest {
         }
     }
 
+    /*
+    * ******************************************
+    * ID
+    * ******************************************
+    */
+
     @Test
     fun `Action_ChangeUserId process 정규식 통과 - 에러메세지 empty`() = runTest {
         with(signUpViewModel()) {
@@ -395,7 +414,7 @@ class SignUpViewModelTest {
             uiState.test {
                 with(awaitItem()) {
                     id shouldBe userId
-                    isNotDuplicatedId shouldBe false
+                    idValidationState shouldBe NONE
                     idErrorMessageResId shouldBe R.string.empty
                 }
             }
@@ -413,12 +432,89 @@ class SignUpViewModelTest {
             uiState.test {
                 with(awaitItem()) {
                     id shouldBe userId
-                    isNotDuplicatedId shouldBe false
+                    idValidationState shouldBe NONE
+                    idErrorMessageResId shouldBe R.string.id_format_guide
+                }
+            }
+        }
+    }
+
+
+
+    @Test
+    fun `Action_ClickIdDuplicateCheck process 입력된 Id가 없음 - 에러메세지 업데이트`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val id = ""
+            process(SignUpUiAction.ChangeUserId(id))
+            // when
+            process(SignUpUiAction.ClickIdDuplicateCheck)
+            // then
+            uiState.test {
+                with(awaitItem()) {
+                    idValidationState shouldBe NONE
+                    idErrorMessageResId shouldBe R.string.please_enter_id
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickIdDuplicateCheck process 정규식 통과 X - API 호출하지 않음`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val id = "test@1234!#"
+            process(SignUpUiAction.ChangeUserId(id))
+            // when
+            process(SignUpUiAction.ClickIdDuplicateCheck)
+            // then
+            coVerify(exactly = 0) { fakeUserRepository.isNotDuplicateId(id) }
+        }
+    }
+
+    @Test
+    fun `Action_ClickIdDuplicateCheck process 정규식 통과 O, API 성공, 사용가능 ID - 상태 업데이트`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val id = "test1234"
+            coEvery { fakeUserRepository.isNotDuplicateId(id) } returns true
+            process(SignUpUiAction.ChangeUserId(id))
+            // when
+            process(SignUpUiAction.ClickIdDuplicateCheck)
+            // then
+            uiState.test {
+                with(awaitItem()) {
+                    idValidationState shouldBe AVAILABLE
+                    idErrorMessageResId shouldBe R.string.empty
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickIdDuplicateCheck process 정규식 통과 O, API 성공, 중복 ID - 상태 업데이트`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val id = "test1234"
+            coEvery { fakeUserRepository.isNotDuplicateId(id) } returns false
+            process(SignUpUiAction.ChangeUserId(id))
+            // when
+            process(SignUpUiAction.ClickIdDuplicateCheck)
+            // then
+            uiState.test {
+                with(awaitItem()) {
+                    idValidationState shouldBe NOT_AVAILABLE
                     idErrorMessageResId shouldBe R.string.id_cannot_be_used
                 }
             }
         }
     }
+
+    /*
+    * ******************************************
+    * PASSWORD
+    * ******************************************
+    */
 
     @Test
     fun `Action_ChangeUserPw process 정규식 통과, 체크 pw 동일 - 에러메세지 둘 다 empty`() = runTest {
@@ -507,6 +603,12 @@ class SignUpViewModelTest {
             }
         }
 
+    /*
+    * ******************************************
+    * COMMON
+    * ******************************************
+    */
+
     @Test
     fun `Action_ClickPreviousPage process 첫 페이지 - 상태변화 X, Effect_MoveToBack 발생`() = runTest {
         with(signUpViewModel()) {
@@ -545,72 +647,6 @@ class SignUpViewModelTest {
             process(SignUpUiAction.ClickNextPage)
             // then
             uiState.test { awaitItem().page shouldBe previousUiState.page.next }
-        }
-    }
-
-    @Test
-    fun `Action_ClickIdDuplicateCheck process 입력된 Id가 없음 - 에러메세지 업데이트`() = runTest {
-        with(signUpViewModel()) {
-            // given
-            val id = ""
-            process(SignUpUiAction.ChangeUserId(id))
-            // when
-            process(SignUpUiAction.ClickIdDuplicateCheck)
-            // then
-            uiState.test {
-                awaitItem().idErrorMessageResId shouldBe R.string.please_enter_id
-            }
-        }
-    }
-
-    @Test
-    fun `Action_ClickIdDuplicateCheck process 정규식 통과 X - API 호출하지 않음`() = runTest {
-        with(signUpViewModel()) {
-            // given
-            val id = "test@1234!#"
-            process(SignUpUiAction.ChangeUserId(id))
-            // when
-            process(SignUpUiAction.ClickIdDuplicateCheck)
-            // then
-            coVerify(exactly = 0) { fakeUserRepository.isNotDuplicateId(id) }
-        }
-    }
-
-    @Test
-    fun `Action_ClickIdDuplicateCheck process 정규식 통과 O, API 성공, 사용가능 ID - 상태 업데이트`() = runTest {
-        with(signUpViewModel()) {
-            // given
-            val id = "test1234"
-            coEvery { fakeUserRepository.isNotDuplicateId(id) } returns true
-            process(SignUpUiAction.ChangeUserId(id))
-            // when
-            process(SignUpUiAction.ClickIdDuplicateCheck)
-            // then
-            uiState.test {
-                with(awaitItem()) {
-                    isNotDuplicatedId shouldBe true
-                    idErrorMessageResId shouldBe R.string.empty
-                }
-            }
-        }
-    }
-
-    @Test
-    fun `Action_ClickIdDuplicateCheck process 정규식 통과 O, API 성공, 중복 ID - 상태 업데이트`() = runTest {
-        with(signUpViewModel()) {
-            // given
-            val id = "test1234"
-            coEvery { fakeUserRepository.isNotDuplicateId(id) } returns false
-            process(SignUpUiAction.ChangeUserId(id))
-            // when
-            process(SignUpUiAction.ClickIdDuplicateCheck)
-            // then
-            uiState.test {
-                with(awaitItem()) {
-                    isNotDuplicatedId shouldBe false
-                    idErrorMessageResId shouldBe R.string.id_cannot_be_used
-                }
-            }
         }
     }
 
