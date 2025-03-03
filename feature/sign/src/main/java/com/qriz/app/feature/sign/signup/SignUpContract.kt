@@ -7,7 +7,6 @@ import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.AUTH
-import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.NAME
 import com.qriz.app.feature.sign.signup.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
 import com.quiz.app.core.data.user.user_api.model.AUTH_NUMBER_MAX_LENGTH
 import com.quiz.app.core.data.user.user_api.model.EMAIL_REGEX
@@ -25,6 +24,7 @@ data class SignUpUiState(
     val emailAuthNumber: String,
     val emailAuthState: AuthenticationState,
     val focusState: FocusState,
+    val idValidationState: UserIdValidationState,
     val nameErrorMessageResId: Int,
     val emailSupportingTextResId: Int,
     val authNumberSupportingTextResId: Int,
@@ -32,7 +32,6 @@ data class SignUpUiState(
     val pwErrorMessageResId: Int,
     val pwCheckErrorMessageResId: Int,
     val page: SignUpPage,
-    val isNotDuplicatedId: Boolean,
     val emailAuthTime: Long,
 ) : UiState {
     val topBarTitleResId: Int = R.string.screen_title_sign_up
@@ -80,6 +79,10 @@ data class SignUpUiState(
         NONE, EMAIL, AUTH_NUM, ID, NAME, PW, PW_CHECK;
     }
 
+    enum class UserIdValidationState {
+        NONE, AVAILABLE, NOT_AVAILABLE;
+    }
+
     enum class SignUpPage(val index: Int) {
         AUTH(0),
         NAME(1),
@@ -103,6 +106,7 @@ data class SignUpUiState(
             pwCheck = "",
             emailAuthNumber = "",
             emailAuthState = AuthenticationState.NONE,
+            idValidationState = UserIdValidationState.NONE,
             emailSupportingTextResId = R.string.empty,
             authNumberSupportingTextResId = R.string.empty,
             idErrorMessageResId = R.string.empty,
@@ -110,7 +114,6 @@ data class SignUpUiState(
             nameErrorMessageResId = R.string.empty,
             pwCheckErrorMessageResId = R.string.empty,
             page = AUTH,
-            isNotDuplicatedId = false,
             emailAuthTime = AUTHENTICATION_LIMIT_MILS,
             focusState = FocusState.NONE,
         )

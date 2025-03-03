@@ -15,7 +15,8 @@
     <!--SignUpViewmodel-->
     <string name="email_auth_sent">인증번호를 메일로 전송하였습니다.</string>
     <string name="email_auth_sent_fail">인증번호 전송을 실패했습니다.</string>
-    <string name="id_cannot_be_used">사용 불가능한 아이디입니다.</string>
+    <string name="id_cannot_be_used">사용할 수 없는 아이디입니다. 다시 입력해 주세요.</string>
+    <string name="id_format_guide">영문과 숫자를 포함하여 6자 이상 20자 이하 입력</string>
     <string name="id_can_be_used">사용 가능한 아이디입니다.</string>
     <string name="email_auth_num_is_different">인증번호가 다르게 입력되었어요</string>
     <string name="email_auth_time_has_expired">인증 시간이 만료되었습니다</string>

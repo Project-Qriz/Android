@@ -203,18 +203,18 @@ open class SignUpViewModel @Inject constructor(
     private fun onChangeUserId(id: String) {
         //TODO : 아이디 생성 조건 노출 필요 (디자인 수정 대기중)
         val idErrorMessageResId = if (ID_REGEX.matches(id)) R.string.empty
-        else R.string.id_cannot_be_used
+        else R.string.id_format_guide
         updateState {
             copy(
                 id = id,
-                isNotDuplicatedId = false,
-                idErrorMessageResId = idErrorMessageResId
+                idErrorMessageResId = idErrorMessageResId,
+                idValidationState = SignUpUiState.UserIdValidationState.NONE
             )
         }
     }
 
     private fun checkDuplicateId() {
-        if (uiState.value.isNotDuplicatedId) return
+        if (uiState.value.idValidationState != SignUpUiState.UserIdValidationState.NONE) return
 
         if (uiState.value.id.isEmpty()) {
             updateState { copy(idErrorMessageResId = R.string.please_enter_id) }
@@ -229,8 +229,9 @@ open class SignUpViewModel @Inject constructor(
                     if (isNotDuplicated) R.string.empty else R.string.id_cannot_be_used
                 updateState {
                     copy(
-                        isNotDuplicatedId = isNotDuplicated,
-                        idErrorMessageResId = idErrorMessageResId
+                        idValidationState = if (isNotDuplicated) SignUpUiState.UserIdValidationState.AVAILABLE
+                        else SignUpUiState.UserIdValidationState.NOT_AVAILABLE,
+                        idErrorMessageResId = idErrorMessageResId,
                     )
                 }
             }.onFailure { t ->

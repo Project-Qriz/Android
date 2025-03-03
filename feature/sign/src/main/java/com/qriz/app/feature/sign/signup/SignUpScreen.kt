@@ -149,10 +149,12 @@ private fun SignUpContent(
                 ID.index -> SignUpIdPage(
                     id = uiState.id,
                     onChangeUserId = onChangeUserId,
+                    validationState = uiState.idValidationState,
+                    focusState = uiState.focusState,
                     onClickIdDuplicateCheck = onClickIdDuplicateCheck,
-                    isAvailableId = uiState.isValidId && uiState.isNotDuplicatedId,
                     errorMessage = stringResource(uiState.idErrorMessageResId),
                     onClickNextPage = onClickNextPage,
+                    onFocused = { onChangeFocus(SignUpUiState.FocusState.ID) }
                 )
 
                 PW.index -> SignUpPasswordPage(
