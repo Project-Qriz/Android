@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.component.QrizCard
+import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.theme.Blue100
 import com.qriz.app.core.designsystem.theme.Blue500
 import com.qriz.app.core.designsystem.theme.Gray200
@@ -30,8 +31,8 @@ fun TestScheduleCard(
     examDateString: String,
     examPeriodString: String,
     isExistSchedule: Boolean,
-    onClickChange: () -> Unit,
-    onClickRegister: () -> Unit,
+    onClickTestDateChange: () -> Unit,
+    onClickTestDateRegister: () -> Unit,
 ) {
     Column {
         if (isExistSchedule) DDayHeader(userName = userName)
@@ -113,13 +114,12 @@ fun TestScheduleCard(
                         .fillMaxWidth()
                         .padding(top = 12.dp),
                     text = buttonText,
-                    onClick = if (isExistSchedule) onClickChange else onClickRegister,
+                    onClick = if (isExistSchedule) onClickTestDateChange else onClickTestDateRegister,
                     textColor = Gray800,
                     containerColor = White,
                     strokeColor = Gray200,
                     textStyle = QrizTheme.typography.label
                 )
-
             }
         }
     }
@@ -194,8 +194,8 @@ private fun TestScheduleCardPreview() {
             examDateString = "3월9일(토)",
             examPeriodString = "01.29(월) 10:00 ~ 02.02(금) 18:00",
             isExistSchedule = true,
-            onClickChange = {},
-            onClickRegister = {},
+            onClickTestDateChange = {},
+            onClickTestDateRegister = {},
         )
     }
 }
@@ -209,8 +209,8 @@ private fun TestScheduleCardPreview2() {
             examDateString = "3월9일(토)",
             examPeriodString = "01.29(월) 10:00 ~ 02.02(금) 18:00",
             isExistSchedule = false,
-            onClickChange = {},
-            onClickRegister = {},
+            onClickTestDateChange = {},
+            onClickTestDateRegister = {},
         )
     }
 }

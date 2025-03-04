@@ -12,4 +12,10 @@
     <string name="test_skill_check">간단한 테스트로 실력을 확인해봐요!</string>
     <string name="take_mock_exam">모의고사 응시</string>
     <string name="prepare_like_real_exam">실전처럼 준비하기</string>
+    <string name="today_s_study">오늘의 공부</string>
+    <string name="preview_test_open">프리뷰 시험을 보면 열려요!</string>
+    <string name="concepts_to_learn">학습해야 하는 개념은</string>
+    <string name="go_to_study">학습하러 가기</string>
+    <string name="weekly_custom_concept">주간 맞춤 개념</string>
+    주간 맞춤 개념
 </resources>
