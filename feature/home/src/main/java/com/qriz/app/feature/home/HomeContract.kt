@@ -9,16 +9,23 @@ import com.qriz.app.feature.base.UiState
 @Immutable
 data class HomeUiState(
     val isLoading: Boolean,
+    val isNeedPreviewTest : Boolean,
+    val todayStudyConcepts :List<Int>,
+    val currentTodayStudyDay: Int
 ) : UiState {
 
     companion object {
         val Default = HomeUiState(
-            isLoading = false
+            isLoading = false,
+            isNeedPreviewTest = false,
+            todayStudyConcepts = List(30) { it + 1 },
+            currentTodayStudyDay = 1
         )
     }
 }
 
 sealed interface HomeUiAction : UiAction {
+    data class ChangeTodayStudyCard(val day: Int) : HomeUiAction
 }
 
 sealed interface HomeUiEffect : UiEffect {
