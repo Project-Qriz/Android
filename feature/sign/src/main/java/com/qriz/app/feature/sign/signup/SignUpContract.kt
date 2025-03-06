@@ -11,6 +11,8 @@ import com.qriz.app.feature.sign.signup.SignUpViewModel.Companion.AUTHENTICATION
 import com.quiz.app.core.data.user.user_api.model.AUTH_NUMBER_MAX_LENGTH
 import com.quiz.app.core.data.user.user_api.model.EMAIL_REGEX
 import com.quiz.app.core.data.user.user_api.model.ID_REGEX
+import com.quiz.app.core.data.user.user_api.model.PW_MAX_LENGTH
+import com.quiz.app.core.data.user.user_api.model.PW_MIN_LENGTH
 import com.quiz.app.core.data.user.user_api.model.PW_REGEX
 import com.quiz.app.core.data.user.user_api.model.USER_NAME_REGEX
 
@@ -29,10 +31,11 @@ data class SignUpUiState(
     val emailSupportingTextResId: Int,
     val authNumberSupportingTextResId: Int,
     val idErrorMessageResId: Int,
-    val pwErrorMessageResId: Int,
     val pwCheckErrorMessageResId: Int,
     val page: SignUpPage,
     val emailAuthTime: Long,
+    val isVisiblePassword: Boolean,
+    val isVisiblePasswordCheck: Boolean,
 ) : UiState {
     val topBarTitleResId: Int = R.string.screen_title_sign_up
 
@@ -71,6 +74,15 @@ data class SignUpUiState(
         get() = emailAuthState != AuthenticationState.NONE &&
                 emailAuthState != AuthenticationState.SEND_FAILED
 
+    val isPasswordValidFormat
+        get() = PW_REGEX.matches(pw)
+
+    val isPasswordValidLength
+        get() = pw.length in PW_MIN_LENGTH..PW_MAX_LENGTH
+
+    val isEqualsPassword
+        get() = pw == pwCheck
+
     enum class AuthenticationState {
         SEND_SUCCESS, SEND_FAILED, NONE, VERIFIED, REJECTED, TIME_EXPIRED;
     }
@@ -105,12 +117,13 @@ data class SignUpUiState(
             pw = "",
             pwCheck = "",
             emailAuthNumber = "",
+            isVisiblePassword = false,
+            isVisiblePasswordCheck = false,
             emailAuthState = AuthenticationState.NONE,
             idValidationState = UserIdValidationState.NONE,
             emailSupportingTextResId = R.string.empty,
             authNumberSupportingTextResId = R.string.empty,
             idErrorMessageResId = R.string.empty,
-            pwErrorMessageResId = R.string.empty,
             nameErrorMessageResId = R.string.empty,
             pwCheckErrorMessageResId = R.string.empty,
             page = AUTH,
@@ -135,6 +148,8 @@ sealed interface SignUpUiAction : UiAction {
     data object ClickSignUp : SignUpUiAction
     data object ClickVerifyAuthNum : SignUpUiAction
     data object StartEmailAuthTimer : SignUpUiAction
+    data class ChangePasswordVisibility(val isVisible: Boolean) : SignUpUiAction
+    data class ChangePasswordCheckVisibility(val isVisible: Boolean) : SignUpUiAction
 }
 
 sealed interface SignUpUiEffect : UiEffect {

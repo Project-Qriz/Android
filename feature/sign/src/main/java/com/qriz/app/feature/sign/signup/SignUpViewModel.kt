@@ -42,6 +42,8 @@ open class SignUpViewModel @Inject constructor(
             is SignUpUiAction.ClickSignUp -> onClickSignUp()
             is SignUpUiAction.StartEmailAuthTimer -> startEmailAuthTimer()
             is SignUpUiAction.ClickVerifyAuthNum -> verifyEmailAuthNumber()
+            is SignUpUiAction.ChangePasswordVisibility -> updateState { copy(isVisiblePassword = action.isVisible) }
+            is SignUpUiAction.ChangePasswordCheckVisibility -> updateState { copy(isVisiblePasswordCheck = action.isVisible) }
         }
     }
 
@@ -253,27 +255,25 @@ open class SignUpViewModel @Inject constructor(
     * PASSWORD
     * ******************************************
     */
-    private fun onChangeUserPw(pw: String) {
-        val pwErrorMessageResId = if (PW_REGEX.matches(pw)) R.string.empty
-        //TODO : 경고 문구 UI 수정 대기 중
-        else R.string.pw_warning
-
-        val pwCheckErrorMessageResId = if (pw == uiState.value.pwCheck) R.string.empty
-        else R.string.password_is_incorrect
+    private fun onChangeUserPw(password: String) {
+        val passwordCheck = uiState.value.pwCheck
+        val errorMessage =
+            if (password.isNotEmpty() && passwordCheck.isNotEmpty() && password != passwordCheck) R.string.password_is_incorrect
+            else R.string.empty
 
         updateState {
             copy(
-                pw = pw,
-                pwErrorMessageResId = pwErrorMessageResId,
-                pwCheckErrorMessageResId = pwCheckErrorMessageResId,
+                pw = password,
+                pwCheckErrorMessageResId = errorMessage,
             )
         }
     }
 
     private fun onChangeUserPwCheck(passwordCheck: String) {
         val password = uiState.value.pw
-        val errorMessage = if (password == passwordCheck) R.string.empty
-        else R.string.password_is_incorrect
+        val errorMessage =
+            if (password.isNotEmpty() && passwordCheck.isNotEmpty() && password != passwordCheck) R.string.password_is_incorrect
+            else R.string.empty
 
         updateState {
             copy(

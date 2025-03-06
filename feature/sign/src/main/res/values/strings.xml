@@ -26,6 +26,7 @@
     <string name="password_is_incorrect">비밀번호가 일치하지 않습니다.</string>
     <string name="id_duplication_check_failed">아이디 중복검사를 실패했습니다.</string>
 
+
     <!--FindIdViewModel-->
     <string name="find_id_screen_title">이메일로 아이디를 전송해 드릴게요.</string>
     <string name="find_id_screen_guide">가입했던 이메일을 입력하고\n‘아이디 찾기’ 버튼을 눌러주세요.</string>
@@ -83,10 +84,10 @@
     <string name="sign_up_id_page_check_duplicate">중복확인</string>
 
     <!-- SignUpPasswordPage -->
-    <string name="sign_up_password_page_title">비밀번호를 입력해주세요!</string>
+    <string name="sign_up_password_page_title">비밀번호를 설정해주세요!</string>
 <!--    <string name="sign_up_password_page_sub_title">사용할 비밀번호를 입력해주세요</string>-->
     <string name="sign_up_password_page_button_text">가입하기</string>
-    <string name="sign_up_password_page_hint">비밀번호 입력 (영문/숫자 조합 8~10자)</string>
+    <string name="sign_up_password_page_hint">비밀번호 입력</string>
     <string name="sign_up_password_page_hint_check">비밀번호 확인</string>
     
     <!-- Password -->

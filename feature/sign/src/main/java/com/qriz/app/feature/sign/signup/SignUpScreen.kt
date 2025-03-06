@@ -70,6 +70,8 @@ fun SignUpScreen(
         onChangeUserPwCheck = { viewModel.process(SignUpUiAction.ChangeUserPwCheck(it)) },
         onChangeEmail = { viewModel.process(SignUpUiAction.ChangeEmail(it)) },
         onChangeEmailAuthNum = { viewModel.process(SignUpUiAction.ChangeEmailAuthNum(it)) },
+        onChangePasswordVisibility = { viewModel.process(SignUpUiAction.ChangePasswordVisibility(it)) },
+        onChangePasswordCheckVisibility = { viewModel.process(SignUpUiAction.ChangePasswordCheckVisibility(it)) },
     )
 }
 
@@ -89,6 +91,8 @@ private fun SignUpContent(
     onChangeUserPwCheck: (String) -> Unit,
     onChangeEmail: (String) -> Unit,
     onChangeEmailAuthNum: (String) -> Unit,
+    onChangePasswordVisibility: (Boolean) -> Unit,
+    onChangePasswordCheckVisibility: (Boolean) -> Unit,
 ) {
     val pagerState = rememberPagerState { SignUpPage.entries.size }
     val currentPage = uiState.page
@@ -160,12 +164,20 @@ private fun SignUpContent(
                 PW.index -> SignUpPasswordPage(
                     password = uiState.pw,
                     passwordCheck = uiState.pwCheck,
-                    passwordErrorMessage = stringResource(uiState.pwErrorMessageResId),
+                    isVisiblePassword = uiState.isVisiblePassword,
+                    isVisiblePasswordCheck = uiState.isVisiblePasswordCheck,
+                    isPasswordValidFormat = uiState.isPasswordValidFormat,
+                    isPasswordValidLength = uiState.isPasswordValidLength,
+                    isEqualsPassword = uiState.isEqualsPassword,
                     passwordCheckErrorMessage = stringResource(uiState.pwCheckErrorMessageResId),
                     canSignUp = uiState.canSignUp,
                     onChangeUserPw = onChangeUserPw,
                     onChangeUserPwCheck = onChangeUserPwCheck,
                     onClickSignUp = onClickSignUp,
+                    onChangePasswordVisibility = onChangePasswordVisibility,
+                    onChangePasswordCheckVisibility = onChangePasswordCheckVisibility,
+                    focusState = uiState.focusState,
+                    onChangeFocusState = onChangeFocus
                 )
             }
         }
