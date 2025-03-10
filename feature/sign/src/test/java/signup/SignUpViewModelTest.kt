@@ -5,6 +5,7 @@ import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiAction
 import com.qriz.app.feature.sign.signup.SignUpUiEffect
+import com.qriz.app.feature.sign.signup.SignUpUiState
 import com.qriz.app.feature.sign.signup.SignUpUiState.AuthenticationState
 import com.qriz.app.feature.sign.signup.SignUpUiState.UserIdValidationState.*
 import com.qriz.app.feature.sign.signup.SignUpViewModel
@@ -517,7 +518,7 @@ class SignUpViewModelTest {
     */
 
     @Test
-    fun `Action_ChangeUserPw process 정규식 통과, 체크 pw 동일 - 에러메세지 둘 다 empty`() = runTest {
+    fun `Action_ChangeUserPw process 정규식&길이 통과, 체크 pw 동일 - 정규식 검사 통과 O, 체크 pw 에러메시지 empty`() = runTest {
         with(signUpViewModel()) {
             // given
             val userPw = "!Password123"
@@ -530,7 +531,9 @@ class SignUpViewModelTest {
                 with(awaitItem()) {
                     pw shouldBe userPw
                     pwCheck shouldBe userPwCheck
-                    pwErrorMessageResId shouldBe R.string.empty
+                    isPasswordValidFormat shouldBe true
+                    isPasswordValidLength shouldBe true
+                    isEqualsPassword shouldBe true
                     pwCheckErrorMessageResId shouldBe R.string.empty
                 }
             }
@@ -538,7 +541,7 @@ class SignUpViewModelTest {
     }
 
     @Test
-    fun `Action_ChangeUserPw process 정규식 통과, 체크 pw 비동일 - pw 에러메세지 empty, pwCheck 에러메세지 O`() =
+    fun `Action_ChangeUserPw process 정규식&길이 통과, 체크 pw 비동일 - 정규식 검사 통과 여부 O, pwCheck 에러메세지 O`() =
         runTest {
             with(signUpViewModel()) {
                 // given
@@ -552,7 +555,9 @@ class SignUpViewModelTest {
                     with(awaitItem()) {
                         pw shouldBe userPw
                         pwCheck shouldBe userPwCheck
-                        pwErrorMessageResId shouldBe R.string.empty
+                        isPasswordValidFormat shouldBe true
+                        isPasswordValidLength shouldBe true
+                        isEqualsPassword shouldBe false
                         pwCheckErrorMessageResId shouldBe R.string.password_is_incorrect
                     }
                 }
@@ -560,7 +565,7 @@ class SignUpViewModelTest {
         }
 
     @Test
-    fun `Action_ChangeUserPw process 정규식 통과 X, 체크 pw 동일 - pw 에러메세지 O, pwCheck 에러메세지 empty`() =
+    fun `Action_ChangeUserPw process 정규식 통과 X, pw 길이 통과 O, 체크 pw 동일 - pw 에러메세지 O, pwCheck 에러메세지 empty`() =
         runTest {
             with(signUpViewModel()) {
                 // given
@@ -574,7 +579,9 @@ class SignUpViewModelTest {
                     with(awaitItem()) {
                         pw shouldBe userPw
                         pwCheck shouldBe userPwCheck
-                        pwErrorMessageResId shouldBe R.string.pw_warning
+                        isPasswordValidFormat shouldBe false
+                        isPasswordValidLength shouldBe true
+                        isEqualsPassword shouldBe true
                         pwCheckErrorMessageResId shouldBe R.string.empty
                     }
                 }
@@ -582,11 +589,11 @@ class SignUpViewModelTest {
         }
 
     @Test
-    fun `Action_ChangeUserPw process 정규식 통과 X, 체크 pw 비동일 - pw 에러메세지 O, pwCheck 에러메세지 O`() =
+    fun `Action_ChangeUserPw process 정규식 통과 X, pw 길이 통과 X, 체크 pw 비동일 - pw 에러메세지 O, pwCheck 에러메세지 O`() =
         runTest {
             with(signUpViewModel()) {
                 // given
-                val userPw = "password123"
+                val userPw = "pw123"
                 val userPwCheck = userPw + "az"
                 // when
                 process(SignUpUiAction.ChangeUserPw(userPw))
@@ -596,7 +603,9 @@ class SignUpViewModelTest {
                     with(awaitItem()) {
                         pw shouldBe userPw
                         pwCheck shouldBe userPwCheck
-                        pwErrorMessageResId shouldBe R.string.pw_warning
+                        isPasswordValidFormat shouldBe false
+                        isPasswordValidLength shouldBe false
+                        isEqualsPassword shouldBe false
                         pwCheckErrorMessageResId shouldBe R.string.password_is_incorrect
                     }
                 }
@@ -647,6 +656,20 @@ class SignUpViewModelTest {
             process(SignUpUiAction.ClickNextPage)
             // then
             uiState.test { awaitItem().page shouldBe previousUiState.page.next }
+        }
+    }
+
+    @Test
+    fun `Action_ChangeFocusState process - focusState 업데이트`() = runTest {
+        with(signUpViewModel()) {
+            SignUpUiState.FocusState.entries.forEach {
+                // given
+                val focusState = it
+                // when
+                process(SignUpUiAction.ChangeFocusState(focusState))
+                // then
+                uiState.test { awaitItem().focusState shouldBe focusState }
+            }
         }
     }
 
