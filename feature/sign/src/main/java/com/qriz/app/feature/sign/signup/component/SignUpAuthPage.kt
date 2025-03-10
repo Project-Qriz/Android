@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,6 +54,7 @@ fun SignUpAuthPage(
     enableInputAuthNumber: Boolean,
     emailSupportingTextResId: Int,
     authNumberSupportingTextResId: Int,
+    enableAuthNumVerifyButton: Boolean,
     isTimeExpiredEmailAuth: Boolean,
     focusState: SignUpUiState.FocusState,
     onChangeFocus: (SignUpUiState.FocusState) -> Unit,
@@ -243,7 +243,7 @@ fun SignUpAuthPage(
                     onClick = onVerifyAuthNumber,
                     border = BorderStroke(
                         width = 1.dp,
-                        color = if (authNumber.length == AUTH_NUMBER_MAX_LENGTH) Blue600 else Gray200,
+                        color = if (enableAuthNumVerifyButton) Blue600 else Gray200,
                     ),
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = PaddingValues(vertical = 14.dp),
@@ -253,7 +253,7 @@ fun SignUpAuthPage(
                 ) {
                     Text(
                         stringResource(R.string.verify),
-                        color = if (authNumber.length == AUTH_NUMBER_MAX_LENGTH) Blue600 else Gray300,
+                        color = if (enableAuthNumVerifyButton) Blue600 else Gray300,
                         style = QrizTheme.typography.subhead,
                     )
                 }
@@ -278,6 +278,7 @@ fun SignUpEmailAuthPagePreview() {
             verifiedAuthNumber = false,
             enableInputAuthNumber = true,
             isTimeExpiredEmailAuth = false,
+            enableAuthNumVerifyButton = false,
             focusState = SignUpUiState.FocusState.NONE,
             emailSupportingTextResId = R.string.empty,
             authNumberSupportingTextResId = R.string.empty,

@@ -30,14 +30,13 @@ import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiState
-import com.qriz.app.feature.sign.signup.SignUpUiState.UserIdValidationState.AVAILABLE
-import com.qriz.app.feature.sign.signup.SignUpUiState.UserIdValidationState.NOT_AVAILABLE
 import com.quiz.app.core.data.user.user_api.model.ID_MAX_LENGTH
 
 @Composable
 fun SignUpIdPage(
     id: String,
-    validationState: SignUpUiState.UserIdValidationState,
+    isAvailableId: Boolean,
+    isNotAvailableId: Boolean,
     errorMessage: String,
     focusState: SignUpUiState.FocusState,
     onChangeUserId: (String) -> Unit,
@@ -46,7 +45,7 @@ fun SignUpIdPage(
     onFocused: () -> Unit,
 ) {
     val supportingText = when {
-        validationState == AVAILABLE -> SupportingText(
+        isAvailableId -> SupportingText(
             message = stringResource(R.string.id_can_be_used),
             color = Mint800,
         )
@@ -59,13 +58,12 @@ fun SignUpIdPage(
         else -> SupportingText(
             message = "${id.length}/$ID_MAX_LENGTH",
             color = Black,
-            isBorderColorRequired = false
         )
     }
 
     val borderColor = when {
-        validationState == AVAILABLE -> Mint800
-        validationState == NOT_AVAILABLE -> Red700
+        isAvailableId -> Mint800
+        isNotAvailableId -> Red700
         focusState == SignUpUiState.FocusState.ID -> Gray800
         else -> Gray200
     }
@@ -73,7 +71,7 @@ fun SignUpIdPage(
     SignUpBasePage(
         title = stringResource(R.string.sign_up_id_page_title),
         buttonText = stringResource(R.string.sign_up_id_page_button_text),
-        buttonEnabled = validationState == AVAILABLE,
+        buttonEnabled = isAvailableId,
         onButtonClick = onClickNextPage,
     ) {
         Row(

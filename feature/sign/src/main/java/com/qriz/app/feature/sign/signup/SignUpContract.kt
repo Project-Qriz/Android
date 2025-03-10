@@ -49,14 +49,8 @@ data class SignUpUiState(
     val isValidEmail: Boolean
         get() = EMAIL_REGEX.matches(email)
 
-    val isValidId: Boolean
-        get() = ID_REGEX.matches(id)
-
     val isValidName: Boolean
         get() = USER_NAME_REGEX.matches(name)
-
-    val isSendEmailAuthNum: Boolean
-        get() = emailAuthState == AuthenticationState.SEND_SUCCESS
 
     val isVerifiedEmailAuth: Boolean
         get() = emailAuthState == AuthenticationState.VERIFIED
@@ -82,6 +76,12 @@ data class SignUpUiState(
 
     val isEqualsPassword
         get() = pw == pwCheck
+
+    val isAvailableId
+        get() = idValidationState == UserIdValidationState.AVAILABLE
+
+    val isNotAvailableId
+        get() = idValidationState == UserIdValidationState.NOT_AVAILABLE
 
     enum class AuthenticationState {
         SEND_SUCCESS, SEND_FAILED, NONE, VERIFIED, REJECTED, TIME_EXPIRED;

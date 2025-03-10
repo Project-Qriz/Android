@@ -132,6 +132,7 @@ private fun SignUpContent(
                     emailSupportingTextResId = uiState.emailSupportingTextResId,
                     authNumberSupportingTextResId = uiState.authNumberSupportingTextResId,
                     isTimeExpiredEmailAuth = uiState.isTimeExpiredEmailAuth,
+                    enableAuthNumVerifyButton = uiState.enableAuthNumVerifyButton,
                     onEmailChanged = onChangeEmail,
                     onAuthNumberChanged = onChangeEmailAuthNum,
                     onSendAuthNumberEmail = onClickEmailAuthNumSend,
@@ -153,7 +154,8 @@ private fun SignUpContent(
                 ID.index -> SignUpIdPage(
                     id = uiState.id,
                     onChangeUserId = onChangeUserId,
-                    validationState = uiState.idValidationState,
+                    isAvailableId = uiState.isAvailableId,
+                    isNotAvailableId = uiState.isNotAvailableId,
                     focusState = uiState.focusState,
                     onClickIdDuplicateCheck = onClickIdDuplicateCheck,
                     errorMessage = stringResource(uiState.idErrorMessageResId),
