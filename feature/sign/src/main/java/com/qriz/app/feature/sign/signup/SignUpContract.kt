@@ -37,8 +37,6 @@ data class SignUpUiState(
     val isVisiblePassword: Boolean,
     val isVisiblePasswordCheck: Boolean,
 ) : UiState {
-    val topBarTitleResId: Int = R.string.screen_title_sign_up
-
     val timerText: String =
         "${(emailAuthTime / 60000)}:${(emailAuthTime % 60000 / 1000).toString().padStart(2, '0')}"
 

@@ -22,6 +22,7 @@ import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.base.extention.collectSideEffect
+import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.ID
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.NAME
@@ -103,7 +104,7 @@ private fun SignUpContent(
 
     Column {
         QrizTopBar(
-            title = stringResource(uiState.topBarTitleResId),
+            title = stringResource(R.string.screen_title_sign_up),
             navigationType = NavigationType.BACK,
             onNavigationClick = onClickPreviousPage
         )
