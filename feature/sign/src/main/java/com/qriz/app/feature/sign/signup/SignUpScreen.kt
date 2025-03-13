@@ -22,6 +22,7 @@ import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.base.extention.collectSideEffect
+import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.ID
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.NAME
@@ -70,6 +71,8 @@ fun SignUpScreen(
         onChangeUserPwCheck = { viewModel.process(SignUpUiAction.ChangeUserPwCheck(it)) },
         onChangeEmail = { viewModel.process(SignUpUiAction.ChangeEmail(it)) },
         onChangeEmailAuthNum = { viewModel.process(SignUpUiAction.ChangeEmailAuthNum(it)) },
+        onChangePasswordVisibility = { viewModel.process(SignUpUiAction.ChangePasswordVisibility(it)) },
+        onChangePasswordCheckVisibility = { viewModel.process(SignUpUiAction.ChangePasswordCheckVisibility(it)) },
     )
 }
 
@@ -89,6 +92,8 @@ private fun SignUpContent(
     onChangeUserPwCheck: (String) -> Unit,
     onChangeEmail: (String) -> Unit,
     onChangeEmailAuthNum: (String) -> Unit,
+    onChangePasswordVisibility: (Boolean) -> Unit,
+    onChangePasswordCheckVisibility: (Boolean) -> Unit,
 ) {
     val pagerState = rememberPagerState { SignUpPage.entries.size }
     val currentPage = uiState.page
@@ -99,7 +104,7 @@ private fun SignUpContent(
 
     Column {
         QrizTopBar(
-            title = stringResource(uiState.topBarTitleResId),
+            title = stringResource(R.string.screen_title_sign_up),
             navigationType = NavigationType.BACK,
             onNavigationClick = onClickPreviousPage
         )
@@ -128,6 +133,7 @@ private fun SignUpContent(
                     emailSupportingTextResId = uiState.emailSupportingTextResId,
                     authNumberSupportingTextResId = uiState.authNumberSupportingTextResId,
                     isTimeExpiredEmailAuth = uiState.isTimeExpiredEmailAuth,
+                    enableAuthNumVerifyButton = uiState.enableAuthNumVerifyButton,
                     onEmailChanged = onChangeEmail,
                     onAuthNumberChanged = onChangeEmailAuthNum,
                     onSendAuthNumberEmail = onClickEmailAuthNumSend,
@@ -139,29 +145,42 @@ private fun SignUpContent(
                 NAME.index -> SignUpNamePage(
                     name = uiState.name,
                     isValidName = uiState.isValidName,
+                    focusState = uiState.focusState,
                     errorMessage = stringResource(uiState.nameErrorMessageResId),
                     onChangeUserName = onChangeUserName,
                     onClickNextPage = onClickNextPage,
+                    onFocused = { onChangeFocus(SignUpUiState.FocusState.NAME) }
                 )
 
                 ID.index -> SignUpIdPage(
                     id = uiState.id,
                     onChangeUserId = onChangeUserId,
+                    isAvailableId = uiState.isAvailableId,
+                    isNotAvailableId = uiState.isNotAvailableId,
+                    focusState = uiState.focusState,
                     onClickIdDuplicateCheck = onClickIdDuplicateCheck,
-                    isAvailableId = uiState.isValidId && uiState.isNotDuplicatedId,
                     errorMessage = stringResource(uiState.idErrorMessageResId),
                     onClickNextPage = onClickNextPage,
+                    onFocused = { onChangeFocus(SignUpUiState.FocusState.ID) }
                 )
 
                 PW.index -> SignUpPasswordPage(
                     password = uiState.pw,
                     passwordCheck = uiState.pwCheck,
-                    passwordErrorMessage = stringResource(uiState.pwErrorMessageResId),
+                    isVisiblePassword = uiState.isVisiblePassword,
+                    isVisiblePasswordCheck = uiState.isVisiblePasswordCheck,
+                    isPasswordValidFormat = uiState.isPasswordValidFormat,
+                    isPasswordValidLength = uiState.isPasswordValidLength,
+                    isEqualsPassword = uiState.isEqualsPassword,
                     passwordCheckErrorMessage = stringResource(uiState.pwCheckErrorMessageResId),
                     canSignUp = uiState.canSignUp,
                     onChangeUserPw = onChangeUserPw,
                     onChangeUserPwCheck = onChangeUserPwCheck,
                     onClickSignUp = onClickSignUp,
+                    onChangePasswordVisibility = onChangePasswordVisibility,
+                    onChangePasswordCheckVisibility = onChangePasswordCheckVisibility,
+                    focusState = uiState.focusState,
+                    onChangeFocusState = onChangeFocus
                 )
             }
         }

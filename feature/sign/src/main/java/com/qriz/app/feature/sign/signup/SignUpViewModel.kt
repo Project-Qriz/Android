@@ -42,6 +42,8 @@ open class SignUpViewModel @Inject constructor(
             is SignUpUiAction.ClickSignUp -> onClickSignUp()
             is SignUpUiAction.StartEmailAuthTimer -> startEmailAuthTimer()
             is SignUpUiAction.ClickVerifyAuthNum -> verifyEmailAuthNumber()
+            is SignUpUiAction.ChangePasswordVisibility -> updateState { copy(isVisiblePassword = action.isVisible) }
+            is SignUpUiAction.ChangePasswordCheckVisibility -> updateState { copy(isVisiblePasswordCheck = action.isVisible) }
         }
     }
 
@@ -203,18 +205,18 @@ open class SignUpViewModel @Inject constructor(
     private fun onChangeUserId(id: String) {
         //TODO : 아이디 생성 조건 노출 필요 (디자인 수정 대기중)
         val idErrorMessageResId = if (ID_REGEX.matches(id)) R.string.empty
-        else R.string.id_cannot_be_used
+        else R.string.id_format_guide
         updateState {
             copy(
                 id = id,
-                isNotDuplicatedId = false,
-                idErrorMessageResId = idErrorMessageResId
+                idErrorMessageResId = idErrorMessageResId,
+                idValidationState = SignUpUiState.UserIdValidationState.NONE
             )
         }
     }
 
     private fun checkDuplicateId() {
-        if (uiState.value.isNotDuplicatedId) return
+        if (uiState.value.idValidationState != SignUpUiState.UserIdValidationState.NONE) return
 
         if (uiState.value.id.isEmpty()) {
             updateState { copy(idErrorMessageResId = R.string.please_enter_id) }
@@ -229,8 +231,9 @@ open class SignUpViewModel @Inject constructor(
                     if (isNotDuplicated) R.string.empty else R.string.id_cannot_be_used
                 updateState {
                     copy(
-                        isNotDuplicatedId = isNotDuplicated,
-                        idErrorMessageResId = idErrorMessageResId
+                        idValidationState = if (isNotDuplicated) SignUpUiState.UserIdValidationState.AVAILABLE
+                        else SignUpUiState.UserIdValidationState.NOT_AVAILABLE,
+                        idErrorMessageResId = idErrorMessageResId,
                     )
                 }
             }.onFailure { t ->
@@ -252,27 +255,25 @@ open class SignUpViewModel @Inject constructor(
     * PASSWORD
     * ******************************************
     */
-    private fun onChangeUserPw(pw: String) {
-        val pwErrorMessageResId = if (PW_REGEX.matches(pw)) R.string.empty
-        //TODO : 경고 문구 UI 수정 대기 중
-        else R.string.pw_warning
-
-        val pwCheckErrorMessageResId = if (pw == uiState.value.pwCheck) R.string.empty
-        else R.string.password_is_incorrect
+    private fun onChangeUserPw(password: String) {
+        val passwordCheck = uiState.value.pwCheck
+        val errorMessage =
+            if (password.isNotEmpty() && passwordCheck.isNotEmpty() && password != passwordCheck) R.string.password_is_incorrect
+            else R.string.empty
 
         updateState {
             copy(
-                pw = pw,
-                pwErrorMessageResId = pwErrorMessageResId,
-                pwCheckErrorMessageResId = pwCheckErrorMessageResId,
+                pw = password,
+                pwCheckErrorMessageResId = errorMessage,
             )
         }
     }
 
     private fun onChangeUserPwCheck(passwordCheck: String) {
         val password = uiState.value.pw
-        val errorMessage = if (password == passwordCheck) R.string.empty
-        else R.string.password_is_incorrect
+        val errorMessage =
+            if (password.isNotEmpty() && passwordCheck.isNotEmpty() && password != passwordCheck) R.string.password_is_incorrect
+            else R.string.empty
 
         updateState {
             copy(

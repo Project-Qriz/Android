@@ -15,7 +15,8 @@
     <!--SignUpViewmodel-->
     <string name="email_auth_sent">인증번호를 메일로 전송하였습니다.</string>
     <string name="email_auth_sent_fail">인증번호 전송을 실패했습니다.</string>
-    <string name="id_cannot_be_used">사용 불가능한 아이디입니다.</string>
+    <string name="id_cannot_be_used">사용할 수 없는 아이디입니다. 다시 입력해 주세요.</string>
+    <string name="id_format_guide">영문과 숫자를 포함하여 6자 이상 20자 이하 입력</string>
     <string name="id_can_be_used">사용 가능한 아이디입니다.</string>
     <string name="email_auth_num_is_different">인증번호가 다르게 입력되었어요</string>
     <string name="email_auth_time_has_expired">인증 시간이 만료되었습니다</string>
@@ -24,6 +25,7 @@
     <string name="pw_warning">영문, 숫자, 특수 문자를 조합하여 8~16자로 입력해 주세요.</string>
     <string name="password_is_incorrect">비밀번호가 일치하지 않습니다.</string>
     <string name="id_duplication_check_failed">아이디 중복검사를 실패했습니다.</string>
+
 
     <!--FindIdViewModel-->
     <string name="find_id_screen_title">이메일로 아이디를 전송해 드릴게요.</string>
@@ -82,10 +84,10 @@
     <string name="sign_up_id_page_check_duplicate">중복확인</string>
 
     <!-- SignUpPasswordPage -->
-    <string name="sign_up_password_page_title">비밀번호를 입력해주세요!</string>
+    <string name="sign_up_password_page_title">비밀번호를 설정해주세요!</string>
 <!--    <string name="sign_up_password_page_sub_title">사용할 비밀번호를 입력해주세요</string>-->
     <string name="sign_up_password_page_button_text">가입하기</string>
-    <string name="sign_up_password_page_hint">비밀번호 입력 (영문/숫자 조합 8~10자)</string>
+    <string name="sign_up_password_page_hint">비밀번호 입력</string>
     <string name="sign_up_password_page_hint_check">비밀번호 확인</string>
     
     <!-- Password -->

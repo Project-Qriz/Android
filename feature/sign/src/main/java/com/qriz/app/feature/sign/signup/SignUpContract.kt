@@ -7,11 +7,12 @@ import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.AUTH
-import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.NAME
 import com.qriz.app.feature.sign.signup.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
 import com.quiz.app.core.data.user.user_api.model.AUTH_NUMBER_MAX_LENGTH
 import com.quiz.app.core.data.user.user_api.model.EMAIL_REGEX
 import com.quiz.app.core.data.user.user_api.model.ID_REGEX
+import com.quiz.app.core.data.user.user_api.model.PW_MAX_LENGTH
+import com.quiz.app.core.data.user.user_api.model.PW_MIN_LENGTH
 import com.quiz.app.core.data.user.user_api.model.PW_REGEX
 import com.quiz.app.core.data.user.user_api.model.USER_NAME_REGEX
 
@@ -25,18 +26,17 @@ data class SignUpUiState(
     val emailAuthNumber: String,
     val emailAuthState: AuthenticationState,
     val focusState: FocusState,
+    val idValidationState: UserIdValidationState,
     val nameErrorMessageResId: Int,
     val emailSupportingTextResId: Int,
     val authNumberSupportingTextResId: Int,
     val idErrorMessageResId: Int,
-    val pwErrorMessageResId: Int,
     val pwCheckErrorMessageResId: Int,
     val page: SignUpPage,
-    val isNotDuplicatedId: Boolean,
     val emailAuthTime: Long,
+    val isVisiblePassword: Boolean,
+    val isVisiblePasswordCheck: Boolean,
 ) : UiState {
-    val topBarTitleResId: Int = R.string.screen_title_sign_up
-
     val timerText: String =
         "${(emailAuthTime / 60000)}:${(emailAuthTime % 60000 / 1000).toString().padStart(2, '0')}"
 
@@ -47,14 +47,8 @@ data class SignUpUiState(
     val isValidEmail: Boolean
         get() = EMAIL_REGEX.matches(email)
 
-    val isValidId: Boolean
-        get() = ID_REGEX.matches(id)
-
     val isValidName: Boolean
         get() = USER_NAME_REGEX.matches(name)
-
-    val isSendEmailAuthNum: Boolean
-        get() = emailAuthState == AuthenticationState.SEND_SUCCESS
 
     val isVerifiedEmailAuth: Boolean
         get() = emailAuthState == AuthenticationState.VERIFIED
@@ -72,12 +66,31 @@ data class SignUpUiState(
         get() = emailAuthState != AuthenticationState.NONE &&
                 emailAuthState != AuthenticationState.SEND_FAILED
 
+    val isPasswordValidFormat
+        get() = PW_REGEX.matches(pw)
+
+    val isPasswordValidLength
+        get() = pw.length in PW_MIN_LENGTH..PW_MAX_LENGTH
+
+    val isEqualsPassword
+        get() = pw == pwCheck
+
+    val isAvailableId
+        get() = idValidationState == UserIdValidationState.AVAILABLE
+
+    val isNotAvailableId
+        get() = idValidationState == UserIdValidationState.NOT_AVAILABLE
+
     enum class AuthenticationState {
         SEND_SUCCESS, SEND_FAILED, NONE, VERIFIED, REJECTED, TIME_EXPIRED;
     }
 
     enum class FocusState {
         NONE, EMAIL, AUTH_NUM, ID, NAME, PW, PW_CHECK;
+    }
+
+    enum class UserIdValidationState {
+        NONE, AVAILABLE, NOT_AVAILABLE;
     }
 
     enum class SignUpPage(val index: Int) {
@@ -102,15 +115,16 @@ data class SignUpUiState(
             pw = "",
             pwCheck = "",
             emailAuthNumber = "",
+            isVisiblePassword = false,
+            isVisiblePasswordCheck = false,
             emailAuthState = AuthenticationState.NONE,
+            idValidationState = UserIdValidationState.NONE,
             emailSupportingTextResId = R.string.empty,
             authNumberSupportingTextResId = R.string.empty,
             idErrorMessageResId = R.string.empty,
-            pwErrorMessageResId = R.string.empty,
             nameErrorMessageResId = R.string.empty,
             pwCheckErrorMessageResId = R.string.empty,
             page = AUTH,
-            isNotDuplicatedId = false,
             emailAuthTime = AUTHENTICATION_LIMIT_MILS,
             focusState = FocusState.NONE,
         )
@@ -132,6 +146,8 @@ sealed interface SignUpUiAction : UiAction {
     data object ClickSignUp : SignUpUiAction
     data object ClickVerifyAuthNum : SignUpUiAction
     data object StartEmailAuthTimer : SignUpUiAction
+    data class ChangePasswordVisibility(val isVisible: Boolean) : SignUpUiAction
+    data class ChangePasswordCheckVisibility(val isVisible: Boolean) : SignUpUiAction
 }
 
 sealed interface SignUpUiEffect : UiEffect {
