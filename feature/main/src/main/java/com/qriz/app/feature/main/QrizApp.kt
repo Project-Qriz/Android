@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
@@ -16,7 +15,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
-import androidx.navigation.navOptions
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.core.navigation.route.SplashRoute
 import com.qriz.app.feature.concept_book.navigation.conceptBookNavGraph
@@ -56,8 +54,6 @@ internal fun QrizApp(
     Scaffold(
         bottomBar = {
             MainBottomBar(
-                modifier = Modifier
-                    .navigationBarsPadding(),
                 isVisible = mainNavigator.shouldShowBottomBar(),
                 tabs = MainTab.entries.toImmutableList(),
                 currentTab = mainNavigator.currentTab,
@@ -67,19 +63,17 @@ internal fun QrizApp(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier
-                    .imePadding()
-                    .navigationBarsPadding(),
+                modifier = Modifier.imePadding(),
             )
         },
         contentWindowInsets = WindowInsets(0.dp),
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
     ) { innerPadding ->
         Box(
             modifier = Modifier
-                .padding(innerPadding)
-                .navigationBarsPadding()
-                .systemBarsPadding(),
+                .padding(innerPadding),
         ) {
             QrizNavHost(
                 mainNavigator = mainNavigator,
