@@ -21,9 +21,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -61,7 +58,7 @@ fun TodayStudyCardPager(
     horizontalPadding: Dp = 18.dp,
     currentDay: Int,
     todayStudyConcepts: List<Int>,
-    isNeedAPreviewTest: Boolean,
+    isNeedPreviewTest: Boolean,
     onClickInit: () -> Unit,
     onChangeTodayStudyCard: (Int) -> Unit,
 ) {
@@ -85,7 +82,7 @@ fun TodayStudyCardPager(
             modifier = Modifier
                 .padding(horizontal = horizontalPadding),
         ) {
-            if (isNeedAPreviewTest) {
+            if (isNeedPreviewTest) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -111,7 +108,7 @@ fun TodayStudyCardPager(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (isNeedAPreviewTest) {
+                if (isNeedPreviewTest) {
                     Box(
                         modifier = Modifier
                             .size(20.dp),
@@ -130,7 +127,7 @@ fun TodayStudyCardPager(
                     modifier = Modifier
                         .weight(1f)
                 )
-                if (isNeedAPreviewTest.not()) {
+                if (isNeedPreviewTest.not()) {
                     IconButton(
                         modifier = Modifier
                             .size(24.dp),
@@ -145,7 +142,7 @@ fun TodayStudyCardPager(
                 }
             }
 
-            if (isNeedAPreviewTest.not()) {
+            if (isNeedPreviewTest.not()) {
                 val currentDayIndex = todayStudyConcepts.indexOf(currentDay)
                 val neededRangeStartIndex = (currentDayIndex / 3) * 3
                 Row(
@@ -169,20 +166,19 @@ fun TodayStudyCardPager(
                         }
                 }
             }
-
         }
 
         HorizontalPager(
             modifier = Modifier
-                .blur(if (isNeedAPreviewTest) 4.dp else 0.dp)
+                .blur(if (isNeedPreviewTest) 4.dp else 0.dp)
                 .padding(
                     top = 12.dp,
-                    bottom = if (isNeedAPreviewTest) 32.dp else 16.dp
+                    bottom = if (isNeedPreviewTest) 32.dp else 16.dp
                 ),
             state = pagerState,
             contentPadding = PaddingValues(horizontal = horizontalPadding),
             pageSpacing = 8.dp,
-            userScrollEnabled = isNeedAPreviewTest.not(),
+            userScrollEnabled = isNeedPreviewTest.not(),
         ) { page ->
             TodayStudyCard(
                 modifier = Modifier
@@ -191,7 +187,7 @@ fun TodayStudyCardPager(
             )
         }
 
-        if (isNeedAPreviewTest.not()) {
+        if (isNeedPreviewTest.not()) {
             //TODO : 이미 완료한 경우도 똑같은 UI 인가?
             QrizButton(
                 text = stringResource(R.string.go_to_study),
@@ -200,7 +196,7 @@ fun TodayStudyCardPager(
                     .fillMaxWidth()
                     .padding(horizontal = horizontalPadding)
                     .padding(
-                        bottom = if (isNeedAPreviewTest) 0.dp else 32.dp
+                        bottom = if (isNeedPreviewTest) 0.dp else 32.dp
                     )
             )
         }
@@ -402,7 +398,7 @@ fun String.asBulletListText(
 private fun TodayStudyCardPreview() {
     QrizTheme {
         TodayStudyCardPager(
-            isNeedAPreviewTest = false,
+            isNeedPreviewTest = false,
             currentDay = 0,
             todayStudyConcepts = listOf(1, 2, 3),
             onClickInit = {},
@@ -416,7 +412,7 @@ private fun TodayStudyCardPreview() {
 private fun TodayStudyCardPreview2() {
     QrizTheme {
         TodayStudyCardPager(
-            isNeedAPreviewTest = true,
+            isNeedPreviewTest = true,
             currentDay = 0,
             todayStudyConcepts = listOf(1, 2, 3),
             onClickInit = {},

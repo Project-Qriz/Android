@@ -9,4 +9,5 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:data:user:user-api"))
 }

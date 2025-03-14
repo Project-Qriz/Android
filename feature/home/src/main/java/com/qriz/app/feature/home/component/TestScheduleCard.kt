@@ -14,7 +14,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.component.QrizCard
-import com.qriz.app.core.designsystem.component.QrizTextFiled
 import com.qriz.app.core.designsystem.theme.Blue100
 import com.qriz.app.core.designsystem.theme.Blue500
 import com.qriz.app.core.designsystem.theme.Gray200
@@ -34,12 +33,12 @@ fun TestScheduleCard(
     onClickTestDateChange: () -> Unit,
     onClickTestDateRegister: () -> Unit,
 ) {
-    Column {
+    Column(
+        modifier = modifier
+    ) {
         if (isExistSchedule) DDayHeader(userName = userName)
 
-        QrizCard(
-            modifier = modifier
-        ) {
+        QrizCard {
             Column(
                 modifier = Modifier
                     .padding(24.dp)

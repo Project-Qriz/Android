@@ -1,5 +1,6 @@
 package com.qriz.app.feature.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,9 +12,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -29,6 +33,8 @@ import com.qriz.app.feature.home.component.TestScheduleCard
 import com.qriz.app.feature.home.component.TestStartCard
 import com.qriz.app.feature.home.component.TodayStudyCardPager
 import com.qriz.app.feature.home.component.WeeklyCustomConcept
+import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
+import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus.NOT_STARTED
 import com.qriz.app.core.designsystem.R as DSR
 
 @Composable
@@ -48,30 +54,47 @@ fun HomeScreen(
     }
 
     HomeContent(
-        isNeedPreviewTest = uiState.isNeedPreviewTest,
+        userName = uiState.user.name,
+        previewTestStatus = uiState.user.previewTestStatus,
         currentTodayStudyDay = uiState.currentTodayStudyDay,
         todayStudyConcepts = uiState.todayStudyConcepts,
+        onInit = { viewModel.process(HomeUiAction.ObserveClient) },
         onClickTestDateChange = { },
         onClickTestDateRegister = {},
         onClickMockTest = {},
         onClickPreviewTest = { },
+        onClickTodayStudyInit = {},
         onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeTodayStudyCard(it)) },
+        onClickWeeklyCustomConcept = {},
     )
 }
 
 @Composable
 fun HomeContent(
-    isNeedPreviewTest: Boolean,
+    userName: String,
+    previewTestStatus: PreviewTestStatus,
     currentTodayStudyDay: Int,
     todayStudyConcepts: List<Int>,
+    onInit: () -> Unit,
     onClickTestDateChange: () -> Unit,
     onClickTestDateRegister: () -> Unit,
     onClickMockTest: () -> Unit,
     onClickPreviewTest: () -> Unit,
+    onClickTodayStudyInit: () -> Unit,
     onChangeTodayStudyCard: (Int) -> Unit,
+    onClickWeeklyCustomConcept: () -> Unit,
 ) {
-    val horizontalPadding = remember { 18.dp }
+    Log.d("로그", "HomeContent: userName : $userName")
+    val isInitialized = rememberSaveable { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        if (isInitialized.value.not()) {
+            onInit()
+            isInitialized.value = true
+        }
+    }
+
+    val horizontalPadding = remember { 18.dp }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -114,7 +137,7 @@ fun HomeContent(
                         bottom = 32.dp
                     ),
                 isExistSchedule = true,
-                userName = "Qriz",
+                userName = userName,
                 examDateString = "3월9일(토)",
                 examPeriodString = "01.29(월) 10:00 ~ 02.02(금) 18:00",
                 onClickTestDateChange = onClickTestDateChange,
@@ -125,25 +148,25 @@ fun HomeContent(
                 modifier = Modifier
                     .padding(horizontal = horizontalPadding)
                     .padding(bottom = 32.dp),
-                isNeedPreviewTest = isNeedPreviewTest,
+                isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
                 onClickMockTest = onClickMockTest,
                 onClickPreviewTest = onClickPreviewTest
             )
 
             TodayStudyCardPager(
                 horizontalPadding = horizontalPadding,
-                isNeedAPreviewTest = isNeedPreviewTest,
+                isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
                 currentDay = currentTodayStudyDay,
                 todayStudyConcepts = todayStudyConcepts,
-                onClickInit = {},
+                onClickInit = onClickTodayStudyInit,
                 onChangeTodayStudyCard = onChangeTodayStudyCard
             )
 
             WeeklyCustomConcept(
-                modifier = Modifier
-                    .padding(horizontal = horizontalPadding)
-                    .padding(bottom = 32.dp),
+                isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
+                onClick = onClickWeeklyCustomConcept,
             )
+
         }
     }
 }
@@ -154,14 +177,18 @@ fun HomeContent(
 fun HomeContentPreview() {
     QrizTheme {
         HomeContent(
-            isNeedPreviewTest = true,
+            userName = "Qriz",
+            previewTestStatus = NOT_STARTED,
             currentTodayStudyDay = 0,
             todayStudyConcepts = List(30) { it + 1 },
+            onInit = {},
             onClickTestDateChange = {},
             onClickTestDateRegister = {},
             onClickPreviewTest = {},
             onClickMockTest = {},
-            onChangeTodayStudyCard = {}
+            onClickTodayStudyInit = {},
+            onChangeTodayStudyCard = {},
+            onClickWeeklyCustomConcept = {},
         )
     }
 }

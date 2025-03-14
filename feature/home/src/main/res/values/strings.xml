@@ -17,5 +17,5 @@
     <string name="concepts_to_learn">학습해야 하는 개념은</string>
     <string name="go_to_study">학습하러 가기</string>
     <string name="weekly_custom_concept">주간 맞춤 개념</string>
-    주간 맞춤 개념
+    <string name="weekly_recommend_concept">주간 추천 개념</string>
 </resources>
