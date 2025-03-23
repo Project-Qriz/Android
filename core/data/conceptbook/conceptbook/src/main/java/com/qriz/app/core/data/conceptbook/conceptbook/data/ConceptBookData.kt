@@ -1,15 +1,15 @@
-package com.qriz.app.feature.concept_book.model
+package com.qriz.app.core.data.conceptbook.conceptbook.data
 
-sealed interface Concept {
+internal sealed interface ConceptBookData {
     val conceptName: String
-    val id: Int
+    val id: Long
     val fileName: String
 
     enum class DataModeling(
-        override val id: Int,
+        override val id: Long,
         override val conceptName: String,
         override val fileName: String,
-    ) : Concept {
+    ) : ConceptBookData {
         DATA_MODEL(1, "데이터 모델의 이해", "data_model.pdf"),
         ENTITY(2, "엔터티", "entity.pdf"),
         ATTRIBUTE(3, "속성", "attribute.pdf"),
@@ -18,10 +18,10 @@ sealed interface Concept {
     }
 
     enum class DataModelSQL(
-        override val id: Int,
+        override val id: Long,
         override val conceptName: String,
         override val fileName: String,
-    ) : Concept {
+    ) : ConceptBookData {
         NORMALIZATION(6, "정규화", "normalization.pdf"),
         RELATION_JOIN(7, "관계와 조인의 이해", "relation_join.pdf"),
         TRANSACTION(8, "모델이 표현하는 트랜잭션의 이해", "transaction.pdf"),
@@ -30,10 +30,10 @@ sealed interface Concept {
     }
 
     enum class SqlBasic(
-        override val id: Int,
+        override val id: Long,
         override val conceptName: String,
         override val fileName: String,
-    ) : Concept {
+    ) : ConceptBookData {
         RELATIONAL_DB_INTRO(11, "관계형 데이터베이스 개요", "relational_db_intro.pdf"),
         SELECT(12, "SELECT문", "select.pdf"),
         FUNCTION(13, "함수", "function.pdf"),
@@ -45,10 +45,10 @@ sealed interface Concept {
     }
 
     enum class SqlAdvanced(
-        override val id: Int,
+        override val id: Long,
         override val conceptName: String,
         override val fileName: String,
-    ) : Concept {
+    ) : ConceptBookData {
         SUBQUERY(19, "서브 쿼리", "subquery.pdf"),
         AGGREGATE_OPERATOR(20, "집합 연산자", "aggregate_operator.pdf"),
         GROUP_FUNCTION(21, "그룹 함수", "group_function.pdf"),
@@ -60,10 +60,10 @@ sealed interface Concept {
     }
 
     enum class QueryManagement(
-        override val id: Int,
+        override val id: Long,
         override val conceptName: String,
         override val fileName: String,
-    ) : Concept {
+    ) : ConceptBookData {
         DML(27, "DML", "dml.pdf"),
         TCL(28, "TCL", "tcl.pdf"),
         DDL(29, "DDL", "ddl.pdf"),

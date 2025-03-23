@@ -1,11 +1,11 @@
 import com.qriz.app.setNamespace
 
 plugins {
-    id("qriz.android.feature")
+    id("qriz.android.library")
 }
 
 android {
-    setNamespace("feature.concept_book")
+    setNamespace("core.data.conceptbook.conceptbook")
 }
 
 dependencies {
