@@ -55,7 +55,7 @@ private fun SubjectCategoryRowItem(
         modifier = modifier
     ) {
         CategoryCard(
-            category = category,
+            categoryName = category.name,
             cardStyle = cardStyle,
         )
         Text(

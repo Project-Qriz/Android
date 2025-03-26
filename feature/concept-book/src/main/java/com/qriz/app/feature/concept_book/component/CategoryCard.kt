@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.qriz.app.core.data.conceptbook.conceptbook_api.model.Category
 import com.qriz.app.core.designsystem.component.box.QrizBox
 import com.qriz.app.core.designsystem.theme.Blue100
 import com.qriz.app.core.designsystem.theme.Blue500
@@ -33,7 +32,7 @@ import com.qriz.app.feature.concept_book.R
 
 @Composable
 internal fun CategoryCard(
-    category: Category,
+    categoryName: String,
     cardStyle: CategoryCardStyle,
 ) {
     Surface(
@@ -72,7 +71,7 @@ internal fun CategoryCard(
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = category.name,
+                    text = categoryName,
                     color = cardStyle.textColor,
                     style = QrizTheme.typography.headline1,
                     textAlign = TextAlign.Center
@@ -96,10 +95,7 @@ private fun CategoryCardPreview() {
             modifier = Modifier.width(100.dp),
         ) {
             CategoryCard(
-                category = Category(
-                    name = "데이터 모델링의 이해",
-                    conceptBooks = emptyList(),
-                ),
+                categoryName = "데이터 모델링의 이해",
                 cardStyle = CategoryCardStyle(
                     backgroundColor = Color.White,
                     textColor = Gray800,
