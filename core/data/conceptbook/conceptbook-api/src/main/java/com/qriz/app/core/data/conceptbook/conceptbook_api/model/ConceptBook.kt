@@ -4,4 +4,6 @@ data class ConceptBook(
     val id: Long,
     val name: String,
     val file: String,
+    val subjectNumber: Int,
+    val categoryName: String,
 )

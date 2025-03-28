@@ -10,21 +10,32 @@ import com.qriz.app.core.data.conceptbook.conceptbook_api.model.Subject
 internal fun SubjectData.toSubject(): Subject {
     return Subject(
         number = number,
-        categories = categories.map { it.toCategory() }
+        categories = categories.map { it.toCategory(subjectNumber = number) },
     )
 }
 
-internal fun CategoryData.toCategory(): Category {
+internal fun CategoryData.toCategory(subjectNumber: Int): Category {
     return Category(
         name = categoryName,
-        conceptBooks = concept.map { it.toConceptBook() }
+        conceptBooks = concept.map {
+            it.toConceptBook(
+                subjectNumber = subjectNumber,
+                categoryName = categoryName,
+            )
+        },
+        subjectNumber = subjectNumber,
     )
 }
 
-internal fun ConceptBookData.toConceptBook(): ConceptBook {
+internal fun ConceptBookData.toConceptBook(
+    subjectNumber: Int,
+    categoryName: String,
+): ConceptBook {
     return ConceptBook(
         name = conceptName,
         id = id,
-        file = fileName
+        file = fileName,
+        subjectNumber = subjectNumber,
+        categoryName = categoryName,
     )
 }
