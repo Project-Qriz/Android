@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
@@ -15,8 +16,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
+import com.qriz.app.core.navigation.route.MainTabRoute
 import com.qriz.app.core.navigation.route.Route
-import com.qriz.app.core.navigation.route.SplashRoute
+import com.qriz.app.core.navigation.route.SignRoute
 import com.qriz.app.feature.concept_book.navigation.conceptBookNavGraph
 import com.qriz.app.feature.home.navigation.homeNavGraph
 import com.qriz.app.feature.incorrect_answers_note.navigation.incorrectAnswersNoteNavGraph
@@ -85,7 +87,8 @@ internal fun QrizApp(
 
 @Composable
 private fun QrizNavHost(
-    startDestination: Route = SplashRoute,
+    startDestination: Route = MainTabRoute.Home,
+//    startDestination: Route = SignRoute.SignIn,
     mainNavigator: MainNavigator,
     onShowSnackbar: (String) -> Unit,
 ) {

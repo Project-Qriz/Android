@@ -15,8 +15,10 @@ class HomeViewModel @Inject constructor(
 
     override fun process(action: HomeUiAction): Job = viewModelScope.launch {
         when (action) {
-            is HomeUiAction.ChangeTodayStudyCard -> onChangeTodayStudyCard(action.day)
             is HomeUiAction.ObserveClient -> observeClient()
+            is HomeUiAction.ChangeTodayStudyCard -> onChangeTodayStudyCard(action.day)
+            is HomeUiAction.ClickTestDateRegister -> onClickTestDateRegister()
+            is HomeUiAction.DismissTestDateBottomSheet -> onDismissTestDateBottomSheet()
         }
     }
 
@@ -28,5 +30,13 @@ class HomeViewModel @Inject constructor(
         userRepository.getUserFlow().collect { user ->
             updateState { copy(user = user) }
         }
+    }
+
+    private fun onClickTestDateRegister() {
+        updateState { copy(isShowTestDateBottomSheet = true) }
+    }
+
+    private fun onDismissTestDateBottomSheet() {
+        updateState { copy(isShowTestDateBottomSheet = false) }
     }
 }

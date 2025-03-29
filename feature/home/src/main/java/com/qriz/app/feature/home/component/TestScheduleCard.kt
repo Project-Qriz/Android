@@ -30,7 +30,6 @@ fun TestScheduleCard(
     examDateString: String,
     examPeriodString: String,
     isExistSchedule: Boolean,
-    onClickTestDateChange: () -> Unit,
     onClickTestDateRegister: () -> Unit,
 ) {
     Column(
@@ -113,7 +112,7 @@ fun TestScheduleCard(
                         .fillMaxWidth()
                         .padding(top = 12.dp),
                     text = buttonText,
-                    onClick = if (isExistSchedule) onClickTestDateChange else onClickTestDateRegister,
+                    onClick = onClickTestDateRegister,
                     textColor = Gray800,
                     containerColor = White,
                     strokeColor = Gray200,
@@ -193,7 +192,6 @@ private fun TestScheduleCardPreview() {
             examDateString = "3월9일(토)",
             examPeriodString = "01.29(월) 10:00 ~ 02.02(금) 18:00",
             isExistSchedule = true,
-            onClickTestDateChange = {},
             onClickTestDateRegister = {},
         )
     }
@@ -208,7 +206,6 @@ private fun TestScheduleCardPreview2() {
             examDateString = "3월9일(토)",
             examPeriodString = "01.29(월) 10:00 ~ 02.02(금) 18:00",
             isExistSchedule = false,
-            onClickTestDateChange = {},
             onClickTestDateRegister = {},
         )
     }

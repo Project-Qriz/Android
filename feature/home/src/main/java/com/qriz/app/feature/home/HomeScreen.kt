@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.base.extention.collectSideEffect
+import com.qriz.app.feature.home.component.TestDateBottomSheet
 import com.qriz.app.feature.home.component.TestScheduleCard
 import com.qriz.app.feature.home.component.TestStartCard
 import com.qriz.app.feature.home.component.TodayStudyCardPager
@@ -53,6 +54,12 @@ fun HomeScreen(
         }
     }
 
+    if (uiState.isShowTestDateBottomSheet) {
+        TestDateBottomSheet(
+            onDismissRequest = { viewModel.process(HomeUiAction.DismissTestDateBottomSheet) },
+        )
+    }
+
     HomeContent(
         userName = uiState.user.name,
         previewTestStatus = uiState.user.previewTestStatus,
@@ -60,7 +67,7 @@ fun HomeScreen(
         todayStudyConcepts = uiState.todayStudyConcepts,
         onInit = { viewModel.process(HomeUiAction.ObserveClient) },
         onClickTestDateChange = { },
-        onClickTestDateRegister = {},
+        onClickTestDateRegister = { viewModel.process(HomeUiAction.ClickTestDateRegister) },
         onClickMockTest = {},
         onClickPreviewTest = { },
         onClickTodayStudyInit = {},
@@ -140,7 +147,6 @@ fun HomeContent(
                 userName = userName,
                 examDateString = "3월9일(토)",
                 examPeriodString = "01.29(월) 10:00 ~ 02.02(금) 18:00",
-                onClickTestDateChange = onClickTestDateChange,
                 onClickTestDateRegister = onClickTestDateRegister,
             )
 

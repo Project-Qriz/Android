@@ -10,6 +10,7 @@ import com.quiz.app.core.data.user.user_api.model.User
 @Immutable
 data class HomeUiState(
     val isLoading: Boolean,
+    val isShowTestDateBottomSheet: Boolean,
     val user: User,
     val todayStudyConcepts: List<Int>,
     val currentTodayStudyDay: Int
@@ -18,6 +19,7 @@ data class HomeUiState(
     companion object {
         val Default = HomeUiState(
             isLoading = false,
+            isShowTestDateBottomSheet = false,
             user = User.Default,
             todayStudyConcepts = List(30) { it + 1 },
             currentTodayStudyDay = 1
@@ -26,8 +28,10 @@ data class HomeUiState(
 }
 
 sealed interface HomeUiAction : UiAction {
-    data class ChangeTodayStudyCard(val day: Int) : HomeUiAction
     data object ObserveClient : HomeUiAction
+    data class ChangeTodayStudyCard(val day: Int) : HomeUiAction
+    data object ClickTestDateRegister : HomeUiAction
+    data object DismissTestDateBottomSheet : HomeUiAction
 }
 
 sealed interface HomeUiEffect : UiEffect {
