@@ -19,6 +19,7 @@ internal fun SubjectItem(
     subject: Subject,
     cardStyle: CategoryCardStyle,
     rowCount: Int,
+    onClickCategory: (String) -> Unit,
 ) {
     Column {
         Text(
@@ -30,6 +31,7 @@ internal fun SubjectItem(
             subject = subject,
             cardStyle = cardStyle,
             rowCount = rowCount,
+            onClickCategory = onClickCategory,
         )
     }
 }
@@ -49,19 +51,23 @@ private fun SubjectItemPreview() {
                         Category(
                             name = "카테고리1",
                             conceptBooks = emptyList(),
+                            subjectNumber = 1,
                         ),
                         Category(
                             name = "카테고리2",
                             conceptBooks = emptyList(),
+                            subjectNumber = 2,
                         ),
                         Category(
                             name = "카테고리3",
                             conceptBooks = emptyList(),
+                            subjectNumber = 3,
                         ),
                     ),
                 ),
                 cardStyle = CategoryCardStyle.light,
                 rowCount = 3,
+                onClickCategory = {}
             )
             SubjectItem(
                 subject = Subject(
@@ -70,15 +76,18 @@ private fun SubjectItemPreview() {
                         Category(
                             name = "카테고리1",
                             conceptBooks = emptyList(),
+                            subjectNumber = 1,
                         ),
                         Category(
                             name = "카테고리2",
                             conceptBooks = emptyList(),
+                            subjectNumber = 2,
                         ),
                     ),
                 ),
                 cardStyle = CategoryCardStyle.dark,
                 rowCount = 3,
+                onClickCategory = {}
             )
         }
     }

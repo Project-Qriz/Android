@@ -34,10 +34,11 @@ import com.qriz.app.feature.concept_book.R
 internal fun CategoryCard(
     categoryName: String,
     cardStyle: CategoryCardStyle,
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         color = cardStyle.backgroundColor,
-        modifier = Modifier.aspectRatio(105.0f / 156.0f),
+        modifier = modifier.aspectRatio(105.0f / 156.0f),
         shape = RoundedCornerShape(8.dp),
     ) {
         QrizBox {

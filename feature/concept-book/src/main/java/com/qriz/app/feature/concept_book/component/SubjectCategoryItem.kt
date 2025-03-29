@@ -1,5 +1,6 @@
 package com.qriz.app.feature.concept_book.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ internal fun SubjectCategoryRow(
     subject: Subject,
     cardStyle: CategoryCardStyle,
     rowCount: Int,
+    onClickCategory: (String) -> Unit,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -35,6 +37,7 @@ internal fun SubjectCategoryRow(
                     category = subject.categories[index],
                     cardStyle = cardStyle,
                     modifier = Modifier.weight(1f),
+                    onClickCategory = onClickCategory,
                 )
             } else {
                 Box(
@@ -50,9 +53,10 @@ private fun SubjectCategoryRowItem(
     category: Category,
     cardStyle: CategoryCardStyle,
     modifier: Modifier = Modifier,
+    onClickCategory: (String) -> Unit,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier.clickable { onClickCategory(category.name) }
     ) {
         CategoryCard(
             categoryName = category.name,
@@ -83,10 +87,12 @@ private fun SubjectCategoryRowPreview() {
                     Category(
                         name = "데이터 모델링의 이해",
                         conceptBooks = emptyList(),
+                        subjectNumber = 1,
                     ),
                     Category(
                         name = "데이터 모델링의 이해",
                         conceptBooks = emptyList(),
+                        subjectNumber = 2,
                     ),
                 ),
             ),
@@ -97,6 +103,7 @@ private fun SubjectCategoryRowPreview() {
                 textColor = Gray800,
             ),
             rowCount = 3,
+            onClickCategory = {}
         )
     }
 }
