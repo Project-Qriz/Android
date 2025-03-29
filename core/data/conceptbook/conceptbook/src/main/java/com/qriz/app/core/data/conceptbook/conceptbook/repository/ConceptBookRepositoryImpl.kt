@@ -19,7 +19,7 @@ class ConceptBookRepositoryImpl @Inject constructor() : ConceptBookRepository {
         for (subject in SubjectData.entries) {
             val result = subject.categories.find { it.categoryName == categoryName }
             if (result != null) {
-                return result.toCategory()
+                return result.toCategory(subjectNumber = subject.number)
             }
         }
 
@@ -31,7 +31,10 @@ class ConceptBookRepositoryImpl @Inject constructor() : ConceptBookRepository {
             for (category in subject.categories) {
                 val result = category.concept.find { it.id == id }
                 if (result != null) {
-                    return result.toConceptBook()
+                    return result.toConceptBook(
+                        subjectNumber = subject.number,
+                        categoryName = category.categoryName,
+                    )
                 }
             }
         }
