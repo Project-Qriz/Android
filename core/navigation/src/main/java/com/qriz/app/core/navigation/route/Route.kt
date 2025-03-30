@@ -46,6 +46,13 @@ sealed interface OnBoardRoute : Route {
     ) : OnBoardRoute
 }
 
+sealed interface ConceptBookRoute : Route {
+    @Serializable
+    data class ConceptBookList(
+        val categoryName: String
+    ) : ConceptBookRoute
+}
+
 sealed interface MainTabRoute : Route {
     @Serializable
     data object Home : MainTabRoute

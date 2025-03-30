@@ -20,6 +20,8 @@ import androidx.navigation.navOptions
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.core.navigation.route.SplashRoute
 import com.qriz.app.feature.concept_book.navigation.conceptBookNavGraph
+import com.qriz.app.feature.concept_book.navigation.navigateToConceptBook
+import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookList
 import com.qriz.app.feature.home.navigation.homeNavGraph
 import com.qriz.app.feature.incorrect_answers_note.navigation.incorrectAnswersNoteNavGraph
 import com.qriz.app.feature.main.component.MainBottomBar
@@ -133,6 +135,8 @@ private fun QrizNavHost(
         )
         conceptBookNavGraph(
             onShowSnackbar = onShowSnackbar,
+            onBack = navController::popBackStack,
+            moveToConceptBookList = navController::navigateToConceptBookList
         )
         incorrectAnswersNoteNavGraph(
             onShowSnackbar = onShowSnackbar,

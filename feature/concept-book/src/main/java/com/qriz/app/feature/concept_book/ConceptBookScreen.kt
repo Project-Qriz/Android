@@ -23,7 +23,9 @@ import com.qriz.app.feature.concept_book.component.SubjectItem
 
 @Composable
 fun ConceptBookScreen(
-    viewModel: ConceptBookViewModel = hiltViewModel(), onShowSnackBar: (String) -> Unit
+    viewModel: ConceptBookViewModel = hiltViewModel(),
+    onShowSnackBar: (String) -> Unit,
+    moveToConceptBookList: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -42,12 +44,14 @@ fun ConceptBookScreen(
 
     ConceptBookContent(
         subjects = uiState.subjects,
+        moveToConceptBookList = moveToConceptBookList,
     )
 }
 
 @Composable
 fun ConceptBookContent(
     subjects: List<Subject>,
+    moveToConceptBookList: (String) -> Unit,
 ) {
     Column {
         QrizTopBar(
@@ -71,6 +75,7 @@ fun ConceptBookContent(
                         else -> throw IllegalStateException("Invalid index")
                     },
                     rowCount = 3,
+                    onClickCategory = moveToConceptBookList,
                 )
             }
         }
