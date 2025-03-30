@@ -1,4 +1,4 @@
-package com.qriz.app.feature.concept_book.list.component
+package com.qriz.app.feature.concept_book.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,20 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.theme.Gray500
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
-import com.qriz.app.feature.concept_book.R
 import com.qriz.app.core.designsystem.R as DSR
 
 @Composable
-internal fun ConceptBookListTopBar(
-    subjectNumber: Int,
-    categoryName: String,
+internal fun ConceptBookTopBar(
+    subTitle: String,
+    title: String,
     onNavigationClick: () -> Unit,
 ) {
     Box(
@@ -53,12 +51,12 @@ internal fun ConceptBookListTopBar(
             modifier = Modifier.align(Alignment.Center),
         ) {
             Text(
-                text = stringResource(id = R.string.subject, subjectNumber),
+                text = subTitle,
                 style = QrizTheme.typography.caption,
                 color = Gray500,
             )
             Text(
-                text = categoryName,
+                text = title,
                 style = QrizTheme.typography.headline1,
                 color = Gray800,
             )
