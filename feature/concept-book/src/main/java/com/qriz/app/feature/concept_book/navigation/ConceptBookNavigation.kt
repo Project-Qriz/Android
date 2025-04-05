@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import com.qriz.app.core.navigation.route.ConceptBookRoute
 import com.qriz.app.core.navigation.route.MainTabRoute
 import com.qriz.app.feature.concept_book.ConceptBookScreen
+import com.qriz.app.feature.concept_book.detail.ConceptBookDetailScreen
 import com.qriz.app.feature.concept_book.list.ConceptBookListScreen
 
 fun NavController.navigateToConceptBook(navOptions: NavOptions) {
@@ -27,10 +28,21 @@ fun NavController.navigateToConceptBookList(
     )
 }
 
+fun NavController.navigateToConceptBookDetail(
+    conceptBookId: Long,
+    navOptions: NavOptions? = null,
+) {
+    navigate(
+        ConceptBookRoute.ConceptBookDetail(conceptBookId),
+        navOptions,
+    )
+}
+
 fun NavGraphBuilder.conceptBookNavGraph(
     onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
     moveToConceptBookList: (String) -> Unit,
+    moveToConceptBookDetail: (Long) -> Unit,
 ) {
     composable<MainTabRoute.ConceptBook> {
         ConceptBookScreen(
@@ -43,7 +55,16 @@ fun NavGraphBuilder.conceptBookNavGraph(
         val route = it.toRoute<ConceptBookRoute.ConceptBookList>()
         ConceptBookListScreen(
             categoryName = route.categoryName,
+            moveToConceptBookDetail = moveToConceptBookDetail,
             moveToBack = onBack,
+        )
+    }
+
+    composable<ConceptBookRoute.ConceptBookDetail> {
+        val route = it.toRoute<ConceptBookRoute.ConceptBookDetail>()
+        ConceptBookDetailScreen(
+            conceptBookId = route.conceptBookId,
+            onBack = onBack,
         )
     }
 }

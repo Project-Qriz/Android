@@ -51,6 +51,11 @@ sealed interface ConceptBookRoute : Route {
     data class ConceptBookList(
         val categoryName: String
     ) : ConceptBookRoute
+
+    @Serializable
+    data class ConceptBookDetail(
+        val conceptBookId: Long
+    ) : ConceptBookRoute
 }
 
 sealed interface MainTabRoute : Route {

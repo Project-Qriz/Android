@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.data.conceptbook.conceptbook_api.model.ConceptBook
 import com.qriz.app.core.designsystem.component.QrizDialog
 import com.qriz.app.core.designsystem.component.QrizLoading
+import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.concept_book.R
 import com.qriz.app.feature.concept_book.component.CategoryCard
 import com.qriz.app.feature.concept_book.component.CategoryCardStyle
@@ -34,9 +35,16 @@ import kotlinx.collections.immutable.persistentListOf
 fun ConceptBookListScreen(
     categoryName: String,
     viewModel: ConceptBookListViewModel = hiltViewModel(),
+    moveToConceptBookDetail: (Long) -> Unit,
     moveToBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    viewModel.collectSideEffect {
+        when(it) {
+            is ConceptBookListUiEffect.NavigateToConceptBook -> moveToConceptBookDetail(it.id)
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.process(ConceptBookListUiAction.Initialize(categoryName))
