@@ -25,4 +25,8 @@ dependencies {
     implementation(projects.core.data.conceptbook.conceptbook)
     implementation(projects.feature.main)
     implementation(projects.feature.splash)
+    implementation(projects.core.ui.common)
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.core)
 }

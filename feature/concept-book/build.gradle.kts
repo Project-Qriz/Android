@@ -10,4 +10,6 @@ android {
 
 dependencies {
     implementation(projects.core.data.conceptbook.conceptbookApi)
+
+    implementation(libs.coil.compose)
 }
