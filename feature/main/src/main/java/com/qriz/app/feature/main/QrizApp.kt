@@ -17,9 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
-import com.qriz.app.core.navigation.route.MainTabRoute
 import com.qriz.app.core.navigation.route.Route
-import com.qriz.app.core.navigation.route.SplashRoute
+import com.qriz.app.core.navigation.route.SignRoute
 import com.qriz.app.feature.concept_book.navigation.conceptBookNavGraph
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBook
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookDetail
@@ -60,8 +59,6 @@ internal fun QrizApp(
     Scaffold(
         bottomBar = {
             MainBottomBar(
-                modifier = Modifier
-                    .navigationBarsPadding(),
                 isVisible = mainNavigator.shouldShowBottomBar(),
                 tabs = MainTab.entries.toImmutableList(),
                 currentTab = mainNavigator.currentTab,
@@ -71,19 +68,17 @@ internal fun QrizApp(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier
-                    .imePadding()
-                    .navigationBarsPadding(),
+                modifier = Modifier.imePadding(),
             )
         },
         contentWindowInsets = WindowInsets(0.dp),
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
     ) { innerPadding ->
         Box(
             modifier = Modifier
-                .padding(innerPadding)
-                .navigationBarsPadding()
-                .systemBarsPadding(),
+                .padding(innerPadding),
         ) {
             QrizNavHost(
                 mainNavigator = mainNavigator,
@@ -96,6 +91,7 @@ internal fun QrizApp(
 @Composable
 private fun QrizNavHost(
     startDestination: Route = MainTabRoute.Home,
+//    startDestination: Route = SignRoute.SignIn,
     mainNavigator: MainNavigator,
     onShowSnackbar: (String) -> Unit,
 ) {

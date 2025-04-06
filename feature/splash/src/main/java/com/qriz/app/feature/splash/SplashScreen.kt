@@ -105,7 +105,7 @@ fun SplashContent(
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 55.dp),
             contentDescription = null,
-            painter = painterResource(R.drawable.qriz_text_logo_white)
+            painter = painterResource(dsR.drawable.qriz_text_logo_white)
         )
     }
 }
