@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="concept_book_title">개념서</string>
+    <string name="subject">%d과목</string>
+    <string name="concept_count">%d 항목</string>
+</resources>

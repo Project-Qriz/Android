@@ -40,6 +40,8 @@ include(":core:data:onboard:onboard")
 include(":core:data:token:token")
 include(":core:data:token:token-api")
 include(":core:data:test:test-api")
+include(":core:data:conceptbook:conceptbook")
+include(":core:data:conceptbook:conceptbook-api")
 
 include(":core:ui:test")
 include(":core:ui:common")
