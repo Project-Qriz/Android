@@ -22,6 +22,11 @@ dependencies {
     implementation(projects.core.data.user.user)
     implementation(projects.core.data.onboard.onboard)
     implementation(projects.core.data.token.token)
+    implementation(projects.core.data.conceptbook.conceptbook)
     implementation(projects.feature.main)
     implementation(projects.feature.splash)
+    implementation(projects.core.ui.common)
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.core)
 }

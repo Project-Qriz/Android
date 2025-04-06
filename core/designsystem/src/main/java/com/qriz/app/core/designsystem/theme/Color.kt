@@ -31,8 +31,10 @@ val Mint600 = Color(0xFF52CAAE)
 val Mint700 = Color(0xFF42BA9E)
 val Mint800 = Color(0xFF37AF93)
 
-val Red700Opacity14 = Color(0x24FA6969)
 val Red700 = Color(0xFFFA6969)
+val Red800 = Color(0xFFEF5D5D)
+
+val Red700Opacity14 = Color(0x24FA6969)
 
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)

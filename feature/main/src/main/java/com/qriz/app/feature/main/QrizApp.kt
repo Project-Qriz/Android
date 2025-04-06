@@ -17,9 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
+import com.qriz.app.core.navigation.route.MainTabRoute
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.core.navigation.route.SplashRoute
 import com.qriz.app.feature.concept_book.navigation.conceptBookNavGraph
+import com.qriz.app.feature.concept_book.navigation.navigateToConceptBook
+import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookDetail
+import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookList
 import com.qriz.app.feature.home.navigation.homeNavGraph
 import com.qriz.app.feature.incorrect_answers_note.navigation.incorrectAnswersNoteNavGraph
 import com.qriz.app.feature.main.component.MainBottomBar
@@ -91,7 +95,7 @@ internal fun QrizApp(
 
 @Composable
 private fun QrizNavHost(
-    startDestination: Route = SplashRoute,
+    startDestination: Route = MainTabRoute.Home,
     mainNavigator: MainNavigator,
     onShowSnackbar: (String) -> Unit,
 ) {
@@ -131,12 +135,18 @@ private fun QrizNavHost(
         homeNavGraph(
             onShowSnackbar = onShowSnackbar,
         )
+
         conceptBookNavGraph(
             onShowSnackbar = onShowSnackbar,
+            onBack = navController::popBackStack,
+            moveToConceptBookList = navController::navigateToConceptBookList,
+            moveToConceptBookDetail = navController::navigateToConceptBookDetail,
         )
+
         incorrectAnswersNoteNavGraph(
             onShowSnackbar = onShowSnackbar,
         )
+
         myPageNavGraph(
             onShowSnackbar = onShowSnackbar,
         )
