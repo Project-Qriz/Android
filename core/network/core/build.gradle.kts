@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.qriz.app.setNamespace
 
 plugins {
@@ -7,6 +8,9 @@ plugins {
 
 android {
     setNamespace("core.network.core")
+    defaultConfig {
+        buildConfigField("String", "BASE_URL", getProperty("BASE_URL"))
+    }
 }
 
 dependencies {
@@ -18,3 +22,5 @@ dependencies {
     implementation(libs.okhttp3.logging.interceptor)
     implementation(libs.okhttp3.mock.webserver)
 }
+
+fun getProperty(key: String): String = gradleLocalProperties(rootDir, providers).getProperty(key)

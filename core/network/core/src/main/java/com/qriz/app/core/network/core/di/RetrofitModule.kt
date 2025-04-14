@@ -1,5 +1,6 @@
 package com.qriz.app.core.network.core.di
 
+import com.qriz.app.core.network.core.BuildConfig
 import com.qriz.app.core.network.core.interceptor.AuthInterceptor
 import com.qriz.app.core.network.core.interceptor.TokenAuthenticator
 import dagger.Module
@@ -24,10 +25,8 @@ object RetrofitModule {
         json: Json,
         okHttpClient: OkHttpClient,
     ): Retrofit {
-        //TODO : 도메인주소 나오면 secretKey로 이동
-        val baseUrl = "https://www.qriz.com"
         return Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
