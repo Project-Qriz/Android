@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -74,24 +75,24 @@ fun QrizTextFiled(
         visualTransformation = visualTransformation,
         decorationBox = { innerTextField ->
             Column {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .background(
+                            color = containerColor,
+                            shape = cornerShape,
+                        )
+                        .then(
+                            if (borderStroke != null) Modifier.border(
+                                border = borderStroke,
+                                shape = cornerShape,
+                            )
+                            else Modifier
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = containerColor,
-                                shape = cornerShape,
-                            )
-                            .then(
-                                if (borderStroke != null) Modifier.border(
-                                    border = borderStroke,
-                                    shape = cornerShape,
-                                )
-                                else Modifier
-                            )
+                            .weight(1f)
                             .padding(contentPadding),
                     ) {
                         Box(
@@ -116,8 +117,7 @@ fun QrizTextFiled(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
                                 .padding(end = trailingPadding)
-                                .height(24.dp)
-                                .align(Alignment.CenterEnd)
+                                .height(24.dp),
                         ) {
                             trailing()
                         }

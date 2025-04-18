@@ -3,11 +3,14 @@ package com.qriz.app.core.data.user.user.repository
 import com.qriz.app.core.network.common.util.verifyResponseCode
 import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.data.user.user.mapper.toDataModel
+import com.qriz.app.core.network.common.const.SERVER_SUCCESS_CODE
+import com.qriz.app.core.network.user.model.request.EmailAuthenticationRequest
 import com.qriz.app.core.network.user.model.request.FindIdRequest
 import com.qriz.app.core.network.user.model.request.FindPwdRequest
 import com.qriz.app.core.network.user.model.request.JoinRequest
 import com.qriz.app.core.network.user.model.request.LoginRequest
 import com.qriz.app.core.network.user.model.request.ResetPwdRequest
+import com.qriz.app.core.network.user.model.request.SingleEmailRequest
 import com.qriz.app.core.network.user.model.request.VerifyPwdResetRequest
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
@@ -42,8 +45,7 @@ internal class UserRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getUser(): User {
-        return user.firstOrNull()
-            ?: getUserProfileFromServer()
+        return user.firstOrNull() ?: getUserProfileFromServer()
     }
 
     private suspend fun getUserProfileFromServer(): User {
@@ -51,24 +53,33 @@ internal class UserRepositoryImpl @Inject constructor(
             .also { newUser -> user.update { newUser } }
     }
 
-    /* TODO: 주소 값 나오면 실제 API 연결 */
     override suspend fun requestEmailAuthNumber(email: String) {
+        userApi.sendAuthEmail(SingleEmailRequest(email)).verifyResponseCode()
     }
 
-    /* TODO: 주소 값 나오면 실제 API 연결 */
-    override suspend fun verifyEmailAuthNumber(authenticationNumber: String): Boolean {
-        return true
+    override suspend fun verifyEmailAuthNumber(
+        email: String,
+        authenticationNumber: String,
+    ): Boolean {
+        val isSuccess = userApi.verifyEmailAuthenticationNumber(
+            EmailAuthenticationRequest(
+                email = email,
+                authNum = authenticationNumber,
+            )
+        )
+
+        return isSuccess.code == SERVER_SUCCESS_CODE
     }
 
     override suspend fun isNotDuplicateId(id: String): Boolean {
-        return true
+        return userApi.checkDuplicateId(id).data.available
     }
 
     override suspend fun signUp(
         loginId: String,
         password: String,
         email: String,
-        nickname: String
+        nickname: String,
     ): User {
         userApi.signUp(
             JoinRequest(
@@ -79,11 +90,14 @@ internal class UserRepositoryImpl @Inject constructor(
             )
         )
 
-        val user = login(
+        val result = login(
             id = loginId,
             password = password
         )
-        return user
+
+        user.update { result }
+
+        return result
     }
 
     override suspend fun sendEmailToFindId(email: String) {
