@@ -1,18 +1,22 @@
 package com.qriz.app.core.network.user.api
 
 import com.qriz.app.core.network.common.NetworkResponse
+import com.qriz.app.core.network.user.model.request.EmailAuthenticationRequest
 import com.qriz.app.core.network.user.model.request.FindIdRequest
 import com.qriz.app.core.network.user.model.request.FindPwdRequest
 import com.qriz.app.core.network.user.model.request.JoinRequest
 import com.qriz.app.core.network.user.model.request.LoginRequest
 import com.qriz.app.core.network.user.model.request.ResetPwdRequest
+import com.qriz.app.core.network.user.model.request.SingleEmailRequest
 import com.qriz.app.core.network.user.model.request.VerifyPwdResetRequest
+import com.qriz.app.core.network.user.model.response.DuplicateResponse
 import com.qriz.app.core.network.user.model.response.UserProfileResponse
 import com.qriz.app.core.network.user.model.response.JoinResponse
 import com.qriz.app.core.network.user.model.response.LoginResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface UserApi {
     @POST("/api/login")
@@ -24,6 +28,21 @@ interface UserApi {
     @GET("")
     suspend fun getUserProfile(
     ): NetworkResponse<UserProfileResponse>
+
+    @POST("/api/email-send")
+    suspend fun sendAuthEmail(
+        @Body request: SingleEmailRequest
+    ): NetworkResponse<String>
+
+    @POST("/api/email-authentication")
+    suspend fun verifyEmailAuthenticationNumber(
+        @Body request: EmailAuthenticationRequest
+    ): NetworkResponse<Unit>
+
+    @GET("/api/username-duplicate")
+    suspend fun checkDuplicateId(
+        @Query("username") userId: String
+    ): NetworkResponse<DuplicateResponse>
 
     @POST("/api/join")
     suspend fun signUp(

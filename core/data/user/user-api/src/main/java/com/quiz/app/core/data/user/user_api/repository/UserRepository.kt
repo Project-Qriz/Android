@@ -15,7 +15,7 @@ interface UserRepository {
 
     suspend fun requestEmailAuthNumber(email: String)
 
-    suspend fun verifyEmailAuthNumber(authenticationNumber: String): Boolean
+    suspend fun verifyEmailAuthNumber(email: String, authenticationNumber: String): Boolean
 
     suspend fun isNotDuplicateId(id: String): Boolean
 

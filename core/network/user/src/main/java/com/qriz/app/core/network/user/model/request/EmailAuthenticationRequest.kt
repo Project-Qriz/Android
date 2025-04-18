@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class EmailAuthenticationRequest(
     @SerialName("authNum") val authNum: String,
+    @SerialName("email") val email: String,
 )
