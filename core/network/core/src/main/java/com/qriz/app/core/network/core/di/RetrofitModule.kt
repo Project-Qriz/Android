@@ -1,6 +1,7 @@
 package com.qriz.app.core.network.core.di
 
 import com.qriz.app.core.network.core.BuildConfig
+import com.qriz.app.core.network.core.adapter.QrizCallAdapterFactory
 import com.qriz.app.core.network.core.interceptor.AuthInterceptor
 import com.qriz.app.core.network.core.interceptor.TokenAuthenticator
 import dagger.Module
@@ -24,11 +25,13 @@ object RetrofitModule {
     fun providesRetrofit(
         json: Json,
         okHttpClient: OkHttpClient,
+        callAdapterFactory: QrizCallAdapterFactory,
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addCallAdapterFactory(callAdapterFactory)
             .build()
     }
 
