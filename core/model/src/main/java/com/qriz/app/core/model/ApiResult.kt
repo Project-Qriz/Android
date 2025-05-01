@@ -11,3 +11,10 @@ sealed interface ApiResult<out T> {
 
     data class UnknownError(val throwable: Throwable?): ApiResult<Nothing>
 }
+
+inline fun <T, R> ApiResult<T>.map(transform: (T) -> R): ApiResult<R> = when (this) {
+    is ApiResult.Success -> ApiResult.Success(transform(data))
+    is ApiResult.Failure -> this
+    is ApiResult.NetworkError -> this
+    is ApiResult.UnknownError -> this
+}
