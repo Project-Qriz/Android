@@ -3,6 +3,7 @@ package com.qriz.app.core.network.core.di
 import com.qriz.app.core.network.core.BuildConfig
 import com.qriz.app.core.network.core.adapter.QrizCallAdapterFactory
 import com.qriz.app.core.network.core.interceptor.AuthInterceptor
+import com.qriz.app.core.network.core.interceptor.ResponseConvertInterceptor
 import com.qriz.app.core.network.core.interceptor.TokenAuthenticator
 import dagger.Module
 import dagger.Provides
@@ -40,6 +41,7 @@ object RetrofitModule {
     fun provideOkHttpClient(
         authenticator: TokenAuthenticator,
         authInterceptor: AuthInterceptor,
+        responseConvertInterceptor: ResponseConvertInterceptor,
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
 
@@ -48,6 +50,7 @@ object RetrofitModule {
         builder.addInterceptor(logging)
         builder.addInterceptor(authInterceptor)
         builder.authenticator(authenticator)
+        builder.addInterceptor(responseConvertInterceptor)
         return builder.build()
     }
 
