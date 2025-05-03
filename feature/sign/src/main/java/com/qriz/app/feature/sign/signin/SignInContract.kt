@@ -18,7 +18,7 @@ data class SignInUiState(
     val isAvailableLogin
         get() = id.isNotBlank()
                 && pw.isNotBlank()
-                && loginErrorMessageResId == R.string.empty
+                && loginErrorMessageResId != R.string.user_not_registered
 
     companion object {
         val Default = SignInUiState(
