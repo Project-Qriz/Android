@@ -1,9 +1,10 @@
 package com.qriz.app.core.data.user.user.repository
 
-import com.qriz.app.core.network.common.util.verifyResponseCode
-import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.data.user.user.mapper.toDataModel
-import com.qriz.app.core.network.common.const.SERVER_SUCCESS_CODE
+import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.model.flatMapSuspend
+import com.qriz.app.core.model.map
+import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.network.user.model.request.EmailAuthenticationRequest
 import com.qriz.app.core.network.user.model.request.FindIdRequest
 import com.qriz.app.core.network.user.model.request.FindPwdRequest
@@ -28,51 +29,57 @@ internal class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
     private val user = MutableStateFlow<User?>(null)
 
-    override suspend fun login(id: String, password: String): User {
+    override suspend fun login(id: String, password: String): ApiResult<User> {
         val response = userApi.login(
             LoginRequest(
                 username = id,
                 password = password
             )
-        )
-        val newUser = response.data.toDataModel()
-        user.update { newUser }
-        return newUser
+        ).flatMapSuspend {
+            val userResult = getUser()
+            if (userResult is ApiResult.Success) {
+                user.update { userResult.data }
+            }
+            userResult
+        }
+
+        return response
     }
 
     override fun getUserFlow(): Flow<User> {
         return user.asStateFlow().filterNotNull()
     }
 
-    override suspend fun getUser(): User {
-        return user.firstOrNull() ?: getUserProfileFromServer()
+    override suspend fun getUser(): ApiResult<User> {
+        val cached = user.firstOrNull()
+        return if (cached != null) {
+            ApiResult.Success(cached)
+        } else {
+            getUserProfileFromServer()
+        }
     }
 
-    private suspend fun getUserProfileFromServer(): User {
-        return userApi.getUserProfile().data.toDataModel()
-            .also { newUser -> user.update { newUser } }
+    private suspend fun getUserProfileFromServer(): ApiResult<User> {
+        return userApi.getUserProfile().map { it.toDataModel() }
     }
 
-    override suspend fun requestEmailAuthNumber(email: String) {
-        userApi.sendAuthEmail(SingleEmailRequest(email)).verifyResponseCode()
-    }
+    override suspend fun requestEmailAuthNumber(email: String): ApiResult<Unit> =
+        userApi.sendAuthEmail(SingleEmailRequest(email))
 
     override suspend fun verifyEmailAuthNumber(
         email: String,
         authenticationNumber: String,
-    ): Boolean {
-        val isSuccess = userApi.verifyEmailAuthenticationNumber(
+    ): ApiResult<Unit> {
+        return userApi.verifyEmailAuthenticationNumber(
             EmailAuthenticationRequest(
                 email = email,
                 authNum = authenticationNumber,
             )
         )
-
-        return isSuccess.code == SERVER_SUCCESS_CODE
     }
 
-    override suspend fun isNotDuplicateId(id: String): Boolean {
-        return userApi.checkDuplicateId(id).data.available
+    override suspend fun isNotDuplicateId(id: String): ApiResult<Boolean> {
+        return userApi.checkDuplicateId(id).map { it.available }
     }
 
     override suspend fun signUp(
@@ -80,24 +87,17 @@ internal class UserRepositoryImpl @Inject constructor(
         password: String,
         email: String,
         nickname: String,
-    ): User {
-        userApi.signUp(
+    ): ApiResult<User> {
+        return userApi.signUp(
             JoinRequest(
                 username = loginId,
                 password = password,
                 email = email,
                 nickname = nickname,
             )
-        )
-
-        val result = login(
-            id = loginId,
-            password = password
-        )
-
-        user.update { result }
-
-        return result
+        ).flatMapSuspend {
+            login(loginId, password)
+        }
     }
 
     override suspend fun sendEmailToFindId(email: String) {
@@ -105,7 +105,7 @@ internal class UserRepositoryImpl @Inject constructor(
             request = FindIdRequest(
                 email = email
             )
-        ).verifyResponseCode()
+        )
     }
 
     override suspend fun sendEmailToFindPassword(email: String) {
@@ -113,7 +113,7 @@ internal class UserRepositoryImpl @Inject constructor(
             request = FindPwdRequest(
                 email = email
             )
-        ).verifyResponseCode()
+        )
     }
 
     override suspend fun verifyPasswordAuthNumber(authNumber: String) {
@@ -121,7 +121,7 @@ internal class UserRepositoryImpl @Inject constructor(
             request = VerifyPwdResetRequest(
                 authNumber = authNumber
             )
-        ).verifyResponseCode()
+        )
     }
 
     override suspend fun resetPassword(password: String) {
@@ -129,6 +129,6 @@ internal class UserRepositoryImpl @Inject constructor(
             request = ResetPwdRequest(
                 password = password
             )
-        ).verifyResponseCode()
+        )
     }
 }

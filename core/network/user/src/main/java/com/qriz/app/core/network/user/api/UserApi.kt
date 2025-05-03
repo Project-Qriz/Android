@@ -1,5 +1,7 @@
 package com.qriz.app.core.network.user.api
 
+import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.network.common.EmptyResponse
 import com.qriz.app.core.network.common.NetworkResponse
 import com.qriz.app.core.network.user.model.request.EmailAuthenticationRequest
 import com.qriz.app.core.network.user.model.request.FindIdRequest
@@ -22,32 +24,31 @@ interface UserApi {
     @POST("/api/login")
     suspend fun login(
         @Body request: LoginRequest
-    ): NetworkResponse<LoginResponse>
+    ): ApiResult<LoginResponse>
 
-    //TODO : 서버 수정 대기 중
-    @GET("")
+    @GET("/api/v1/user/info")
     suspend fun getUserProfile(
-    ): NetworkResponse<UserProfileResponse>
+    ): ApiResult<UserProfileResponse>
 
     @POST("/api/email-send")
     suspend fun sendAuthEmail(
         @Body request: SingleEmailRequest
-    ): NetworkResponse<String>
+    ): ApiResult<Unit>
 
     @POST("/api/email-authentication")
     suspend fun verifyEmailAuthenticationNumber(
         @Body request: EmailAuthenticationRequest
-    ): NetworkResponse<Unit>
+    ): ApiResult<Unit>
 
     @GET("/api/username-duplicate")
     suspend fun checkDuplicateId(
         @Query("username") userId: String
-    ): NetworkResponse<DuplicateResponse>
+    ): ApiResult<DuplicateResponse>
 
     @POST("/api/join")
     suspend fun signUp(
         @Body request: JoinRequest
-    ): NetworkResponse<JoinResponse>
+    ): ApiResult<JoinResponse>
 
     @POST("/api/find-username")
     suspend fun sendEmailToFindId(
