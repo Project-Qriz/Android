@@ -298,7 +298,7 @@ open class SignUpViewModel @Inject constructor(
                             failureDialogState = SignUpUiState.FailureDialogState(
                                 title = NETWORK_IS_UNSTABLE,
                                 message = CHECK_NETWORK_AND_TRY_AGAIN,
-                                retryAction = SignUpUiAction.ClickVerifyAuthNum
+                                retryAction = SignUpUiAction.ClickIdDuplicateCheck
                             )
                         )
                     }
