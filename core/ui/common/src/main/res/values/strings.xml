@@ -12,5 +12,6 @@
     <string name="check_network_and_try_again">Wi-Fi나 셀룰러 데이터 연결 상태를\n확인하고 다시 시도해주세요.</string>
 
     <string name="retry">재시도</string>
+    <string name="confirm">확인</string>
 
 </resources>

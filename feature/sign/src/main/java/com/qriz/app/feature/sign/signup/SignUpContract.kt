@@ -10,7 +10,6 @@ import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.AUTH
 import com.qriz.app.feature.sign.signup.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
 import com.quiz.app.core.data.user.user_api.model.AUTH_NUMBER_MAX_LENGTH
 import com.quiz.app.core.data.user.user_api.model.EMAIL_REGEX
-import com.quiz.app.core.data.user.user_api.model.ID_REGEX
 import com.quiz.app.core.data.user.user_api.model.PW_MAX_LENGTH
 import com.quiz.app.core.data.user.user_api.model.PW_MIN_LENGTH
 import com.quiz.app.core.data.user.user_api.model.PW_REGEX
@@ -36,13 +35,17 @@ data class SignUpUiState(
     val emailAuthTime: Long,
     val isVisiblePassword: Boolean,
     val isVisiblePasswordCheck: Boolean,
+    val failureDialogState: FailureDialogState?
 ) : UiState {
-    val timerText: String =
-        "${(emailAuthTime / 60000)}:${(emailAuthTime % 60000 / 1000).toString().padStart(2, '0')}"
+    val timerText: String = "${(emailAuthTime / 60000)}:${
+        (emailAuthTime % 60000 / 1000).toString().padStart(
+            2,
+            '0'
+        )
+    }"
 
     val canSignUp: Boolean
-        get() = PW_REGEX.matches(pw)
-                && pw == pwCheck
+        get() = PW_REGEX.matches(pw) && pw == pwCheck
 
     val isValidEmail: Boolean
         get() = EMAIL_REGEX.matches(email)
@@ -63,8 +66,7 @@ data class SignUpUiState(
         get() = emailAuthNumber.length == AUTH_NUMBER_MAX_LENGTH
 
     val showAuthNumberLayout: Boolean
-        get() = emailAuthState != AuthenticationState.NONE &&
-                emailAuthState != AuthenticationState.SEND_FAILED
+        get() = emailAuthState != AuthenticationState.NONE && emailAuthState != AuthenticationState.SEND_FAILED
 
     val isPasswordValidFormat
         get() = PW_REGEX.matches(pw)
@@ -81,6 +83,9 @@ data class SignUpUiState(
     val isNotAvailableId
         get() = idValidationState == UserIdValidationState.NOT_AVAILABLE
 
+    val showFailureDialog
+        get() = failureDialogState != null
+
     enum class AuthenticationState {
         SEND_SUCCESS, SEND_FAILED, NONE, VERIFIED, REJECTED, TIME_EXPIRED;
     }
@@ -94,10 +99,7 @@ data class SignUpUiState(
     }
 
     enum class SignUpPage(val index: Int) {
-        AUTH(0),
-        NAME(1),
-        ID(2),
-        PW(3);
+        AUTH(0), NAME(1), ID(2), PW(3);
 
         val next
             get() = entries[index + 1]
@@ -105,6 +107,14 @@ data class SignUpUiState(
             get() = entries[index - 1]
         val percent
             get() = (index + 1).toFloat() / entries.size.toFloat()
+    }
+
+    data class FailureDialogState(
+        val title: String,
+        val message: String,
+        val retryAction: SignUpUiAction? = null,
+    ) {
+        val shouldRetry: Boolean = retryAction != null
     }
 
     companion object {
@@ -127,6 +137,7 @@ data class SignUpUiState(
             page = AUTH,
             emailAuthTime = AUTHENTICATION_LIMIT_MILS,
             focusState = FocusState.NONE,
+            failureDialogState = null,
         )
     }
 }
@@ -146,6 +157,7 @@ sealed interface SignUpUiAction : UiAction {
     data object ClickSignUp : SignUpUiAction
     data object ClickVerifyAuthNum : SignUpUiAction
     data object StartEmailAuthTimer : SignUpUiAction
+    data object DismissFailureDialog : SignUpUiAction
     data class ChangePasswordVisibility(val isVisible: Boolean) : SignUpUiAction
     data class ChangePasswordCheckVisibility(val isVisible: Boolean) : SignUpUiAction
 }
@@ -154,7 +166,6 @@ sealed interface SignUpUiEffect : UiEffect {
     data object SignUpUiComplete : SignUpUiEffect
     data object MoveToBack : SignUpUiEffect
     data class ShowSnackBer(
-        @StringRes val defaultResId: Int,
-        val message: String? = null
+        @StringRes val defaultResId: Int, val message: String? = null
     ) : SignUpUiEffect
 }
