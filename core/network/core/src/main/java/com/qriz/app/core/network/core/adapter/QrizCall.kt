@@ -74,7 +74,7 @@ class QrizCall<T>(
                     }
                 } else {
                     val errorBody = errorBody()?.string()
-                    if (code() == 400 && errorBody != null) {
+                    if (errorBody != null) {
                         val errorResponse =
                             json.decodeFromString<InternalFailureResponse>(errorBody)
                         ApiResult.Failure(
