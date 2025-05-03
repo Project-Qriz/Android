@@ -22,12 +22,8 @@ class TokenRepositoryImpl @Inject constructor(
         .map { token -> token.ifEmpty { null } }
         .first()
 
-    override suspend fun getRefreshToken(): String? = tokenDataStore.flowRefreshToken()
-        .map { token -> token.ifEmpty { null } }
-        .first()
-
-    override suspend fun saveToken(accessToken: String, refreshToken: String) {
-        tokenDataStore.saveToken(accessToken = accessToken, refreshToken = refreshToken)
+    override suspend fun saveToken(accessToken: String) {
+        tokenDataStore.saveToken(accessToken = accessToken)
     }
 
     override suspend fun clearToken() {
