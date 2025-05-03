@@ -1,6 +1,7 @@
 package signin
 
 import app.cash.turbine.test
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signin.SignInUiAction
@@ -15,6 +16,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 class SignInViewModelTest {
     @get:Rule
@@ -83,7 +85,7 @@ class SignInViewModelTest {
             process(SignInUiAction.ChangeUserId(userId))
             process(SignInUiAction.ChangeUserPw(userPw))
 
-            coEvery { fakeUserRepository.login(userId, userPw) } returns User.Default
+            coEvery { fakeUserRepository.login(userId, userPw) } returns ApiResult.Success(User.Default)
             // when
             process(SignInUiAction.ClickLogin)
             // then
@@ -93,18 +95,62 @@ class SignInViewModelTest {
     }
 
     @Test
-    fun `Action_ClickLogin process 실패 - loginErrorMessageResId 업데이트`() = runTest {
+    fun `Action_ClickLogin process Failure - loginErrorMessageResId 업데이트`() = runTest {
         with(signInViewModel()) {
             // given
             val userId = "test123"
             val userPw = "tasfasfasf"
-            coEvery { fakeUserRepository.login(userId, userPw) } throws Exception()
+            process(SignInUiAction.ChangeUserId(userId))
+            process(SignInUiAction.ChangeUserPw(userPw))
+            coEvery { fakeUserRepository.login(userId, userPw) } returns ApiResult.Failure(code = -1, message = "일치하는 회원 정보가 없습니다")
             // when
             process(SignInUiAction.ClickLogin)
             // then
             uiState.test {
                 with(awaitItem()) {
                     loginErrorMessageResId shouldBe R.string.user_not_registered
+                    isLoading shouldBe false
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickLogin process NetworkError - loginErrorMessageResId 업데이트`() = runTest {
+        with(signInViewModel()) {
+            // given
+            val userId = "test123"
+            val userPw = "tasfasfasf"
+            process(SignInUiAction.ChangeUserId(userId))
+            process(SignInUiAction.ChangeUserPw(userPw))
+            coEvery { fakeUserRepository.login(userId, userPw) } returns ApiResult.NetworkError(IOException())
+            // when
+            process(SignInUiAction.ClickLogin)
+            // then
+            uiState.test {
+                with(awaitItem()) {
+                    loginErrorMessageResId shouldBe com.qriz.app.core.ui.common.R.string.check_network_and_try_again
+                    isLoading shouldBe false
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickLogin process UnknownError - loginErrorMessageResId 업데이트`() = runTest {
+        with(signInViewModel()) {
+            // given
+            val userId = "test123"
+            val userPw = "tasfasfasf"
+            process(SignInUiAction.ChangeUserId(userId))
+            process(SignInUiAction.ChangeUserPw(userPw))
+            coEvery { fakeUserRepository.login(userId, userPw) } returns ApiResult.UnknownError(throwable = null)
+            // when
+            process(SignInUiAction.ClickLogin)
+            // then
+            uiState.test {
+                with(awaitItem()) {
+                    loginErrorMessageResId shouldBe com.qriz.app.core.ui.common.R.string.unknown_error_occurs
                     isLoading shouldBe false
                 }
             }

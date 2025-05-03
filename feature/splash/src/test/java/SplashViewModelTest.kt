@@ -1,4 +1,5 @@
 import app.cash.turbine.test
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.feature.splash.SplashUiAction
 import com.qriz.app.feature.splash.SplashUiEffect
@@ -45,8 +46,10 @@ class SplashViewModelTest {
         with(splashViewModel()) {
             // given
             coEvery { fakeTokenRepository.isTokenExist() } returns true
-            coEvery { fakeUserRepository.getUser() } returns User.Default.copy(
-                previewTestStatus = NOT_STARTED
+            coEvery { fakeUserRepository.getUser() } returns ApiResult.Success(
+                User.Default.copy(
+                    previewTestStatus = NOT_STARTED
+                )
             )
             // when
             process(SplashUiAction.StartLogin)
@@ -62,8 +65,10 @@ class SplashViewModelTest {
             with(splashViewModel()) {
                 // given
                 coEvery { fakeTokenRepository.isTokenExist() } returns true
-                coEvery { fakeUserRepository.getUser() } returns User.Default.copy(
-                    previewTestStatus = previewTestStatus
+                coEvery { fakeUserRepository.getUser() } returns ApiResult.Success(
+                    User.Default.copy(
+                        previewTestStatus = previewTestStatus
+                    )
                 )
                 // when
                 process(SplashUiAction.StartLogin)
@@ -78,7 +83,7 @@ class SplashViewModelTest {
         with(splashViewModel()) {
             // given
             coEvery { fakeTokenRepository.isTokenExist() } returns true
-            coEvery { fakeUserRepository.getUser() } throws Exception()
+            coEvery { fakeUserRepository.getUser() } returns ApiResult.Failure(code = -1, message = "존재하지 않는 유저입니다.")
             // when
             process(SplashUiAction.StartLogin)
             // then
