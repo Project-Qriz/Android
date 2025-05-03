@@ -18,3 +18,12 @@ inline fun <T, R> ApiResult<T>.map(transform: (T) -> R): ApiResult<R> = when (th
     is ApiResult.NetworkError -> this
     is ApiResult.UnknownError -> this
 }
+
+suspend inline fun <T, R> ApiResult<T>.flatMapSuspend(
+    crossinline transform: suspend (T) -> ApiResult<R>
+): ApiResult<R> = when (this) {
+    is ApiResult.Success -> transform(data)
+    is ApiResult.Failure -> this
+    is ApiResult.NetworkError -> this
+    is ApiResult.UnknownError -> this
+}
