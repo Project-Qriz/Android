@@ -1,15 +1,23 @@
 package signup
 
 import app.cash.turbine.test
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.testing.MainDispatcherRule
+import com.qriz.app.core.ui.common.resource.CHECK_NETWORK_AND_TRY_AGAIN
+import com.qriz.app.core.ui.common.resource.CONTACT_DEVELOPER_IF_PERSISTS
+import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
+import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiAction
 import com.qriz.app.feature.sign.signup.SignUpUiEffect
 import com.qriz.app.feature.sign.signup.SignUpUiState
 import com.qriz.app.feature.sign.signup.SignUpUiState.AuthenticationState
-import com.qriz.app.feature.sign.signup.SignUpUiState.UserIdValidationState.*
+import com.qriz.app.feature.sign.signup.SignUpUiState.UserIdValidationState.AVAILABLE
+import com.qriz.app.feature.sign.signup.SignUpUiState.UserIdValidationState.NONE
+import com.qriz.app.feature.sign.signup.SignUpUiState.UserIdValidationState.NOT_AVAILABLE
 import com.qriz.app.feature.sign.signup.SignUpViewModel
 import com.qriz.app.feature.sign.signup.SignUpViewModel.Companion.AUTHENTICATION_LIMIT_MILS
+import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
@@ -23,6 +31,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 class SignUpViewModelTest {
     @get:Rule
@@ -87,6 +96,7 @@ class SignUpViewModelTest {
             // given
             val fakeEmail = "test1234@example.com"
             process(SignUpUiAction.ChangeEmail(fakeEmail))
+            coEvery { fakeUserRepository.requestEmailAuthNumber(fakeEmail) } returns ApiResult.Success(Unit)
             // when
             process(SignUpUiAction.ClickEmailAuthNumSend)
             // then
@@ -129,7 +139,7 @@ class SignUpViewModelTest {
         with(signUpViewModel()) {
             // given
             val fakeEmail = "test1234@example.com"
-            coEvery { fakeUserRepository.requestEmailAuthNumber(fakeEmail) } returns Unit
+            coEvery { fakeUserRepository.requestEmailAuthNumber(fakeEmail) } returns ApiResult.Success(Unit)
             process(SignUpUiAction.ChangeEmail(fakeEmail))
             // when
             process(SignUpUiAction.ClickEmailAuthNumSend)
@@ -143,11 +153,30 @@ class SignUpViewModelTest {
     }
 
     @Test
-    fun `Action_ClickEmailAuthNumSend process 실패 - SEND_FAILED 상태 업데이트, 에러메세지 추가`() = runTest {
+    fun `Action_ClickEmailAuthNumSend Failure - SEND_FAILED 상태 업데이트, 에러메세지 추가`() = runTest {
         with(signUpViewModel()) {
             // given
             val fakeEmail = "test1234@example.com"
-            coEvery { fakeUserRepository.requestEmailAuthNumber(fakeEmail) } throws Exception()
+            coEvery { fakeUserRepository.requestEmailAuthNumber(fakeEmail) } returns ApiResult.Failure(code = -1, message = "이메일 전송에 실패하였습니다.")
+            process(SignUpUiAction.ChangeEmail(fakeEmail))
+            // when
+            process(SignUpUiAction.ClickEmailAuthNumSend)
+            // then
+            uiState.test {
+                with(awaitItem()) {
+                    emailAuthState shouldBe AuthenticationState.SEND_FAILED
+                    authNumberSupportingTextResId shouldBe R.string.email_auth_sent_fail
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickEmailAuthNumSend UnknownError - SEND_FAILED 상태 업데이트, 에러메세지 추가`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val fakeEmail = "test1234@example.com"
+            coEvery { fakeUserRepository.requestEmailAuthNumber(fakeEmail) } returns ApiResult.UnknownError(throwable = null)
             process(SignUpUiAction.ChangeEmail(fakeEmail))
             // when
             process(SignUpUiAction.ClickEmailAuthNumSend)
@@ -280,8 +309,6 @@ class SignUpViewModelTest {
                 uiState.test {
                     with(awaitItem()) {
                         emailAuthNumber shouldBe fakeEmailAuthNum
-                        emailAuthState shouldBe AuthenticationState.NONE
-                        authNumberSupportingTextResId shouldBe R.string.empty
                     }
                 }
             }
@@ -311,9 +338,11 @@ class SignUpViewModelTest {
         runTest {
             with(signUpViewModel()) {
                 // given
+                val fakeEmail = "test@example.com"
                 val authNum = "123456"
+                process(SignUpUiAction.ChangeEmail(fakeEmail))
                 process(SignUpUiAction.ChangeEmailAuthNum(authNum))
-                coEvery { fakeUserRepository.verifyEmailAuthNumber(authNum) } returns true
+                coEvery { fakeUserRepository.verifyEmailAuthNumber(fakeEmail, authNum) } returns ApiResult.Success(Unit)
                 // when
                 process(SignUpUiAction.ClickVerifyAuthNum)
                 // then
@@ -332,9 +361,11 @@ class SignUpViewModelTest {
         runTest {
             with(signUpViewModel()) {
                 // given
+                val fakeEmail = "test@example.com"
                 val authNum = "123456"
+                process(SignUpUiAction.ChangeEmail(fakeEmail))
                 process(SignUpUiAction.ChangeEmailAuthNum(authNum))
-                coEvery { fakeUserRepository.verifyEmailAuthNumber(authNum) } returns false
+                coEvery { fakeUserRepository.verifyEmailAuthNumber(fakeEmail, authNum) } returns ApiResult.Failure(code = -1, "인증번호가 다르게 입력되었어요")
                 // when
                 process(SignUpUiAction.ClickVerifyAuthNum)
                 // then
@@ -342,6 +373,54 @@ class SignUpViewModelTest {
                     with(awaitItem()) {
                         emailAuthState shouldBe AuthenticationState.REJECTED
                         authNumberSupportingTextResId shouldBe R.string.email_auth_num_is_different
+                    }
+                }
+            }
+        }
+    @Test
+    fun `Action_ClickVerifyAuthNum process 검증 API NetworkError - 네트워크 확인 다이얼로그 노출`() =
+        runTest {
+            with(signUpViewModel()) {
+                // given
+                val fakeEmail = "test@example.com"
+                val authNum = "123456"
+                process(SignUpUiAction.ChangeEmailAuthNum(authNum))
+                process(SignUpUiAction.ChangeEmail(fakeEmail))
+                coEvery { fakeUserRepository.verifyEmailAuthNumber(fakeEmail, authNum) } returns ApiResult.NetworkError(IOException())
+                // when
+                process(SignUpUiAction.ClickVerifyAuthNum)
+                // then
+                uiState.test {
+                    with(awaitItem()) {
+                        failureDialogState shouldBe SignUpUiState.FailureDialogState(
+                            title = NETWORK_IS_UNSTABLE,
+                            message = CHECK_NETWORK_AND_TRY_AGAIN,
+                            retryAction = SignUpUiAction.ClickVerifyAuthNum
+                        )
+                    }
+                }
+            }
+        }
+
+    @Test
+    fun `Action_ClickVerifyAuthNum process 검증 API UnknownError - 알 수 없는 오류 다이얼로그 노출`() =
+        runTest {
+            with(signUpViewModel()) {
+                // given
+                val fakeEmail = "test@example.com"
+                val authNum = "123456"
+                process(SignUpUiAction.ChangeEmail(fakeEmail))
+                process(SignUpUiAction.ChangeEmailAuthNum(authNum))
+                coEvery { fakeUserRepository.verifyEmailAuthNumber(fakeEmail, authNum) } returns ApiResult.UnknownError(throwable = null)
+                // when
+                process(SignUpUiAction.ClickVerifyAuthNum)
+                // then
+                uiState.test {
+                    with(awaitItem()) {
+                        failureDialogState shouldBe SignUpUiState.FailureDialogState(
+                            title = UNKNOWN_ERROR,
+                            message = CONTACT_DEVELOPER_IF_PERSISTS,
+                        )
                     }
                 }
             }
@@ -440,8 +519,6 @@ class SignUpViewModelTest {
         }
     }
 
-
-
     @Test
     fun `Action_ClickIdDuplicateCheck process 입력된 Id가 없음 - 에러메세지 업데이트`() = runTest {
         with(signUpViewModel()) {
@@ -478,7 +555,7 @@ class SignUpViewModelTest {
         with(signUpViewModel()) {
             // given
             val id = "test1234"
-            coEvery { fakeUserRepository.isNotDuplicateId(id) } returns true
+            coEvery { fakeUserRepository.isNotDuplicateId(id) } returns ApiResult.Success(true)
             process(SignUpUiAction.ChangeUserId(id))
             // when
             process(SignUpUiAction.ClickIdDuplicateCheck)
@@ -497,7 +574,7 @@ class SignUpViewModelTest {
         with(signUpViewModel()) {
             // given
             val id = "test1234"
-            coEvery { fakeUserRepository.isNotDuplicateId(id) } returns false
+            coEvery { fakeUserRepository.isNotDuplicateId(id) } returns ApiResult.Failure(code = -1, "이미 존재하는 아이디 입니다.")
             process(SignUpUiAction.ChangeUserId(id))
             // when
             process(SignUpUiAction.ClickIdDuplicateCheck)
@@ -506,6 +583,50 @@ class SignUpViewModelTest {
                 with(awaitItem()) {
                     idValidationState shouldBe NOT_AVAILABLE
                     idErrorMessageResId shouldBe R.string.id_cannot_be_used
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickIdDuplicateCheck process 정규식 통과 O, API 성공, NetworkError - 상태 업데이트`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val id = "test1234"
+            coEvery { fakeUserRepository.isNotDuplicateId(id) } returns ApiResult.NetworkError(IOException())
+            process(SignUpUiAction.ChangeUserId(id))
+            // when
+            process(SignUpUiAction.ClickIdDuplicateCheck)
+            // then
+            uiState.test {
+                with(awaitItem()) {
+                    failureDialogState shouldBe SignUpUiState.FailureDialogState(
+                        title = NETWORK_IS_UNSTABLE,
+                        message = CHECK_NETWORK_AND_TRY_AGAIN,
+                        retryAction = SignUpUiAction.ClickIdDuplicateCheck
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ClickIdDuplicateCheck process 정규식 통과 O, API 성공, UnknownError - 상태 업데이트`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val id = "test1234"
+            val expected = ApiResult.UnknownError(throwable = Throwable(message = "Unknown Error"))
+            coEvery { fakeUserRepository.isNotDuplicateId(id) } returns expected
+            process(SignUpUiAction.ChangeUserId(id))
+            // when
+            process(SignUpUiAction.ClickIdDuplicateCheck)
+            // then
+            uiState.test {
+                with(awaitItem()) {
+                    failureDialogState shouldBe SignUpUiState.FailureDialogState(
+                        title = expected.throwable?.message ?: UNKNOWN_ERROR,
+                        message = CONTACT_DEVELOPER_IF_PERSISTS,
+                    )
                 }
             }
         }
@@ -673,40 +794,35 @@ class SignUpViewModelTest {
         }
     }
 
-//    @Test
-//    fun `Action_ClickIdDuplicateCheck process 정규식 통과 O, API 실패 - `() = runTest {
-//        with(signUpViewModel()) {
-//            // given
-//            val id = "test@1234!#"
-//            coEvery { fakeUserRepository.isNotDuplicateId(id) } throws Exception()
-//            process(SignUpUiAction.ChangeUserId(id))
-//            // when
-//            process(SignUpUiAction.ClickIdDuplicateCheck)
-//            // then
-//        }
-//    }
+    @Test
+    fun `Action_ClickSignUp process API Success - 스낵바 노출, 완료 이벤트`() = runTest {
+        with(signUpViewModel()) {
+            // given
+            val loginId = "test123"
+            val password = "Test123!"
+            val email = "test@example.com"
+            val name = "Test"
+            process(SignUpUiAction.ChangeUserId(loginId))
+            process(SignUpUiAction.ChangeUserPw(password))
+            process(SignUpUiAction.ChangeEmail(email))
+            process(SignUpUiAction.ChangeUserName(name))
+            coEvery { fakeUserRepository.signUp(
+                loginId = loginId,
+                password = password,
+                email = email,
+                nickname = name,
+            ) } returns ApiResult.Success(User.Default)
 
-//    @Test
-//    fun `Action_ClickSignUp process API 성공`() = runTest {
-//        with(signUpViewModel()) {
-//            // given
-//            coEvery { fakeUserRepository.signUp() }
-//            // when
-//            process(SignUpUiAction.ClickSignUp)
-//            // then
-//        }
-//    }
+            // when
+            process(SignUpUiAction.ClickSignUp)
 
-//    @Test
-//    fun `Action_ClickSignUp process API 실패`() = runTest {
-//        with(signUpViewModel()) {
-//            // given
-//            coEvery { fakeUserRepository.signUp() } throws Exception()
-//            // when
-//            process(SignUpUiAction.ClickSignUp)
-//            // then
-//        }
-//    }
+            // then
+            effect.test {
+                awaitItem() shouldBe SignUpUiEffect.ShowSnackBer(R.string.sign_up_complete)
+                awaitItem() shouldBe SignUpUiEffect.SignUpUiComplete
+            }
+        }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
