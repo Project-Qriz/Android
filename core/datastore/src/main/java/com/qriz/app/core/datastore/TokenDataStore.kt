@@ -28,31 +28,21 @@ class TokenDataStore @Inject constructor(
                 saved?.let { cryptographyUtil.decrypt(it) } ?: ""
             }
 
-    fun flowRefreshToken(): Flow<String> =
-        dataStore.data.catch { emit(emptyPreferences()) }.map { preferences ->
-                val saved = preferences[REFRESH_TOKEN_KEY]
-                saved?.let { cryptographyUtil.decrypt(it) } ?: ""
-            }
-
-    suspend fun saveToken(accessToken: String, refreshToken: String) {
+    suspend fun saveToken(accessToken: String) {
         val encryptedAccessToken = cryptographyUtil.encrypt(accessToken)
-        val encryptedRefreshToken = cryptographyUtil.encrypt(refreshToken)
 
         dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN_KEY] = encryptedAccessToken
-            preferences[REFRESH_TOKEN_KEY] = encryptedRefreshToken
         }
     }
 
     suspend fun clearToken() {
         dataStore.edit { preferences ->
             preferences.remove(ACCESS_TOKEN_KEY)
-            preferences.remove(REFRESH_TOKEN_KEY)
         }
     }
 
     companion object {
-        private val REFRESH_TOKEN_KEY = stringPreferencesKey("refreshToken")
         private val ACCESS_TOKEN_KEY = stringPreferencesKey("accessToken")
 
         private const val TOKEN_DATA_STORE_NAME = "token_store"

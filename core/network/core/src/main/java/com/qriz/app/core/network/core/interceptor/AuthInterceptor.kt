@@ -1,7 +1,6 @@
 package com.qriz.app.core.network.core.interceptor
 
 import com.qriz.app.core.network.core.const.ACCESS_TOKEN_HEADER_KEY
-import com.qriz.app.core.network.core.const.REFRESH_TOKEN_HEADER_KEY
 import com.qriz.core.data.token.token_api.TokenRepository
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -16,21 +15,24 @@ class AuthInterceptor @Inject constructor(
 
         val newRequest = chain.request().newBuilder().apply {
             if (accessToken != null) {
-                header(ACCESS_TOKEN_HEADER_KEY, accessToken)
+                header(ACCESS_TOKEN_HEADER_KEY, "$TOKEN_PREFIX$accessToken")
             }
         }.build()
 
         val response = chain.proceed(newRequest)
-
         val newAccessToken = response.header(ACCESS_TOKEN_HEADER_KEY)
-        val newRefreshToken = response.header(REFRESH_TOKEN_HEADER_KEY)
 
-        if (newAccessToken != null && newRefreshToken != null) {
+        if (newAccessToken != null) {
             runBlocking {
-                tokenRepository.saveToken(newAccessToken, newRefreshToken)
+                val value = newAccessToken.removePrefix(TOKEN_PREFIX)
+                tokenRepository.saveToken(value)
             }
         }
 
         return response
+    }
+
+    companion object {
+        const val TOKEN_PREFIX = "Bearer "
     }
 }

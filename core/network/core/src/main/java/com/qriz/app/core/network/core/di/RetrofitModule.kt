@@ -4,7 +4,6 @@ import com.qriz.app.core.network.core.BuildConfig
 import com.qriz.app.core.network.core.adapter.QrizCallAdapterFactory
 import com.qriz.app.core.network.core.interceptor.AuthInterceptor
 import com.qriz.app.core.network.core.interceptor.ResponseConvertInterceptor
-import com.qriz.app.core.network.core.interceptor.TokenAuthenticator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,7 +38,6 @@ object RetrofitModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        authenticator: TokenAuthenticator,
         authInterceptor: AuthInterceptor,
         responseConvertInterceptor: ResponseConvertInterceptor,
     ): OkHttpClient {
@@ -49,7 +47,6 @@ object RetrofitModule {
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
         builder.addInterceptor(logging)
         builder.addInterceptor(authInterceptor)
-        builder.authenticator(authenticator)
         builder.addInterceptor(responseConvertInterceptor)
         return builder.build()
     }
