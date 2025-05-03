@@ -9,7 +9,9 @@ android {
 }
 
 dependencies {
+    api(projects.core.model)
     api(projects.core.network.common)
+
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.retrofit)
 }
