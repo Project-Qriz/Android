@@ -41,7 +41,6 @@ import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiState
 import com.quiz.app.core.data.user.user_api.model.AUTH_NUMBER_MAX_LENGTH
-import com.quiz.app.core.data.user.user_api.model.ID_MAX_LENGTH
 
 @Composable
 fun SignUpAuthPage(
@@ -117,7 +116,6 @@ fun SignUpAuthPage(
                 containerColor = White,
                 singleLine = true,
                 hint = stringResource(R.string.email_sample_hint),
-                maxLength = ID_MAX_LENGTH,
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(emailFocusRequester)
@@ -125,7 +123,7 @@ fun SignUpAuthPage(
                         if (it.isFocused) onChangeFocus(SignUpUiState.FocusState.EMAIL)
                     },
                 contentPadding = PaddingValues(
-                    horizontal = 16.dp,
+                    horizontal = 10.dp,
                     vertical = 14.dp,
                 ),
                 trailing = {

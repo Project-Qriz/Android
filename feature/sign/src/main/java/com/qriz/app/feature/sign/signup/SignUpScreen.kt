@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.designsystem.component.NavigationType
+import com.qriz.app.core.designsystem.component.QrizDialog
 import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
@@ -24,14 +25,15 @@ import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage
+import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.AUTH
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.ID
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.NAME
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.PW
-import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage.AUTH
 import com.qriz.app.feature.sign.signup.component.SignUpAuthPage
 import com.qriz.app.feature.sign.signup.component.SignUpIdPage
 import com.qriz.app.feature.sign.signup.component.SignUpNamePage
 import com.qriz.app.feature.sign.signup.component.SignUpPasswordPage
+import com.qriz.app.core.ui.common.R as UCR
 
 @Composable
 fun SignUpScreen(
@@ -44,16 +46,28 @@ fun SignUpScreen(
     val context = LocalContext.current
     viewModel.collectSideEffect {
         when (it) {
-            SignUpUiEffect.SignUpUiComplete -> moveToConceptCheckGuide()
-            is SignUpUiEffect.ShowSnackBer -> onShowSnackbar(
-                it.message ?: context.getString(it.defaultResId)
-            )
+            is SignUpUiEffect.SignUpUiComplete -> moveToConceptCheckGuide()
+            is SignUpUiEffect.ShowSnackBer -> onShowSnackbar(it.message ?: context.getString(it.defaultResId))
             is SignUpUiEffect.MoveToBack -> onBack()
         }
     }
 
     BackHandler {
         viewModel.process(SignUpUiAction.ClickPreviousPage)
+    }
+
+    state.failureDialogState?.let {
+        QrizDialog(
+            title = it.title,
+            description = it.message,
+            confirmText = stringResource(if (it.shouldRetry) UCR.string.retry else UCR.string.confirm),
+            onConfirmClick = {
+                viewModel.process(SignUpUiAction.DismissFailureDialog)
+                if (it.shouldRetry) {
+                    viewModel.process(it.retryAction!!)
+                }
+            }
+        )
     }
 
     SignUpContent(

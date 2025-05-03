@@ -25,6 +25,7 @@
     <string name="pw_warning">영문, 숫자, 특수 문자를 조합하여 8~16자로 입력해 주세요.</string>
     <string name="password_is_incorrect">비밀번호가 일치하지 않습니다.</string>
     <string name="id_duplication_check_failed">아이디 중복검사를 실패했습니다.</string>
+    <string name="sign_up_complete">회원가입을 완료했습니다.\n사전 체크를 시작해주세요!</string>
 
 
     <!--FindIdViewModel-->
