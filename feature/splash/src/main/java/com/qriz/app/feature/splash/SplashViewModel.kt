@@ -1,6 +1,7 @@
 package com.qriz.app.feature.splash
 
 import androidx.lifecycle.viewModelScope
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.core.data.token.token_api.TokenRepository
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
@@ -30,18 +31,20 @@ class SplashViewModel @Inject constructor(
     }
 
     private fun loadClientProfile() = viewModelScope.launch {
-        runCatching { userRepository.getUser() }
-            .onSuccess { client ->
-                if (client.isSurveyNeeded) {
+        when(val result = userRepository.getUser()) {
+            is ApiResult.Success -> {
+                if (result.data.isSurveyNeeded) {
                     sendEffect(SplashUiEffect.MoveToSurvey)
                     return@launch
                 }
                 sendEffect(SplashUiEffect.MoveToMain())
             }
-            .onFailure {
+            is ApiResult.Failure,
+            is ApiResult.NetworkError,
+            is ApiResult.UnknownError -> {
                 sendEffect(SplashUiEffect.MoveToLogin)
-                //clearAllData() //TODO : ClearAllDataUseCase 호출
             }
+        }
     }
 
     private suspend fun isTokenExist(): Boolean {
