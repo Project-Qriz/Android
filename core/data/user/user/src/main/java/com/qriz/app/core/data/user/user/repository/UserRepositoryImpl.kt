@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-//TODO : getUserProfile 함수 서버 수정 대기
 internal class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
 ) : UserRepository {
@@ -100,32 +99,32 @@ internal class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun sendEmailToFindId(email: String) {
-        userApi.sendEmailToFindId(
+    override suspend fun sendEmailToFindId(email: String): ApiResult<Unit> {
+        return userApi.sendEmailToFindId(
             request = FindIdRequest(
                 email = email
             )
         )
     }
 
-    override suspend fun sendEmailToFindPassword(email: String) {
-        userApi.sendEmailToPwd(
+    override suspend fun sendEmailToFindPassword(email: String): ApiResult<Unit> {
+        return userApi.sendEmailToPwd(
             request = FindPwdRequest(
                 email = email
             )
         )
     }
 
-    override suspend fun verifyPasswordAuthNumber(authNumber: String) {
-        userApi.verifyPwdReset(
+    override suspend fun verifyPasswordAuthNumber(authNumber: String): ApiResult<Unit> {
+        return userApi.verifyPwdReset(
             request = VerifyPwdResetRequest(
                 authNumber = authNumber
             )
         )
     }
 
-    override suspend fun resetPassword(password: String) {
-        userApi.resetPwd(
+    override suspend fun resetPassword(password: String): ApiResult<Unit> {
+        return userApi.resetPwd(
             request = ResetPwdRequest(
                 password = password
             )
