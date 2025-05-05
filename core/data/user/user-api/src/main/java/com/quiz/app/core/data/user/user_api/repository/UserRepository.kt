@@ -27,11 +27,11 @@ interface UserRepository {
         nickname: String,
     ): ApiResult<User>
 
-    suspend fun sendEmailToFindId(email: String)
+    suspend fun sendEmailToFindId(email: String): ApiResult<Unit>
 
-    suspend fun sendEmailToFindPassword(email: String)
+    suspend fun sendEmailToFindPassword(email: String): ApiResult<Unit>
 
-    suspend fun verifyPasswordAuthNumber(authNumber: String)
+    suspend fun verifyPasswordAuthNumber(authNumber: String): ApiResult<Unit>
 
-    suspend fun resetPassword(password: String)
+    suspend fun resetPassword(password: String): ApiResult<Unit>
 }

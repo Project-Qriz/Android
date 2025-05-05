@@ -53,20 +53,20 @@ interface UserApi {
     @POST("/api/find-username")
     suspend fun sendEmailToFindId(
         @Body request: FindIdRequest
-    ): NetworkResponse<Unit>
+    ): ApiResult<Unit>
 
     @POST("/api/find-pwd")
     suspend fun sendEmailToPwd(
         @Body request: FindPwdRequest
-    ): NetworkResponse<Unit>
+    ): ApiResult<Unit>
 
     @POST("/api/verify-pwd-reset")
     suspend fun verifyPwdReset(
         @Body request: VerifyPwdResetRequest
-    ): NetworkResponse<Unit>
+    ): ApiResult<Unit>
 
     @POST("/api/pwd-reset")
     suspend fun resetPwd(
         @Body request: ResetPwdRequest
-    ): NetworkResponse<Unit>
+    ): ApiResult<Unit>
 }
