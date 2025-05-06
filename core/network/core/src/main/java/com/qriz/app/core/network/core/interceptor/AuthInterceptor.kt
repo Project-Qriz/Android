@@ -29,6 +29,11 @@ class AuthInterceptor @Inject constructor(
             }
         }
 
+        //AccessToken이 있지만 서버에서 갱신이 안되었을 경우 토큰 삭제
+        if (accessToken != null && response.code == 401) {
+            runBlocking { tokenRepository.clearToken() }
+        }
+
         return response
     }
 
