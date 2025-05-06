@@ -1,6 +1,8 @@
 package com.qriz.app.feature.sign.findId
 
 import androidx.lifecycle.viewModelScope
+import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.sign.R
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
@@ -57,34 +59,36 @@ class FindIdViewModel @Inject constructor(
             return@launch
         }
 
-        runCatching {
-            userRepository.sendEmailToFindId(email)
-        }.onSuccess {
-            updateState {
-                copy(
-                    errorMessageResId = R.string.empty,
-                    isVisibleSuccessDialog = true,
-                )
-            }
-        }.onFailure { exception ->
-            when (exception) {
-                is UnknownHostException,
-                is SocketTimeoutException -> {
-                    updateState {
-                        copy(
-                            errorMessageResId = R.string.empty,
-                            isVisibleNetworkErrorDialog = true,
-                        )
-                    }
+        when(val result = userRepository.sendEmailToFindId(email)) {
+            is ApiResult.Success -> {
+                updateState {
+                    copy(
+                        errorMessageResId = R.string.empty,
+                        isVisibleSuccessDialog = true,
+                    )
                 }
+            }
 
-                else -> {
-                    updateState {
-                        copy(
-                            errorMessageResId = R.string.empty,
-                            errorDialogMessage = exception.message ?: "",
-                        )
-                    }
+            is ApiResult.Failure -> {
+                updateState {
+                    copy(errorMessageResId = R.string.email_is_not_exist)
+                }
+            }
+
+            is ApiResult.NetworkError -> {
+                updateState {
+                    copy(
+                        errorMessageResId = R.string.empty,
+                        isVisibleNetworkErrorDialog = true,
+                    )
+                }
+            }
+            is ApiResult.UnknownError -> {
+                updateState {
+                    copy(
+                        errorMessageResId = R.string.empty,
+                        errorDialogMessage = result.throwable?.message ?: UNKNOWN_ERROR,
+                    )
                 }
             }
         }
