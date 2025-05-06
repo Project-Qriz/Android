@@ -1,7 +1,9 @@
 package findId
 
 import app.cash.turbine.test
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.testing.MainDispatcherRule
+import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.findId.FindIdUiAction
 import com.qriz.app.feature.sign.findId.FindIdUiState
@@ -14,6 +16,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 import java.net.UnknownHostException
 
 class FindIdViewModelTest {
@@ -63,11 +66,11 @@ class FindIdViewModelTest {
     }
 
     @Test
-    fun `Action_SendEmailToFind - 이메일 전송 성공 시 다이얼로그 띄움`() = runTest {
+    fun `Action_SendEmailToFind Success - 이메일 전송 성공 시 다이얼로그 띄움`() = runTest {
         with(findIdViewModel()) {
             //given
             val input = "test@gmail.com"
-            coEvery { mockUserRepository.sendEmailToFindId(input) } returns Unit
+            coEvery { mockUserRepository.sendEmailToFindId(input) } returns ApiResult.Success(Unit)
             val expectedUiState = FindIdUiState.DEFAULT.copy(
                 email = input,
                 errorMessageResId = R.string.empty,
@@ -86,14 +89,31 @@ class FindIdViewModelTest {
     }
 
     @Test
-    fun `Action_SendEmailToFind - 네트워크 오류로 인한 실패 시, 다이얼로그 띄움`() = runTest {
+    fun `Action_SendEmailToFind Failure - 오류 메시지 상태 업데이트`() = runTest {
         with(findIdViewModel()) {
             //given
             val input = "test@gmail.com"
-            val errorMessage = "Http 404"
-            coEvery { mockUserRepository.sendEmailToFindId(input) } throws UnknownHostException(
-                errorMessage
-            )
+            coEvery { mockUserRepository.sendEmailToFindId(input) } returns ApiResult.Failure(code = -1, message = "가입되지 않은 이메일입니다")
+            val expectedUiState = FindIdUiState.DEFAULT
+                .copy(email = input, errorMessageResId = R.string.email_is_not_exist)
+
+            //when
+            process(FindIdUiAction.OnChangeEmail(email = input))
+            process(FindIdUiAction.SendEmailToFindId)
+
+            //then
+            uiState.test {
+                awaitItem() shouldBe expectedUiState
+            }
+        }
+    }
+
+    @Test
+    fun `Action_SendEmailToFind NetworkError - 네트워크 에러 다이얼로그 띄움`() = runTest {
+        with(findIdViewModel()) {
+            //given
+            val input = "test@gmail.com"
+            coEvery { mockUserRepository.sendEmailToFindId(input) } returns ApiResult.NetworkError(IOException())
             val expectedUiState = FindIdUiState.DEFAULT.copy(
                 email = input,
                 errorMessageResId = R.string.empty,
@@ -112,16 +132,17 @@ class FindIdViewModelTest {
     }
 
     @Test
-    fun `Action_SendEmailToFind - 이메일 전송 실패 시 다이얼로그 띄움`() = runTest {
+    fun `Action_SendEmailToFind Unknown - 오류발생 시 다이얼로그 띄움`() = runTest {
         with(findIdViewModel()) {
             //given
             val input = "test@gmail.com"
             val errorMessage = "올바르지 않은 접근입니다."
-            coEvery { mockUserRepository.sendEmailToFindId(input) } throws Exception(errorMessage)
+            val unknownErrorResult = ApiResult.UnknownError(throwable = Exception("알 수 없는 오류가 발생했습니다."))
+            coEvery { mockUserRepository.sendEmailToFindId(input) } returns unknownErrorResult
             val expectedUiState = FindIdUiState.DEFAULT.copy(
                 email = input,
                 errorMessageResId = R.string.empty,
-                errorDialogMessage = errorMessage,
+                errorDialogMessage = unknownErrorResult.throwable?.message ?: UNKNOWN_ERROR,
             )
 
             //when
