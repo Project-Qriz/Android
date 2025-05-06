@@ -115,9 +115,10 @@ internal class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun verifyPasswordAuthNumber(authNumber: String): ApiResult<Unit> {
+    override suspend fun verifyPasswordAuthNumber(email: String, authNumber: String): ApiResult<Unit> {
         return userApi.verifyPwdReset(
             request = VerifyPwdResetRequest(
+                email = email,
                 authNumber = authNumber
             )
         )
