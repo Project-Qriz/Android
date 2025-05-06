@@ -1,5 +1,6 @@
 package com.qriz.app.feature.sign.signup
 
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.model.ApiResult
@@ -119,7 +120,7 @@ open class SignUpViewModel @Inject constructor(
             )
         }
 
-        when (userRepository.requestEmailAuthNumber(uiState.value.email)) {
+        when (val result = userRepository.requestEmailAuthNumber(uiState.value.email)) {
             is ApiResult.Success -> {
                 sendEffect(SignUpUiEffect.ShowSnackBer(R.string.email_auth_sent))
                 updateState { copy(emailAuthState = AuthenticationState.SEND_SUCCESS) }
@@ -146,6 +147,9 @@ open class SignUpViewModel @Inject constructor(
                         authNumberSupportingTextResId = R.string.email_auth_sent_fail
                     )
                 }
+
+                val message = if (result is ApiResult.Failure) result.message else UNKNOWN_ERROR
+                sendEffect(SignUpUiEffect.ShowSnackBer(defaultResId = R.string.empty, message = message))
             }
         }
     }
