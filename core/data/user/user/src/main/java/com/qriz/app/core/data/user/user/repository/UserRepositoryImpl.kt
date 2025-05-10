@@ -115,19 +115,20 @@ internal class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun verifyPasswordAuthNumber(email: String, authNumber: String): ApiResult<Unit> {
+    override suspend fun verifyPasswordAuthNumber(email: String, authNumber: String): ApiResult<String> {
         return userApi.verifyPwdReset(
             request = VerifyPwdResetRequest(
                 email = email,
                 authNumber = authNumber
             )
-        )
+        ).map { it.resetToken }
     }
 
-    override suspend fun resetPassword(password: String): ApiResult<Unit> {
+    override suspend fun resetPassword(password: String, resetToken: String): ApiResult<Unit> {
         return userApi.resetPwd(
             request = ResetPwdRequest(
-                password = password
+                password = password,
+                resetToken = resetToken,
             )
         )
     }

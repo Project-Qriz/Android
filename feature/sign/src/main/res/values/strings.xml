@@ -47,6 +47,8 @@
     <string name="success_verify_auth_number">인증 완료되었습니다.</string>
     <string name="find_password_auth_title">비밀번호를 잊으셨나요?</string>
     <string name="find_password_auth_guide">이메일로 인증과정을 거친 후,\n재설정 할 수 있도록 도와드릴게요.</string>
+    <string name="sending_email_fail">알 수 없는 오류로 이메일 전송에 실패하였습니다.\n다시 시도해주세요.</string>
+    <string name="verifying_auth_number_fail">알 수 없는 오류로 인증번호 검사에 실패하였습니다.\n다시 시도해주세요.</string>
     <string name="reset_password">재설정 하기</string>
     <string name="send">전송</string>
     <string name="resend">재전송</string>

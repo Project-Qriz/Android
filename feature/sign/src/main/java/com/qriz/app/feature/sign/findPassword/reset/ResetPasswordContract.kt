@@ -17,6 +17,8 @@ data class ResetPasswordUiState(
     val visiblePasswordConfirm: Boolean,
     val isFocusedPassword: Boolean,
     val isFocusedPasswordConfirm: Boolean,
+    val showNetworkErrorDialog: Boolean,
+    val showUnknownErrorDialog: Boolean,
 ) : UiState {
 
     val isValidPasswordFormat: Boolean
@@ -47,6 +49,8 @@ data class ResetPasswordUiState(
             visiblePasswordConfirm = false,
             isFocusedPassword = false,
             isFocusedPasswordConfirm = false,
+            showNetworkErrorDialog = false,
+            showUnknownErrorDialog = false,
         )
     }
 }
@@ -59,8 +63,11 @@ sealed interface ResetPasswordUiAction : UiAction {
     data class ChangePasswordConfirmVisibility(val visible: Boolean) : ResetPasswordUiAction
     data class ChangeFocusPassword(val isFocused: Boolean) : ResetPasswordUiAction
     data class ChangeFocusPasswordConfirm(val isFocused: Boolean) : ResetPasswordUiAction
+    data object ConfirmNetworkErrorDialog : ResetPasswordUiAction
+    data object ConfirmUnknownErrorDialog : ResetPasswordUiAction
 }
 
 sealed interface ResetPasswordUiEffect : UiEffect {
     data object ResetComplete : ResetPasswordUiEffect
+    data class OnShowSnackbar(val message: String) : ResetPasswordUiEffect
 }

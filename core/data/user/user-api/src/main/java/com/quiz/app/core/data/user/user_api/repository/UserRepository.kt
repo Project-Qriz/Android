@@ -31,7 +31,7 @@ interface UserRepository {
 
     suspend fun sendEmailToFindPassword(email: String): ApiResult<Unit>
 
-    suspend fun verifyPasswordAuthNumber(email: String, authNumber: String): ApiResult<Unit>
+    suspend fun verifyPasswordAuthNumber(email: String, authNumber: String): ApiResult<String>
 
-    suspend fun resetPassword(password: String): ApiResult<Unit>
+    suspend fun resetPassword(password: String, resetToken: String): ApiResult<Unit>
 }
