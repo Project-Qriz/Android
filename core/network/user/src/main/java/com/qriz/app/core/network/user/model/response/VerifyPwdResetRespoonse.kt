@@ -1,10 +1,9 @@
-package com.qriz.app.core.network.user.model.request
+package com.qriz.app.core.network.user.model.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ResetPwdRequest(
-    @SerialName("newPassword") val password: String,
+data class VerifyPwdResetRespoonse(
     @SerialName("resetToken") val resetToken: String,
 )

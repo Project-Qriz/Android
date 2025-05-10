@@ -2,6 +2,7 @@ package com.qriz.app.feature.sign.findPassword.auth
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.sign.R
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
@@ -24,27 +25,23 @@ class FindPasswordAuthViewModel @Inject constructor(
 
     override fun process(action: FindPasswordAuthUiAction): Job = viewModelScope.launch {
         when (action) {
-            is FindPasswordAuthUiAction.OnChangeEmail -> {
-                updateState { copy(email = action.email) }
+            is FindPasswordAuthUiAction.OnChangeEmail -> updateState { copy(email = action.email) }
+
+            is FindPasswordAuthUiAction.SendAuthNumberEmail -> sendEmail()
+
+            is FindPasswordAuthUiAction.OnChangeAuthNumber -> updateState { copy(authNumber = action.authNumber) }
+
+            is FindPasswordAuthUiAction.VerifyAuthNumber -> verifyAuthNumber()
+
+            is FindPasswordAuthUiAction.ClickReset -> if (uiState.value.verifiedAuthNumber) {
+                sendEffect(FindPasswordAuthUiEffect.NavigateToResetPassword(uiState.value.resetToken))
             }
 
-            is FindPasswordAuthUiAction.SendAuthNumberEmail -> {
-                sendEmail()
-            }
+            is FindPasswordAuthUiAction.ConfirmNetworkErrorDialog -> updateState { copy(showNetworkErrorDialog = false) }
 
-            is FindPasswordAuthUiAction.OnChangeAuthNumber -> {
-                updateState { copy(authNumber = action.authNumber) }
-            }
+            is FindPasswordAuthUiAction.ConfirmSendingEmailFailDialog -> updateState { copy(showFailSendEmailDialog = false) }
 
-            is FindPasswordAuthUiAction.VerifyAuthNumber -> {
-                verifyAuthNumber()
-            }
-
-            is FindPasswordAuthUiAction.ClickReset -> {
-                if (uiState.value.verifiedAuthNumber) {
-                    sendEffect(FindPasswordAuthUiEffect.NavigateToResetPassword)
-                }
-            }
+            is FindPasswordAuthUiAction.ConfirmVerifyingAuthNumberDialog -> updateState { copy(showFailVerifyAuthNumberDialog = false) }
         }
     }
 
@@ -63,54 +60,62 @@ class FindPasswordAuthViewModel @Inject constructor(
             return
         }
 
-        runCatching {
-            userRepository.sendEmailToFindPassword(email = email)
-        }.onSuccess {
-            updateState {
-                copy(
-                    emailSupportingTextResId = R.string.empty,
-                    authNumberSupportingTextResId = R.string.success_send_email_auth_number,
-                    enableInputAuthNumber = true,
-                    showAuthNumberLayout = true,
-                    verifiedAuthNumber = false,
-                )
+        when(userRepository.sendEmailToFindPassword(email = email)) {
+            is ApiResult.Success -> {
+                updateState {
+                    copy(
+                        emailSupportingTextResId = R.string.empty,
+                        authNumberSupportingTextResId = R.string.success_send_email_auth_number,
+                        enableInputAuthNumber = true,
+                        showAuthNumberLayout = true,
+                        verifiedAuthNumber = false,
+                    )
+                }
+                startTimer()
             }
-            startTimer()
-        }.onFailure {
-            updateState { copy(showFailSendEmailDialog = true) }
+
+            is ApiResult.Failure -> {
+                updateState { copy(authNumberSupportingTextResId = R.string.email_is_not_exist) }
+            }
+
+            is ApiResult.NetworkError -> {
+                updateState { copy(showNetworkErrorDialog = true) }
+            }
+
+            is ApiResult.UnknownError -> {
+                updateState { copy(showFailSendEmailDialog = true) }
+            }
         }
     }
 
     private suspend fun verifyAuthNumber() {
         val authNumber = uiState.value.authNumber
+        val email = uiState.value.email
 
         if (uiState.value.isValidAuthNumberFormat.not()) {
             updateState { copy(authNumberSupportingTextResId = R.string.invalid_auth_number_format) }
             return
         }
 
-        runCatching {
-            userRepository.verifyPasswordAuthNumber(authNumber = authNumber)
-        }.onSuccess {
-            cancelTimer()
-            updateState {
-                copy(
-                    authNumberSupportingTextResId = R.string.success_verify_auth_number,
-                    verifiedAuthNumber = true,
-                )
+        when(val result = userRepository.verifyPasswordAuthNumber(email = email, authNumber = authNumber)) {
+            is ApiResult.Success -> {
+                cancelTimer()
+                updateState {
+                    copy(
+                        authNumberSupportingTextResId = R.string.success_verify_auth_number,
+                        verifiedAuthNumber = true,
+                        resetToken = result.data,
+                    )
+                }
             }
-        }.onFailure {
-            when (it) {
-                is UnknownHostException,
-                is SocketTimeoutException -> {
-                    updateState { copy(showFailSendEmailDialog = true) }
-                }
-
-                else -> {
-                    updateState {
-                        copy(authNumberSupportingTextResId = R.string.fail_verify_auth_number)
-                    }
-                }
+            is ApiResult.Failure -> {
+                updateState { copy(authNumberSupportingTextResId = R.string.fail_verify_auth_number) }
+            }
+            is ApiResult.NetworkError -> {
+                updateState { copy(showNetworkErrorDialog = true) }
+            }
+            is ApiResult.UnknownError -> {
+                updateState { copy(showFailVerifyAuthNumberDialog = true) }
             }
         }
     }

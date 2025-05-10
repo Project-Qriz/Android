@@ -10,12 +10,15 @@ data class FindPasswordAuthUiState(
     val email: String,
     val authNumber: String,
     val authTimerMs: Long,
+    val resetToken: String,
     val showAuthNumberLayout: Boolean,
     val verifiedAuthNumber: Boolean,
     val enableInputAuthNumber: Boolean,
     val showFailSendEmailDialog: Boolean,
+    val showFailVerifyAuthNumberDialog: Boolean,
     val emailSupportingTextResId: Int,
     val authNumberSupportingTextResId: Int,
+    val showNetworkErrorDialog: Boolean,
 ) : UiState {
 
     val isValidEmailFormat = EMAIL_REGEX.matches(email)
@@ -35,12 +38,15 @@ data class FindPasswordAuthUiState(
             email = "",
             authNumber = "",
             authTimerMs = 0,
+            resetToken = "",
             showAuthNumberLayout = false,
             verifiedAuthNumber = false,
             enableInputAuthNumber = true,
             showFailSendEmailDialog = false,
             emailSupportingTextResId = R.string.empty,
             authNumberSupportingTextResId = R.string.empty,
+            showNetworkErrorDialog = false,
+            showFailVerifyAuthNumberDialog = false
         )
     }
 }
@@ -55,8 +61,14 @@ sealed interface FindPasswordAuthUiAction : UiAction {
     data object VerifyAuthNumber : FindPasswordAuthUiAction
 
     data object ClickReset : FindPasswordAuthUiAction
+
+    data object ConfirmNetworkErrorDialog : FindPasswordAuthUiAction
+
+    data object ConfirmSendingEmailFailDialog : FindPasswordAuthUiAction
+
+    data object ConfirmVerifyingAuthNumberDialog : FindPasswordAuthUiAction
 }
 
 sealed interface FindPasswordAuthUiEffect: UiEffect {
-    data object NavigateToResetPassword : FindPasswordAuthUiEffect
+    data class NavigateToResetPassword(val resetToken: String) : FindPasswordAuthUiEffect
 }

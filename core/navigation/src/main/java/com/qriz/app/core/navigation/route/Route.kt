@@ -21,7 +21,7 @@ sealed interface SignRoute : Route {
     data object FindPasswordAuth : SignRoute
 
     @Serializable
-    data object ResetPassword : SignRoute
+    data class ResetPassword(val resetToken: String) : SignRoute
 }
 
 sealed interface OnBoardRoute : Route {

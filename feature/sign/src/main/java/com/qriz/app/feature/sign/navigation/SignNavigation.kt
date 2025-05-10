@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
+import androidx.navigation.toRoute
 import com.qriz.app.core.navigation.route.SignRoute
 import com.qriz.app.feature.sign.findId.FindIdScreen
 import com.qriz.app.feature.sign.findPassword.auth.FindPasswordAuthScreen
@@ -39,8 +40,8 @@ fun NavHostController.navigateFindPasswordAuth() {
     navigate(SignRoute.FindPasswordAuth)
 }
 
-fun NavHostController.navigateResetPassword() {
-    navigate(SignRoute.ResetPassword)
+fun NavHostController.navigateResetPassword(resetToken: String) {
+    navigate(SignRoute.ResetPassword(resetToken))
 }
 
 fun NavGraphBuilder.signNavGraph(
@@ -51,7 +52,7 @@ fun NavGraphBuilder.signNavGraph(
     moveToHome: () -> Unit,
     moveToConceptCheckGuide: () -> Unit,
     onShowSnackbar: (String) -> Unit,
-    moveToResetPw: () -> Unit,
+    moveToResetPw: (String) -> Unit,
     moveToSignIn: () -> Unit,
 ) {
     composable<SignRoute.SignIn> {
@@ -84,8 +85,10 @@ fun NavGraphBuilder.signNavGraph(
     }
 
     composable<SignRoute.ResetPassword> {
+        it.savedStateHandle["resetToken"] = it.toRoute<SignRoute.ResetPassword>().resetToken
         ResetPasswordScreen(
             onBack = onBack,
+            onShowSnackbar = onShowSnackbar,
             moveToSignIn = moveToSignIn
         )
     }

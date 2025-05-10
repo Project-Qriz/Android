@@ -43,23 +43,24 @@ import com.qriz.app.core.designsystem.theme.Mint800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.designsystem.theme.White
+import com.qriz.app.core.ui.common.const.ErrorDialog
+import com.qriz.app.core.ui.common.const.NetworkErrorDialog
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.component.SignUpBasePage
 import com.quiz.app.core.data.user.user_api.model.AUTH_NUMBER_MAX_LENGTH
-import com.quiz.app.core.data.user.user_api.model.ID_MAX_LENGTH
 
 @Composable
 fun FindPasswordAuthScreen(
     viewModel: FindPasswordAuthViewModel = hiltViewModel(),
     onBack: () -> Unit,
-    onNavigateReset: () -> Unit,
+    onNavigateReset: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     viewModel.collectSideEffect {
         when (it) {
-            FindPasswordAuthUiEffect.NavigateToResetPassword -> onNavigateReset()
+            is FindPasswordAuthUiEffect.NavigateToResetPassword -> onNavigateReset(it.resetToken)
         }
     }
 
@@ -72,6 +73,9 @@ fun FindPasswordAuthScreen(
         verifiedAuthNumber = uiState.verifiedAuthNumber,
         emailSupportingTextResId = uiState.emailSupportingTextResId,
         authNumberSupportingTextResId = uiState.authNumberSupportingTextResId,
+        showNetworkErrorDialog = uiState.showNetworkErrorDialog,
+        showFailSendEmailDialog = uiState.showFailSendEmailDialog,
+        showFailVerifyAuthNumberDialog = uiState.showFailVerifyAuthNumberDialog,
         onBack = onBack,
         onEmailChanged = {
             viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = it))
@@ -84,6 +88,15 @@ fun FindPasswordAuthScreen(
         },
         onVerifyAuthNumber = {
             viewModel.process(FindPasswordAuthUiAction.VerifyAuthNumber)
+        },
+        confirmNetworkDialog = {
+            viewModel.process(FindPasswordAuthUiAction.ConfirmNetworkErrorDialog)
+        },
+        confirmSendingFailEmailDialog = {
+            viewModel.process(FindPasswordAuthUiAction.ConfirmSendingEmailFailDialog)
+        },
+        confirmVerifyingAuthNumberDialog = {
+            viewModel.process(FindPasswordAuthUiAction.ConfirmVerifyingAuthNumberDialog)
         },
         onNavigateReset = {
             viewModel.process(FindPasswordAuthUiAction.ClickReset)
@@ -102,14 +115,19 @@ private fun FindPasswordAuthContent(
     enableInputAuthNumber: Boolean,
     emailSupportingTextResId: Int,
     authNumberSupportingTextResId: Int,
+    showNetworkErrorDialog: Boolean,
+    showFailSendEmailDialog: Boolean,
+    showFailVerifyAuthNumberDialog: Boolean,
     onBack: () -> Unit,
     onEmailChanged: (String) -> Unit,
     onSendAuthNumberEmail: () -> Unit,
     onAuthNumberChanged: (String) -> Unit,
     onVerifyAuthNumber: () -> Unit,
+    confirmNetworkDialog: () -> Unit,
+    confirmSendingFailEmailDialog: () -> Unit,
+    confirmVerifyingAuthNumberDialog: () -> Unit,
     onNavigateReset: () -> Unit,
 ) {
-    //TODO: Dialog 작업
 
     val authNumberSupportingTextColor = when(authNumberSupportingTextResId) {
         R.string.success_send_email_auth_number,
@@ -123,6 +141,18 @@ private fun FindPasswordAuthContent(
     }
 
     val emailButtonTextColor = if (showAuthNumberLayout) Gray800 else Gray300
+
+    if (showNetworkErrorDialog) {
+        NetworkErrorDialog(onConfirmClick = confirmNetworkDialog)
+    }
+
+    if (showFailSendEmailDialog) {
+        ErrorDialog(description = stringResource(R.string.sending_email_fail), onConfirmClick = confirmSendingFailEmailDialog)
+    }
+
+    if (showFailVerifyAuthNumberDialog) {
+        ErrorDialog(description = stringResource(R.string.verifying_auth_number_fail), onConfirmClick = confirmVerifyingAuthNumberDialog)
+    }
 
     Column(
         modifier = Modifier
@@ -167,7 +197,6 @@ private fun FindPasswordAuthContent(
                     containerColor = White,
                     singleLine = true,
                     hint = stringResource(R.string.email_sample_hint),
-                    maxLength = ID_MAX_LENGTH,
                     modifier = Modifier.weight(1f),
                     contentPadding = PaddingValues(
                         horizontal = 16.dp,
@@ -300,6 +329,9 @@ private fun FindPasswordAuthContentPreview() {
             showAuthNumberLayout = true,
             verifiedAuthNumber = true,
             enableInputAuthNumber = true,
+            showNetworkErrorDialog = false,
+            showFailSendEmailDialog = false,
+            showFailVerifyAuthNumberDialog = false,
             emailSupportingTextResId = R.string.empty,
             authNumberSupportingTextResId = R.string.empty,
             onEmailChanged = {},
@@ -307,6 +339,9 @@ private fun FindPasswordAuthContentPreview() {
             onSendAuthNumberEmail = {},
             onBack = {},
             onNavigateReset = {},
+            confirmNetworkDialog = {},
+            confirmSendingFailEmailDialog = {},
+            confirmVerifyingAuthNumberDialog = {},
             onVerifyAuthNumber = {},
         )
     }

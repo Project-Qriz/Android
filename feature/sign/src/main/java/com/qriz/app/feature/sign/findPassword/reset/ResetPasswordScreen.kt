@@ -1,6 +1,5 @@
 package com.qriz.app.feature.sign.findPassword.reset
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -32,6 +31,9 @@ import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.core.designsystem.theme.White
+import com.qriz.app.core.ui.common.const.ErrorDialog
+import com.qriz.app.core.ui.common.const.NetworkErrorDialog
+import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.component.FormatStateRow
@@ -42,6 +44,7 @@ import com.qriz.app.core.designsystem.R as DSR
 @Composable
 fun ResetPasswordScreen(
     viewmodel: ResetPasswordViewModel = hiltViewModel(),
+    onShowSnackbar: (String) -> Unit,
     onBack: () -> Unit,
     moveToSignIn: () -> Unit,
 ) {
@@ -49,9 +52,8 @@ fun ResetPasswordScreen(
 
     viewmodel.collectSideEffect {
         when (it) {
-            is ResetPasswordUiEffect.ResetComplete -> {
-                moveToSignIn()
-            }
+            is ResetPasswordUiEffect.ResetComplete -> moveToSignIn()
+            is ResetPasswordUiEffect.OnShowSnackbar -> onShowSnackbar(it.message)
         }
     }
 
@@ -65,6 +67,8 @@ fun ResetPasswordScreen(
         onPasswordConfirmVisibilityChange = { viewmodel.process(ResetPasswordUiAction.ChangePasswordConfirmVisibility(it)) },
         onChangeFocusPassword = { viewmodel.process(ResetPasswordUiAction.ChangeFocusPassword(it)) },
         onChangeFocusPasswordConfirm = { viewmodel.process(ResetPasswordUiAction.ChangeFocusPasswordConfirm(it)) },
+        onConfirmNetworkErrorDialog = { viewmodel.process(ResetPasswordUiAction.ConfirmNetworkErrorDialog) },
+        onConfirmUnknownErrorDialog = { viewmodel.process(ResetPasswordUiAction.ConfirmUnknownErrorDialog) },
     )
 }
 
@@ -79,7 +83,17 @@ private fun ResetPasswordContent(
     onPasswordConfirmVisibilityChange: (Boolean) -> Unit,
     onChangeFocusPassword: (Boolean) -> Unit,
     onChangeFocusPasswordConfirm: (Boolean) -> Unit,
+    onConfirmNetworkErrorDialog: () -> Unit,
+    onConfirmUnknownErrorDialog: () -> Unit,
 ) {
+    if (uiState.showNetworkErrorDialog) {
+        NetworkErrorDialog(onConfirmClick = onConfirmNetworkErrorDialog)
+    }
+
+    if (uiState.showUnknownErrorDialog) {
+        ErrorDialog(description = UNKNOWN_ERROR, onConfirmClick = onConfirmUnknownErrorDialog)
+    }
+
     Column(
         modifier = Modifier.background(color = White),
     ) {
@@ -205,6 +219,8 @@ private fun ResetPasswordContentPreview() {
             onPasswordConfirmVisibilityChange = { },
             onChangeFocusPassword = { },
             onChangeFocusPasswordConfirm = { },
+            onConfirmNetworkErrorDialog = { },
+            onConfirmUnknownErrorDialog = { },
         )
     }
 }

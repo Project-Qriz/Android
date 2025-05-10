@@ -1,8 +1,6 @@
 package com.qriz.app.core.network.user.api
 
 import com.qriz.app.core.model.ApiResult
-import com.qriz.app.core.network.common.EmptyResponse
-import com.qriz.app.core.network.common.NetworkResponse
 import com.qriz.app.core.network.user.model.request.EmailAuthenticationRequest
 import com.qriz.app.core.network.user.model.request.FindIdRequest
 import com.qriz.app.core.network.user.model.request.FindPwdRequest
@@ -15,6 +13,7 @@ import com.qriz.app.core.network.user.model.response.DuplicateResponse
 import com.qriz.app.core.network.user.model.response.UserProfileResponse
 import com.qriz.app.core.network.user.model.response.JoinResponse
 import com.qriz.app.core.network.user.model.response.LoginResponse
+import com.qriz.app.core.network.user.model.response.VerifyPwdResetRespoonse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -63,7 +62,7 @@ interface UserApi {
     @POST("/api/verify-pwd-reset")
     suspend fun verifyPwdReset(
         @Body request: VerifyPwdResetRequest
-    ): ApiResult<Unit>
+    ): ApiResult<VerifyPwdResetRespoonse>
 
     @POST("/api/pwd-reset")
     suspend fun resetPwd(
