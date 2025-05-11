@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SurveyRequest(
-    @SerialName("keyConcept") val keyConcept: List<String>
+    @SerialName("keyConcepts") val keyConcepts: List<String>
 )
