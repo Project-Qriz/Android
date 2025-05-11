@@ -2,6 +2,7 @@ package com.qriz.app.feature.onboard.survey.mapper
 
 import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem
+import kotlinx.collections.immutable.toImmutableList
 
 fun List<SQLDConcept>.toSurveyListItem(
     isCheckedMap: Map<SQLDConcept, Boolean>,
@@ -14,12 +15,15 @@ fun List<SQLDConcept>.toSurveyListItem(
 
     return listOf(
         SurveyListItem.KnowsNothing(isChecked = isAllUnChecked),
-        SurveyListItem.KnowsAll(isChecked = isAllChecked)
-    ) + this.map { concept ->
-        SurveyListItem.SurveyItem(
-            concept = concept,
-            isChecked = isCheckedMap[concept] ?: false
-        )
-    }
+        SurveyListItem.KnowsAll(isChecked = isAllChecked),
+        SurveyListItem.SurveyItemGroup(
+            list = this.map { concept ->
+                SurveyListItem.SurveyItem(
+                    concept = concept,
+                    isChecked = isCheckedMap[concept] ?: false
+                )
+            }.toImmutableList(),
+        ),
+    )
 }
 

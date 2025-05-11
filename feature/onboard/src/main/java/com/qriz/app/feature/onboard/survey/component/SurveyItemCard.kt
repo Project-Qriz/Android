@@ -1,5 +1,6 @@
 package com.qriz.app.feature.onboard.survey.component
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,38 +30,26 @@ import com.qriz.app.feature.onboard.survey.model.SurveyListItem
 
 @Composable
 fun SurveyItemCard(
-    surveyItem: SurveyListItem,
+    text: String,
+    isChecked: Boolean,
     modifier: Modifier = Modifier,
     onChecked: (Boolean) -> Unit,
+    actionItems: @Composable (() -> Unit)? = null,
 ) {
+    Log.d("SurveyItemCard", text)
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onChecked(surveyItem.isChecked.not()) },
+            .clickable { onChecked(isChecked.not()) },
         shape = RoundedCornerShape(8.dp),
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .background(White)
-                .padding(
-                    horizontal = 24.dp,
-                ),
+            modifier = Modifier.background(White)
         ) {
-            val cardText = when (surveyItem) {
-                is SurveyListItem.KnowsAll -> stringResource(R.string.know_all_about_concepts)
-                is SurveyListItem.KnowsNothing -> stringResource(R.string.know_nothing_about_concepts)
-                is SurveyListItem.SurveyItem -> surveyItem.concept.title
-            }
-            Text(
-                text = cardText,
-                style = QrizTheme.typography.headline3,
-                color = Gray800,
-            )
-            //TODO : 체크되지 않았을때도 흰색 체크 모양이 있어야함
             Checkbox(
-                checked = surveyItem.isChecked,
+                checked = isChecked,
                 colors = CheckboxDefaults.colors().copy(
                     uncheckedBoxColor = Blue100,
                     uncheckedBorderColor = Blue100,
@@ -69,8 +58,19 @@ fun SurveyItemCard(
                     checkedBorderColor = Blue500,
                     checkedCheckmarkColor = White,
                 ),
-                onCheckedChange = { onChecked(surveyItem.isChecked.not()) }
+                onCheckedChange = { onChecked(isChecked.not()) }
             )
+
+            Text(
+                text = text,
+                style = QrizTheme.typography.headline3,
+                color = Gray800,
+                modifier = Modifier.weight(1f)
+            )
+
+            if (actionItems != null) {
+                actionItems()
+            }
         }
     }
 }
@@ -83,25 +83,13 @@ private fun ConceptCheckOptionCardPreview() {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             SurveyItemCard(
-                surveyItem = SurveyListItem.KnowsAll(false),
+                text = stringResource(R.string.know_all_about_concepts),
+                isChecked = false,
                 onChecked = {}
             )
             SurveyItemCard(
-                surveyItem = SurveyListItem.KnowsNothing(false),
-                onChecked = {}
-            )
-            SurveyItemCard(
-                surveyItem = SurveyListItem.SurveyItem(
-                    concept = SQLDConcept.JOIN,
-                    isChecked = true
-                ),
-                onChecked = {}
-            )
-            SurveyItemCard(
-                surveyItem = SurveyListItem.SurveyItem(
-                    concept = SQLDConcept.UNDERSTANDING_NULL_PROPERTIES,
-                    isChecked = true
-                ),
+                text = stringResource(R.string.know_nothing_about_concepts),
+                isChecked = false,
                 onChecked = {}
             )
         }

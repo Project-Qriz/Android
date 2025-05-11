@@ -12,14 +12,26 @@ import kotlinx.collections.immutable.persistentListOf
 @Immutable
 data class SurveyUiState(
     val surveyItems: ImmutableList<SurveyListItem>,
+    val isExpandSurveyItemGroup: Boolean,
+    val showNetworkErrorDialog: Boolean,
+    val showErrorDialog: Boolean,
 ) : UiState {
 
     val isPossibleSubmit
-        get() = surveyItems.any { it.isChecked }
+        get() = surveyItems.any {
+            if (it is SurveyListItem.SurveyItemGroup) {
+                it.list.any { item -> item.isChecked }
+            } else {
+                it.isChecked
+            }
+        }
 
     companion object {
         val Default = SurveyUiState(
             surveyItems = persistentListOf(),
+            isExpandSurveyItemGroup = true,
+            showNetworkErrorDialog = false,
+            showErrorDialog = false,
         )
     }
 }
@@ -34,6 +46,9 @@ sealed interface SurveyUiAction : UiAction {
     ) : SurveyUiAction
 
     data object ClickSubmit : SurveyUiAction
+    data class ChangeExpandSurveyItemGroup(val isExpand: Boolean) : SurveyUiAction
+    data object ConfirmNetworkErrorDialog : SurveyUiAction
+    data object ConfirmErrorDialog : SurveyUiAction
 }
 
 sealed interface SurveyUiEffect : UiEffect {
