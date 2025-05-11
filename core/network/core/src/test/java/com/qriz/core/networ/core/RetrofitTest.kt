@@ -1,9 +1,10 @@
 package com.qriz.core.networ.core
 
+import com.qriz.app.core.network.core.adapter.QrizCallAdapterFactory
 import com.qriz.app.core.network.core.const.ACCESS_TOKEN_HEADER_KEY
 import com.qriz.app.core.network.core.const.REFRESH_TOKEN_HEADER_KEY
 import com.qriz.app.core.network.core.interceptor.AuthInterceptor
-import com.qriz.app.core.network.core.interceptor.TokenAuthenticator
+import com.qriz.app.core.network.core.interceptor.AuthInterceptor.Companion.TOKEN_PREFIX
 import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.network.user.model.request.LoginRequest
 import com.qriz.app.core.testing.MainDispatcherRule
@@ -41,11 +42,7 @@ class RetrofitTest {
                     "code": 1,
                     "msg": "로그인성공",
                     "data": {
-                        "id": 3,
-                        "username": "test",
-                        "nickname" : "nickname"
-                        "createdAt": "2024-12-31 15:34:47"
-                        "previewTestStatus": "NOT_STARTED"
+                        "name" : "test"
                     }
                 }
             """.trimIndent()
@@ -57,12 +54,15 @@ class RetrofitTest {
 
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(tokenRepository = mockTokenRepository))
-            .authenticator(TokenAuthenticator(tokenRepository = mockTokenRepository)).build()
+            .build()
 
         val json = Json { ignoreUnknownKeys = true }
         val converterFactory = json.asConverterFactory("application/json".toMediaType())
 
-        retrofit = Retrofit.Builder().baseUrl(mockWebServer.url("/")).client(okHttpClient)
+        retrofit = Retrofit.Builder()
+            .baseUrl(mockWebServer.url("/"))
+            .client(okHttpClient)
+            .addCallAdapterFactory(QrizCallAdapterFactory())
             .addConverterFactory(converterFactory).build()
 
         userApi = retrofit.create(UserApi::class.java)
@@ -92,7 +92,7 @@ class RetrofitTest {
 
         //then
         Assertions.assertEquals(
-            accessToken,
+            "$TOKEN_PREFIX$accessToken",
             request.getHeader(ACCESS_TOKEN_HEADER_KEY)
         )
     }
@@ -101,15 +101,11 @@ class RetrofitTest {
     fun `AuthInterceptor Test - 응답에 token이 포함되어 있으면 repository 저장 메소드를 호출한다`() = runTest {
         //given
         val accessToken = "access"
-        val refreshToken = "refresh"
         coEvery { mockTokenRepository.getAccessToken() } returns null
         mockWebServer.enqueue(
             MockResponse().addHeader(
                     ACCESS_TOKEN_HEADER_KEY,
                     accessToken
-                ).addHeader(
-                    REFRESH_TOKEN_HEADER_KEY,
-                    refreshToken
                 ).setBody(successResponseBody)
         )
 
@@ -123,46 +119,10 @@ class RetrofitTest {
 
         //then
         coVerify {
-            mockTokenRepository.saveToken(
-                accessToken = accessToken,
-                refreshToken = refreshToken,
-            )
+            mockTokenRepository.saveToken(accessToken = accessToken)
         }
     }
 
-    @Test
-    fun `TokenAuthenticator Test - 401 응답이 발생하면 refresh token을 포함하여 요청한다`() = runTest {
-        //given
-        val accessToken = "access"
-        val refreshToken = "refresh"
-        mockWebServer.enqueue(
-            MockResponse()
-                .setResponseCode(401)
-                .setBody("")
-        )
-
-        mockWebServer.enqueue(
-            MockResponse()
-                .setResponseCode(200)
-                .setBody(successResponseBody)
-        )
-
-        coEvery { mockTokenRepository.flowTokenExist } returns flow { emit(true) }
-        coEvery { mockTokenRepository.getAccessToken() } returns accessToken
-        coEvery { mockTokenRepository.getRefreshToken() } returns refreshToken
-
-        //when
-        userApi.login(
-            LoginRequest(
-                "test",
-                "password"
-            )
-        )
-        val firstRequest = mockWebServer.takeRequest()
-        val secondRequest = mockWebServer.takeRequest()
-
-        //then
-        Assertions.assertNull(firstRequest.getHeader(REFRESH_TOKEN_HEADER_KEY))
-        Assertions.assertEquals(refreshToken, secondRequest.getHeader(REFRESH_TOKEN_HEADER_KEY))
-    }
+    //TODO: ResponseConvertInterceptor 테스트 코드 추가
+    //TODO: CallAdapter 테스트 코드 추가
 }
