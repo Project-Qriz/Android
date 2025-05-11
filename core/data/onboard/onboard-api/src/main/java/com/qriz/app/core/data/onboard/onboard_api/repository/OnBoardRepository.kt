@@ -4,9 +4,10 @@ import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.onboard.onboard_api.model.PreviewTestResult
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Test
+import com.qriz.app.core.model.ApiResult
 
 interface OnBoardRepository {
-    fun submitSurvey(concepts: Collection<SQLDConcept>)
+    suspend fun submitSurvey(concepts: Collection<SQLDConcept>): ApiResult<Unit>
 
     suspend fun getPreviewTest(): Test
 

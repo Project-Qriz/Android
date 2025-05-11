@@ -10,4 +10,5 @@ android {
 
 dependencies {
     api(projects.core.data.test.testApi)
+    api(projects.core.model)
 }
