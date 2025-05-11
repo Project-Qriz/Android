@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.onboard.survey.mapper.toSurveyListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,8 +14,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-//TODO : Timber 로그 찍어보자
-//TODO : String Resources 정리
 @HiltViewModel
 class SurveyViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -39,6 +38,12 @@ class SurveyViewModel @Inject constructor(
             )
 
             is SurveyUiAction.ClickSubmit -> onClickSubmit()
+            is SurveyUiAction.ChangeExpandSurveyItemGroup -> updateState {
+                copy(isExpandSurveyItemGroup = action.isExpand)
+            }
+
+            is SurveyUiAction.ConfirmErrorDialog -> { updateState { copy(showNetworkErrorDialog = false) } }
+            is SurveyUiAction.ConfirmNetworkErrorDialog -> { updateState { copy(showErrorDialog = false) } }
         }
     }
 
@@ -76,15 +81,20 @@ class SurveyViewModel @Inject constructor(
     }
 
     private fun submitSurvey(checked: List<SQLDConcept>) = viewModelScope.launch {
-        runCatching { onBoardRepository.submitSurvey(checked) }
-            .onSuccess { sendEffect(SurveyUiEffect.MoveToGuide) }
-            .onFailure { throwable ->
-                sendEffect(
-                    SurveyUiEffect.ShowSnackBar(
-                        throwable.message ?: "알 수 없는 에러가 발생했습니다."
-                    )
-                )
+        when(onBoardRepository.submitSurvey(checked)) {
+            is ApiResult.Success -> {
+                sendEffect(SurveyUiEffect.MoveToGuide)
             }
+
+            is ApiResult.NetworkError -> {
+                updateState { copy(showNetworkErrorDialog = true) }
+            }
+
+            is ApiResult.Failure,
+            is ApiResult.UnknownError -> {
+                updateState { copy(showErrorDialog = true) }
+            }
+        }
     }
 
     companion object {
