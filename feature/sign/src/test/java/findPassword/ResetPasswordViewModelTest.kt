@@ -1,8 +1,10 @@
 package findPassword
 
-import com.qriz.app.feature.sign.R
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.testing.MainDispatcherRule
+import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.findPassword.reset.ResetPasswordUiAction
 import com.qriz.app.feature.sign.findPassword.reset.ResetPasswordUiEffect
 import com.qriz.app.feature.sign.findPassword.reset.ResetPasswordViewModel
@@ -13,6 +15,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 class ResetPasswordViewModelTest {
 
@@ -20,7 +23,10 @@ class ResetPasswordViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val mockUserRepository: UserRepository = mockk()
-    private val viewModel: ResetPasswordViewModel = ResetPasswordViewModel(mockUserRepository)
+    private val viewModel: ResetPasswordViewModel = ResetPasswordViewModel(
+        savedStateHandle = SavedStateHandle(initialState = mapOf("resetToken" to "resetToken")),
+        userRepository = mockUserRepository,
+    )
 
     @Test
     fun `Action_OnChangePassword 올바른 비밀번호 입력 시 email 업데이트, 유효성 검사 성공`() = runTest {
@@ -98,7 +104,13 @@ class ResetPasswordViewModelTest {
     fun `Action_ResetPassword 비밀번호 변경 성공 시 ResetComplete 발생`() = runTest {
         // given
         val password = "newPassword123!"
-        coEvery { mockUserRepository.resetPassword(password) } returns Unit
+        val resetToken = "resetToken"
+        coEvery {
+            mockUserRepository.resetPassword(
+                password = password,
+                resetToken = resetToken
+            )
+        } returns ApiResult.Success(Unit)
         viewModel.process(ResetPasswordUiAction.OnChangePassword(password))
         viewModel.process(ResetPasswordUiAction.OnChangePasswordConfirm(password))
 
@@ -108,6 +120,61 @@ class ResetPasswordViewModelTest {
         // then
         viewModel.effect.test {
             awaitItem() shouldBe ResetPasswordUiEffect.ResetComplete
+            awaitItem() shouldBe ResetPasswordUiEffect.OnShowSnackbar(message = "비밀번호 변경이 완료되었습니다.\n변경된 비밀번호로 로그인 해주세요")
+        }
+    }
+
+    @Test
+    fun `Action_ResetPassword NetworkError - 네트워크 오류 다이얼로그 노출`() = runTest {
+        //given
+        val password = "newPassword123!"
+        val resetToken = "resetToken"
+
+        coEvery {
+            mockUserRepository.resetPassword(
+                password = password,
+                resetToken = resetToken
+            )
+        } returns ApiResult.NetworkError(IOException())
+
+        viewModel.process(ResetPasswordUiAction.OnChangePassword(password))
+        viewModel.process(ResetPasswordUiAction.OnChangePasswordConfirm(password))
+
+        //when
+        viewModel.process(ResetPasswordUiAction.ResetPassword)
+
+        //then
+        viewModel.uiState.test {
+            with(awaitItem()) {
+                showNetworkErrorDialog shouldBe true
+            }
+        }
+    }
+
+    @Test
+    fun `Action_ResetPassword Failure or UnknownError - 오류 다이얼로그 노출`() = runTest {
+        //given
+        val password = "newPassword123!"
+        val resetToken = "resetToken"
+
+        coEvery {
+            mockUserRepository.resetPassword(
+                password = password,
+                resetToken = resetToken
+            )
+        } returns ApiResult.UnknownError(null)
+
+        viewModel.process(ResetPasswordUiAction.OnChangePassword(password))
+        viewModel.process(ResetPasswordUiAction.OnChangePasswordConfirm(password))
+
+        //when
+        viewModel.process(ResetPasswordUiAction.ResetPassword)
+
+        //then
+        viewModel.uiState.test {
+            with(awaitItem()) {
+                showUnknownErrorDialog shouldBe true
+            }
         }
     }
 

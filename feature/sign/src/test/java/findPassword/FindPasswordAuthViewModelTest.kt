@@ -1,6 +1,7 @@
 package findPassword
 
 import app.cash.turbine.test
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.findPassword.auth.FindPasswordAuthUiAction
@@ -12,6 +13,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import java.io.IOException
 
 class FindPasswordAuthViewModelTest {
     @get:Rule
@@ -37,10 +39,10 @@ class FindPasswordAuthViewModelTest {
     }
 
     @Test
-    fun `Action_SendAuthNumberEmail 이메일 전송 성공 시 상태 업데이트`() = runTest {
+    fun `Action_SendAuthNumberEmail Success - 상태 업데이트`() = runTest {
         //given
         val email = "test123@gmail.com"
-        coEvery { mockUserRepository.sendEmailToFindPassword(email) } returns Unit
+        coEvery { mockUserRepository.sendEmailToFindPassword(email) } returns ApiResult.Success(Unit)
 
         //when
         viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = email))
@@ -60,10 +62,46 @@ class FindPasswordAuthViewModelTest {
     }
 
     @Test
-    fun `Action_SendAuthNumberEmail 이메일 전송 실패 시 상태 업데이트`() = runTest {
+    fun `Action_SendAuthNumberEmail Failure - 실패 메시지 노출`() = runTest {
         //given
         val email = "test123@gmail.com"
-        coEvery { mockUserRepository.sendEmailToFindPassword(email) } throws Exception()
+        coEvery { mockUserRepository.sendEmailToFindPassword(email) } returns ApiResult.Failure(code = -1, message = "존재하지 않는 이메일입니다.")
+
+        //when
+        viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = email))
+        viewModel.process(FindPasswordAuthUiAction.SendAuthNumberEmail)
+
+        //then
+        viewModel.uiState.test {
+            with(awaitItem()) {
+                authNumberSupportingTextResId shouldBe R.string.email_is_not_exist
+            }
+        }
+    }
+
+    @Test
+    fun `Action_SendAuthNumberEmail NetworkError - 네트워크 오류 다이얼로그 노출`() = runTest {
+        //given
+        val email = "test123@gmail.com"
+        coEvery { mockUserRepository.sendEmailToFindPassword(email) } returns ApiResult.NetworkError(IOException())
+
+        //when
+        viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = email))
+        viewModel.process(FindPasswordAuthUiAction.SendAuthNumberEmail)
+
+        //then
+        viewModel.uiState.test {
+            with(awaitItem()) {
+                showNetworkErrorDialog shouldBe true
+            }
+        }
+    }
+
+    @Test
+    fun `Action_SendAuthNumberEmail UnknownError - 오류 다이얼로그 노출`() = runTest {
+        //given
+        val email = "test123@gmail.com"
+        coEvery { mockUserRepository.sendEmailToFindPassword(email) } returns ApiResult.UnknownError(throwable = null)
 
         //when
         viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = email))
@@ -78,12 +116,15 @@ class FindPasswordAuthViewModelTest {
     }
 
     @Test
-    fun `Action_VerifyAuthNumber 인증번호 검증 성공 시 상태 업데이트`() = runTest {
+    fun `Action_VerifyAuthNumber 인증번호 검증 성공 시 상태 업데이트, resetToken 발급`() = runTest {
         //given
+        val email = "test123@gmail.com"
         val authNumber = "123456"
-        coEvery { mockUserRepository.verifyPasswordAuthNumber(authNumber) } returns Unit
+        val successToken = "successToken"
+        coEvery { mockUserRepository.verifyPasswordAuthNumber(email, authNumber) } returns ApiResult.Success(successToken)
 
         //when
+        viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = email))
         viewModel.process(FindPasswordAuthUiAction.OnChangeAuthNumber(authNumber = authNumber))
         viewModel.process(FindPasswordAuthUiAction.VerifyAuthNumber)
 
@@ -92,18 +133,21 @@ class FindPasswordAuthViewModelTest {
             with(awaitItem()) {
                 authNumberSupportingTextResId shouldBe R.string.success_verify_auth_number
                 verifiedAuthNumber shouldBe true
+                resetToken shouldBe successToken
                 viewModel.isTimerJobNull() shouldBe true
             }
         }
     }
 
     @Test
-    fun `Action_VerifyAuthNumber 인증번호 검증 실패 시 에러메시지`() = runTest {
+    fun `Action_VerifyAuthNumber Failure - 실패 메시지 노출`() = runTest {
         //given
+        val email = "test123@gmail.com"
         val authNumber = "123456"
-        coEvery { mockUserRepository.verifyPasswordAuthNumber(authNumber) } throws Exception()
+        coEvery { mockUserRepository.verifyPasswordAuthNumber(email, authNumber) } returns ApiResult.Failure(code = -1, message = "잘못된 인증번호")
 
         //when
+        viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = email))
         viewModel.process(FindPasswordAuthUiAction.OnChangeAuthNumber(authNumber = authNumber))
         viewModel.process(FindPasswordAuthUiAction.VerifyAuthNumber)
 
@@ -116,10 +160,50 @@ class FindPasswordAuthViewModelTest {
     }
 
     @Test
+    fun `Action_VerifyAuthNumber NetworkError - 네트워크 오류 다이얼로그 노출`() = runTest {
+        //given
+        val email = "test123@gmail.com"
+        val authNumber = "123456"
+        coEvery { mockUserRepository.verifyPasswordAuthNumber(email, authNumber) } returns ApiResult.NetworkError(IOException())
+
+        //when
+        viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = email))
+        viewModel.process(FindPasswordAuthUiAction.OnChangeAuthNumber(authNumber = authNumber))
+        viewModel.process(FindPasswordAuthUiAction.VerifyAuthNumber)
+
+        //then
+        viewModel.uiState.test {
+            with(awaitItem()) {
+                showNetworkErrorDialog shouldBe true
+            }
+        }
+    }
+
+    @Test
+    fun `Action_VerifyAuthNumber UnknownError - 오류 다이얼로그 노출`() = runTest {
+        //given
+        val email = "test123@gmail.com"
+        val authNumber = "123456"
+        coEvery { mockUserRepository.verifyPasswordAuthNumber(email, authNumber) } returns ApiResult.UnknownError(throwable = null)
+
+        //when
+        viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = email))
+        viewModel.process(FindPasswordAuthUiAction.OnChangeAuthNumber(authNumber = authNumber))
+        viewModel.process(FindPasswordAuthUiAction.VerifyAuthNumber)
+
+        //then
+        viewModel.uiState.test {
+            with(awaitItem()) {
+                showFailVerifyAuthNumberDialog shouldBe true
+            }
+        }
+    }
+
+    @Test
     fun `Action_SendAuthNumberEmail 이메일 형식이 유효하지 않을 때 에러메시지`() = runTest {
         //given
         val email = "invalid-email-format"
-        coEvery { mockUserRepository.sendEmailToFindPassword(email) } returns Unit
+        coEvery { mockUserRepository.sendEmailToFindPassword(email) } returns ApiResult.Success(Unit)
 
         //when
         viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = email))
@@ -137,7 +221,6 @@ class FindPasswordAuthViewModelTest {
     fun `Action_VerifyAuthNumber 인증번호 형식이 유효하지 않을 때 에러메시지`() = runTest {
         //given
         val authNumber = "123"
-        coEvery { mockUserRepository.verifyPasswordAuthNumber(authNumber) } returns Unit
 
         //when
         viewModel.process(FindPasswordAuthUiAction.OnChangeAuthNumber(authNumber = authNumber))
