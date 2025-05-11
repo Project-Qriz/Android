@@ -10,6 +10,7 @@ import com.qriz.app.core.data.test.test_api.model.TestCategory
 import com.qriz.app.core.network.common.util.verifyResponseCode
 import com.qriz.app.core.network.onboard.api.OnBoardApi
 import com.qriz.app.core.data.onboard.onboard.mapper.toTest
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.network.onboard.model.request.SurveyRequest
 import com.qriz.app.core.network.onboard.model.request.TestSubmitActivity
 import com.qriz.app.core.network.onboard.model.request.TestSubmitQuestion
@@ -20,10 +21,10 @@ internal class OnBoardRepositoryImpl @Inject constructor(
     private val onBoardApi: OnBoardApi
 ) : OnBoardRepository {
 
-    override fun submitSurvey(concepts: Collection<SQLDConcept>) {
-        onBoardApi.submitSurvey(
-            SurveyRequest(keyConcept = concepts.map { it.title })
-        ).verifyResponseCode()
+    override suspend fun submitSurvey(concepts: Collection<SQLDConcept>): ApiResult<Unit> {
+        return onBoardApi.submitSurvey(
+            SurveyRequest(keyConcepts = concepts.map { it.title })
+        )
     }
 
     override suspend fun getPreviewTest(): Test {
