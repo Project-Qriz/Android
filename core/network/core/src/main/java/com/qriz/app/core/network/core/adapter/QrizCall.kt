@@ -1,6 +1,7 @@
 package com.qriz.app.core.network.core.adapter
 
 import com.qriz.app.core.model.ApiResult
+import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.Request
@@ -75,12 +76,16 @@ class QrizCall<T>(
                 } else {
                     val errorBody = errorBody()?.string()
                     if (errorBody != null) {
-                        val errorResponse =
-                            json.decodeFromString<InternalFailureResponse>(errorBody)
-                        ApiResult.Failure(
-                            code = errorResponse.code,
-                            message = errorResponse.msg
-                        )
+                        try {
+                            val errorResponse =
+                                json.decodeFromString<InternalFailureResponse>(errorBody)
+                            ApiResult.Failure(
+                                code = errorResponse.code,
+                                message = errorResponse.msg
+                            )
+                        } catch (e: Exception) {
+                            ApiResult.UnknownError(throwable = e)
+                        }
                     } else {
                         ApiResult.UnknownError(null)
                     }
