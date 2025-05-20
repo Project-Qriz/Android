@@ -42,8 +42,8 @@ class SurveyViewModel @Inject constructor(
                 copy(isExpandSurveyItemGroup = action.isExpand)
             }
 
-            is SurveyUiAction.ConfirmErrorDialog -> { updateState { copy(showNetworkErrorDialog = false) } }
-            is SurveyUiAction.ConfirmNetworkErrorDialog -> { updateState { copy(showErrorDialog = false) } }
+            is SurveyUiAction.ConfirmErrorDialog -> { updateState { copy(showErrorDialog = false) } }
+            is SurveyUiAction.ConfirmNetworkErrorDialog -> { updateState { copy(showNetworkErrorDialog = false) } }
         }
     }
 
