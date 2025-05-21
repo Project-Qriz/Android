@@ -3,6 +3,7 @@ package com.qriz.app.core.network.core.di
 import com.qriz.app.core.network.core.BuildConfig
 import com.qriz.app.core.network.core.adapter.QrizCallAdapterFactory
 import com.qriz.app.core.network.core.interceptor.AuthInterceptor
+import com.qriz.app.core.network.core.interceptor.PrettyLoggingInterceptor
 import com.qriz.app.core.network.core.interceptor.ResponseConvertInterceptor
 import dagger.Module
 import dagger.Provides
@@ -43,7 +44,7 @@ object RetrofitModule {
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
 
-        val logging = HttpLoggingInterceptor()
+        val logging = HttpLoggingInterceptor(PrettyLoggingInterceptor())
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
         builder.addInterceptor(logging)
         builder.addInterceptor(authInterceptor)
