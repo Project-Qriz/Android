@@ -17,11 +17,11 @@ interface OnBoardApi {
     ): ApiResult<Unit>
 
     @GET("/api/v1/preview/get")
-    fun getPreviewTest(): NetworkResponse<PreviewTestListResponse>
+    suspend fun getPreviewTest(): ApiResult<PreviewTestListResponse>
 
-    @GET("api/v1/preview/submit")
-    fun submitPreviewTest(request: TestSubmitRequest): NetworkResponse<Unit>
+    @POST("api/v1/preview/submit")
+    suspend fun submitPreviewTest(@Body request: TestSubmitRequest): ApiResult<Unit>
 
     @GET("/api/v1/preview/analyze")
-    fun getPreviewTestResult(): NetworkResponse<AnalyzePreviewResponse>
+    suspend fun getPreviewTestResult(): ApiResult<AnalyzePreviewResponse>
 }
