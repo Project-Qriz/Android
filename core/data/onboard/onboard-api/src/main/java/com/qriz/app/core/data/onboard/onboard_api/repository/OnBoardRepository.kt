@@ -9,8 +9,8 @@ import com.qriz.app.core.model.ApiResult
 interface OnBoardRepository {
     suspend fun submitSurvey(concepts: Collection<SQLDConcept>): ApiResult<Unit>
 
-    suspend fun getPreviewTest(): Test
+    suspend fun getPreviewTest(): ApiResult<Test>
 
-    suspend fun submitPreviewTest(answer: Map<Long, Option>)
-    suspend fun getPreviewTestResult(): PreviewTestResult
+    suspend fun submitPreviewTest(answer: Map<Long, Option>): ApiResult<Unit>
+    suspend fun getPreviewTestResult(): ApiResult<PreviewTestResult>
 }

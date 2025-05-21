@@ -7,10 +7,10 @@ import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.test.test_api.model.Test
 import com.qriz.app.core.data.test.test_api.model.TestCategory
-import com.qriz.app.core.network.common.util.verifyResponseCode
 import com.qriz.app.core.network.onboard.api.OnBoardApi
 import com.qriz.app.core.data.onboard.onboard.mapper.toTest
 import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.model.map
 import com.qriz.app.core.network.onboard.model.request.SurveyRequest
 import com.qriz.app.core.network.onboard.model.request.TestSubmitActivity
 import com.qriz.app.core.network.onboard.model.request.TestSubmitQuestion
@@ -27,30 +27,29 @@ internal class OnBoardRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getPreviewTest(): Test {
-        val response = onBoardApi.getPreviewTest().verifyResponseCode()
-        return response.data.toTest()
+    override suspend fun getPreviewTest(): ApiResult<Test> {
+        val response = onBoardApi.getPreviewTest()
+        return response.map { it.toTest() }
     }
 
-    override suspend fun submitPreviewTest(answer: Map<Long, Option>) {
+    override suspend fun submitPreviewTest(answer: Map<Long, Option>): ApiResult<Unit> {
         val request = TestSubmitRequest(
-            activities = answer.map { (questionId, option) ->
+            activities = answer.toList().mapIndexed { index, (questionId, option) ->
                 TestSubmitActivity(
                     question = TestSubmitQuestion(
                         questionId = questionId,
                         category = TestCategory.PREVIEW.id
                     ),
-                    questionNum = questionId.toInt(), //TODO: 서버 수정 대기
-                    checked = option.description
+                    questionNum = index + 1,
+                    optionId = option.id,
                 )
             }
         )
-        onBoardApi.submitPreviewTest(request).verifyResponseCode()
+
+        return onBoardApi.submitPreviewTest(request)
     }
 
-    override suspend fun getPreviewTestResult(): PreviewTestResult {
-        val response = onBoardApi.getPreviewTestResult().verifyResponseCode()
-        return response.data.toPreviewTestResult()
+    override suspend fun getPreviewTestResult(): ApiResult<PreviewTestResult> {
+        return onBoardApi.getPreviewTestResult().map { it.toPreviewTestResult() }
     }
-
 }
