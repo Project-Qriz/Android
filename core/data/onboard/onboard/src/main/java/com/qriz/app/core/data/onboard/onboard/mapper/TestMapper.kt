@@ -4,6 +4,7 @@ import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Question
 import com.qriz.app.core.data.test.test_api.model.Test
 import com.qriz.app.core.network.onboard.model.response.PreviewTestListResponse
+import com.qriz.app.core.network.onboard.model.response.QuestionOptionModel
 import com.qriz.app.core.network.onboard.model.response.QuestionResponseModel
 
 fun PreviewTestListResponse.toTest() = Test(
@@ -13,13 +14,17 @@ fun PreviewTestListResponse.toTest() = Test(
 
 fun QuestionResponseModel.toQuestion() =
     Question(
-        id = question.hashCode().toLong(), //TODO : API 수정 대기 (문서에 ID 포함되어있지 않음)
+        id = questionId,
         question = question,
-        options = listOf(
-            Option(option1),
-            Option(option2),
-            Option(option3),
-            Option(option4),
-        ),
+        options = options.map(QuestionOptionModel::toOption),
         timeLimit = timeLimit,
+        category = category,
+        description = description,
+        difficulty = difficulty,
+    )
+
+fun QuestionOptionModel.toOption() =
+    Option(
+        id = id,
+        content = content,
     )

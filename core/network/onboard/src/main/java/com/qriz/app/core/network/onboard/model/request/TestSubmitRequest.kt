@@ -12,7 +12,7 @@ data class TestSubmitRequest(
 data class TestSubmitActivity(
     @SerialName("question") val question: TestSubmitQuestion,
     @SerialName("questionNum") val questionNum: Int,
-    @SerialName("checked") val checked: String
+    @SerialName("optionId") val optionId: Long,
 )
 
 @Serializable

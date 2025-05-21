@@ -5,5 +5,6 @@ package com.qriz.app.core.data.test.test_api.model
  * @property description 선택지에 대한 설명
  */
 data class Option(
-    val description: String
+    val id: Long,
+    val content: String,
 )
