@@ -34,13 +34,7 @@ internal class UserRepositoryImpl @Inject constructor(
                 username = id,
                 password = password
             )
-        ).flatMapSuspend {
-            val userResult = getUser()
-            if (userResult is ApiResult.Success) {
-                user.update { userResult.data }
-            }
-            userResult
-        }
+        ).flatMapSuspend { getUser() }
 
         return response
     }
@@ -51,11 +45,17 @@ internal class UserRepositoryImpl @Inject constructor(
 
     override suspend fun getUser(): ApiResult<User> {
         val cached = user.firstOrNull()
-        return if (cached != null) {
+        val result = if (cached != null) {
             ApiResult.Success(cached)
         } else {
-            getUserProfileFromServer()
+            val response = getUserProfileFromServer()
+            if (response is ApiResult.Success) {
+                user.update { response.data }
+            }
+            response
         }
+
+        return result
     }
 
     private suspend fun getUserProfileFromServer(): ApiResult<User> {
