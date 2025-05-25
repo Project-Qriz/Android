@@ -1,7 +1,6 @@
 package com.qriz.app.core.network.onboard.api
 
 import com.qriz.app.core.model.ApiResult
-import com.qriz.app.core.network.common.NetworkResponse
 import com.qriz.app.core.network.onboard.model.request.SurveyRequest
 import com.qriz.app.core.network.onboard.model.request.TestSubmitRequest
 import com.qriz.app.core.network.onboard.model.response.AnalyzePreviewResponse
