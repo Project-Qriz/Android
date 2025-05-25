@@ -1,6 +1,5 @@
 package com.qriz.app.feature.home
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +40,7 @@ import com.qriz.app.core.designsystem.R as DSR
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    moveToPreviewTest: () -> Unit,
     onShowSnackBar: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -48,6 +48,7 @@ fun HomeScreen(
 
     viewModel.collectSideEffect {
         when (it) {
+            is HomeUiEffect.MoveToPreviewTest -> moveToPreviewTest()
             is HomeUiEffect.ShowSnackBar -> onShowSnackBar(
                 it.message ?: context.getString(it.defaultResId)
             )
@@ -69,7 +70,9 @@ fun HomeScreen(
         onClickTestDateChange = { },
         onClickTestDateRegister = { viewModel.process(HomeUiAction.ClickTestDateRegister) },
         onClickMockTest = {},
-        onClickPreviewTest = { },
+        onClickPreviewTest = {
+            viewModel.process(HomeUiAction.MoveToPreviewTest)
+        },
         onClickTodayStudyInit = {},
         onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeTodayStudyCard(it)) },
         onClickWeeklyCustomConcept = {},
@@ -91,7 +94,6 @@ fun HomeContent(
     onChangeTodayStudyCard: (Int) -> Unit,
     onClickWeeklyCustomConcept: () -> Unit,
 ) {
-    Log.d("로그", "HomeContent: userName : $userName")
     val isInitialized = rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {

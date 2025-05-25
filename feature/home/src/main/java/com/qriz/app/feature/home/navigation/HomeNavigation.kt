@@ -12,10 +12,12 @@ fun NavController.navigateToHome(navOptions: NavOptions) {
 }
 
 fun NavGraphBuilder.homeNavGraph(
+    moveToPreviewTest: () -> Unit,
     onShowSnackbar: (String) -> Unit,
 ) {
     composable<MainTabRoute.Home> {
         HomeScreen(
+            moveToPreviewTest = moveToPreviewTest,
             onShowSnackBar = onShowSnackbar,
         )
     }
