@@ -20,6 +20,8 @@
     <string name="failed_get_test">시험 목록을 가져오지 못했습니다.</string>
     <string name="failed_submit_test">시험 제출을 실패했습니다.</string>
     <string name="failed_submit_test_problems_remain">해결되지 않은 문제가 있습니다!</string>
+    <string name="fail_get_preview_test_item">문제를 불러오는 데 실패하였습니다.</string>
+    <string name="please_try_again">다시 시도해주세요.</string>
 
     <!--TestEndWarningDialog-->
     <string name="test_end_warning_title">프리뷰 테스트를 종료하시겠습니까?</string>

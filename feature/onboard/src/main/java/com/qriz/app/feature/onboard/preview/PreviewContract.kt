@@ -12,7 +12,7 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class PreviewUiState(
-    val isLoading: Boolean,
+    val loadStatus: LoadStatus,
     val questions: ImmutableList<QuestionTestItem>,
     val remainTimeMs: Long,
     val totalTimeLimitMs: Long,
@@ -35,7 +35,7 @@ data class PreviewUiState(
 
     companion object {
         val Default = PreviewUiState(
-            isLoading = false,
+            loadStatus = LoadStatus.Loading,
             questions = persistentListOf(),
             remainTimeMs = 0,
             totalTimeLimitMs = 0,
@@ -43,6 +43,12 @@ data class PreviewUiState(
             isVisibleTestSubmitWarningDialog = false,
             isVisibleTestEndWarningDialog = false,
         )
+    }
+
+    enum class LoadStatus {
+        Loading,
+        Success,
+        Failure,
     }
 }
 

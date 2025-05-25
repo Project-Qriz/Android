@@ -1,11 +1,15 @@
 package com.qriz.app.feature.onboard.preview
 
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Test
+import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
+import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.core.ui.test.mapper.toOption
 import com.qriz.app.core.ui.test.mapper.toQuestionTestItem
 import com.qriz.app.core.ui.test.model.OptionItem
@@ -20,11 +24,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.qriz.app.feature.onboard.preview.PreviewUiState.LoadStatus.*
+import com.qriz.app.core.designsystem.R as DSR
 
 @HiltViewModel
 open class PreviewViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val onBoardRepository: OnBoardRepository
+    private val onBoardRepository: OnBoardRepository,
 ) : BaseViewModel<PreviewUiState, PreviewUiEffect, PreviewUiAction>(PreviewUiState.Default) {
     private val isTest = savedStateHandle.get<Boolean>(IS_TEST_FLAG) ?: false
 
@@ -113,10 +119,9 @@ open class PreviewViewModel @Inject constructor(
     }
 
     private suspend fun getPreviewTest(): Test? {
-        if (uiState.value.isLoading) return null
-        updateState { copy(isLoading = true) }
-        return runCatching { onBoardRepository.getPreviewTest() }
-            .onSuccess { test ->
+        return when(val result = onBoardRepository.getPreviewTest()) {
+            is ApiResult.Success -> {
+                val test = result.data
                 updateState {
                     copy(
                         questions = test.questions
@@ -124,24 +129,31 @@ open class PreviewViewModel @Inject constructor(
                             .toImmutableList(),
                         remainTimeMs = test.totalTimeLimit.toMilliSecond(),
                         totalTimeLimitMs = test.totalTimeLimit.toMilliSecond(),
+                        loadStatus = Success,
                     )
                 }
+                test
             }
-            .onFailure {
-                //TODO : 추후 재시도 UI 나오면 실패 상태로 변경(재시도 UI 노출)
-                sendEffect(
-                    PreviewUiEffect.ShowSnackBar(
-                        defaultResId = R.string.failed_get_test,
-                        message = it.message
-                    )
-                )
+
+            is ApiResult.Failure -> {
+                updateState {
+                    copy(loadStatus = Failure)
+                }
+                null
             }
-            .also { updateState { copy(isLoading = false) } }
-            .getOrNull()
+
+            is ApiResult.NetworkError,
+            is ApiResult.UnknownError -> {
+                updateState {
+                    copy(loadStatus = Failure)
+                }
+                null
+            }
+        }
     }
 
     private fun submitTest(selectedOptions: Map<Long, Option>) = viewModelScope.launch {
-        if (uiState.value.isLoading) return@launch
+        if (uiState.value.loadStatus == PreviewUiState.LoadStatus.Loading) return@launch
         val isExistUnresolvedProblem = selectedOptions.size < uiState.value.questions.size
         if (isExistUnresolvedProblem) {
             sendEffect(
@@ -151,18 +163,38 @@ open class PreviewViewModel @Inject constructor(
             )
             return@launch
         }
-        updateState { copy(isLoading = true) }
-        runCatching { onBoardRepository.submitPreviewTest(selectedOptions) }
-            .onSuccess { sendEffect(PreviewUiEffect.MoveToResult) }
-            .onFailure {
+        updateState { copy(loadStatus = Loading) }
+        when(val result = onBoardRepository.submitPreviewTest(selectedOptions)) {
+            is ApiResult.Success -> {
+                sendEffect(PreviewUiEffect.MoveToResult)
+            }
+
+            is ApiResult.Failure -> {
+                updateState { copy(loadStatus = Success) }
                 sendEffect(
                     PreviewUiEffect.ShowSnackBar(
                         defaultResId = R.string.failed_submit_test,
-                        message = it.message
+                        message = result.message
                     )
                 )
             }
-            .also { updateState { copy(isLoading = false) } }
+
+            is ApiResult.NetworkError -> {
+                updateState { copy(loadStatus = Success) }
+                PreviewUiEffect.ShowSnackBar(
+                    defaultResId = DSR.string.empty,
+                    message = NETWORK_IS_UNSTABLE,
+                )
+            }
+
+            is ApiResult.UnknownError -> {
+                updateState { copy(loadStatus = Success) }
+                PreviewUiEffect.ShowSnackBar(
+                    defaultResId = DSR.string.empty,
+                    message = UNKNOWN_ERROR,
+                )
+            }
+        }
     }
 
     private fun startTimer() {
@@ -185,7 +217,7 @@ open class PreviewViewModel @Inject constructor(
 
     private fun getForcedAnswer() =
         with(uiState.value) {
-            questions.associate { it.id to Option("") } + isSelectedOption.value
+            questions.associate { it.id to Option(id = 0,"") } + isSelectedOption.value
         }
 
 
