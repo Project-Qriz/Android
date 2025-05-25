@@ -54,10 +54,10 @@ private fun QuestionResultPagePreview() {
                     skillName = "asdasd",
                     question = "다음 중 GROUP BY 절의 특징으로 올바르지 않은 것은?",
                     options = persistentListOf(
-                        GeneralOptionItem("특정 열을 기준으로 행을 그룹화한다"),
-                        SelectedAndIncorrectOptionItem("집계 함수와 함께 자주 사용된다"),
-                        SelectedOrCorrectOptionItem("WHERE 절 다음에 위치한다"),
-                        GeneralOptionItem("ORDER BY 절 다음에 위치한다"),
+                        GeneralOptionItem(0,"특정 열을 기준으로 행을 그룹화한다"),
+                        SelectedAndIncorrectOptionItem(0, "집계 함수와 함께 자주 사용된다"),
+                        SelectedOrCorrectOptionItem(0, "WHERE 절 다음에 위치한다"),
+                        GeneralOptionItem(0, "ORDER BY 절 다음에 위치한다"),
                     ),
                     solution = "asd",
                     correction = false
