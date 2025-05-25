@@ -19,6 +19,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.core.navigation.route.SignRoute
+import com.qriz.app.core.navigation.route.SplashRoute
 import com.qriz.app.feature.concept_book.navigation.conceptBookNavGraph
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBook
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookDetail
@@ -90,8 +91,7 @@ internal fun QrizApp(
 
 @Composable
 private fun QrizNavHost(
-    startDestination: Route = MainTabRoute.Home,
-//    startDestination: Route = SignRoute.SignIn,
+    startDestination: Route = SplashRoute,
     mainNavigator: MainNavigator,
     onShowSnackbar: (String) -> Unit,
 ) {
@@ -129,6 +129,7 @@ private fun QrizNavHost(
         )
 
         homeNavGraph(
+            moveToPreviewTest = navController::navigatePreviewGuide,
             onShowSnackbar = onShowSnackbar,
         )
 
