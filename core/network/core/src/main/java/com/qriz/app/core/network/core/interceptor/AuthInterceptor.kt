@@ -1,5 +1,6 @@
 package com.qriz.app.core.network.core.interceptor
 
+import android.util.Log
 import com.qriz.app.core.network.core.const.ACCESS_TOKEN_HEADER_KEY
 import com.qriz.core.data.token.token_api.TokenRepository
 import kotlinx.coroutines.runBlocking
@@ -15,6 +16,8 @@ class AuthInterceptor @Inject constructor(
 
         val newRequest = chain.request().newBuilder().apply {
             if (accessToken != null) {
+                // TODO: API response json 형태 확인하기 위해 완성때까지 찍어놓을 것 
+                Log.d("AuthInterceptor", "AccessToken: $accessToken")
                 header(ACCESS_TOKEN_HEADER_KEY, "$TOKEN_PREFIX$accessToken")
             }
         }.build()
