@@ -26,6 +26,7 @@ import com.qriz.app.core.designsystem.component.QrizTopBar
 import com.qriz.app.core.designsystem.theme.Blue50
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
+import com.qriz.app.core.ui.common.const.ErrorScreen
 import com.qriz.app.core.ui.common.const.NetworkErrorScreen
 import com.qriz.app.core.ui.test.model.TestResultItem
 import com.qriz.app.feature.base.extention.collectSideEffect
@@ -106,7 +107,9 @@ private fun PreviewResultContent(
             }
 
             PreviewResultUiState.State.FAILURE -> {
-                NetworkErrorScreen(
+                ErrorScreen(
+                    title = stringResource(R.string.fail_get_preview_result),
+                    description = stringResource(R.string.please_try_again),
                     onClickRetry = onClickRetry
                 )
             }
@@ -146,7 +149,6 @@ private fun PreviewResultContent(
             }
         }
     }
-
 }
 
 @Preview(showBackground = true)

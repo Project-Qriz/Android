@@ -42,6 +42,7 @@
     <string name="first">1위</string>
     <string name="second">2위</string>
     <string name="question_count">%1$s문제</string>
+    <string name="fail_get_preview_result">테스트 결과를 불러오는 데 실패하였습니다.</string>
 
     <string name="recommended_concepts_top2">보충하면 좋은 개념 top2</string>
 </resources>

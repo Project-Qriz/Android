@@ -2,6 +2,7 @@ package com.qriz.app.feature.onboard.previewresult
 
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.onboard.previewresult.PreviewResultUiState.State
 import com.qriz.app.feature.onboard.previewresult.mapper.toPreviewTestResultItem
@@ -30,21 +31,27 @@ class PreviewResultViewModel @Inject constructor(
     }
 
     private fun loadPreviewResult() = viewModelScope.launch {
-        updateState { copy(state = State.LOADING) }
-        runCatching { onBoardRepository.getPreviewTestResult() }
-            .onSuccess { result ->
+        when (val result = onBoardRepository.getPreviewTestResult()) {
+            is ApiResult.Success -> {
                 updateState {
                     copy(
-                        previewTestResultItem = result.toPreviewTestResultItem(),
+                        previewTestResultItem = result.data.toPreviewTestResultItem(),
                         state = State.SUCCESS
                     )
                 }
             }
-            .onFailure { updateState { copy(state = State.FAILURE) } }
+
+            is ApiResult.Failure, is ApiResult.NetworkError, is ApiResult.UnknownError -> {
+                updateState { copy(state = State.FAILURE) }
+            }
+        }
     }
 
     private fun observeClient() = viewModelScope.launch {
-        userRepository.getUserFlow()
-            .collect { user -> updateState { copy(userName = user.name) } }
+        userRepository.getUserFlow().collect { user ->
+            updateState {
+                copy(userName = user.name)
+            }
+        }
     }
 }
