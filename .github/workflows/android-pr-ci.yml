@@ -58,3 +58,9 @@ jobs:
         with:
           name: Test Results
           path: "**/test-results/**/*.xml"
+
+      - name: Add local.properties
+        env:
+          BASE_URL: ${{ secrets.DEV_BASE_URL }}
+        run: 
+          echo BASE_URL=\"$BASE_URL\" > ./local.properties
