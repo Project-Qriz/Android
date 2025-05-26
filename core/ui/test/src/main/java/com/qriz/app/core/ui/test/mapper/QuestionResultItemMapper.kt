@@ -23,9 +23,9 @@ fun QuestionResult.toQuestionResultItem(): QuestionResultItem {
             val isWrongChoice = isSelected.not() && isCorrect
             val isGoodChoice = isSelected && isCorrect
             when {
-                isWrongChoice -> SelectedAndIncorrectOptionItem(option.description)
-                isGoodChoice || isSelected -> SelectedOrCorrectOptionItem(option.description)
-                else -> GeneralOptionItem(option.description)
+                isWrongChoice -> SelectedAndIncorrectOptionItem(option.id, option.content)
+                isGoodChoice || isSelected -> SelectedOrCorrectOptionItem(option.id, option.content)
+                else -> GeneralOptionItem(option.id, option.content)
             }
         }.toImmutableList()
     )

@@ -1,15 +1,19 @@
 package com.qriz.app.feature.sign.signup
 
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
+import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.ui.common.resource.CHECK_NETWORK_AND_TRY_AGAIN
+import com.qriz.app.core.ui.common.resource.CONTACT_DEVELOPER_IF_PERSISTS
+import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
+import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.sign.R
 import com.qriz.app.feature.sign.signup.SignUpUiState.AuthenticationState
 import com.qriz.app.feature.sign.signup.SignUpUiState.SignUpPage
-import com.quiz.app.core.data.user.user_api.model.AUTH_NUMBER_MAX_LENGTH
 import com.quiz.app.core.data.user.user_api.model.EMAIL_REGEX
 import com.quiz.app.core.data.user.user_api.model.ID_REGEX
-import com.quiz.app.core.data.user.user_api.model.PW_REGEX
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -44,6 +48,7 @@ open class SignUpViewModel @Inject constructor(
             is SignUpUiAction.ClickVerifyAuthNum -> verifyEmailAuthNumber()
             is SignUpUiAction.ChangePasswordVisibility -> updateState { copy(isVisiblePassword = action.isVisible) }
             is SignUpUiAction.ChangePasswordCheckVisibility -> updateState { copy(isVisiblePasswordCheck = action.isVisible) }
+            is SignUpUiAction.DismissFailureDialog -> updateState { copy(failureDialogState = null) }
         }
     }
 
@@ -66,9 +71,9 @@ open class SignUpViewModel @Inject constructor(
         when (uiState.value.emailAuthState) {
             AuthenticationState.TIME_EXPIRED, AuthenticationState.VERIFIED -> return
 
-            AuthenticationState.SEND_SUCCESS, AuthenticationState.SEND_FAILED -> updateState { copy(emailAuthNumber = authNum) }
+            AuthenticationState.SEND_SUCCESS, AuthenticationState.SEND_FAILED, AuthenticationState.REJECTED -> updateState { copy(emailAuthNumber = authNum) }
 
-            AuthenticationState.NONE, AuthenticationState.REJECTED -> {
+            AuthenticationState.NONE -> {
                 updateState {
                     copy(
                         emailAuthNumber = authNum,
@@ -114,29 +119,54 @@ open class SignUpViewModel @Inject constructor(
                 authNumberSupportingTextResId = R.string.empty
             )
         }
-        runCatching { userRepository.requestEmailAuthNumber(uiState.value.email) }.onSuccess {
-            sendEffect(SignUpUiEffect.ShowSnackBer(R.string.email_auth_sent))
-            updateState { copy(emailAuthState = AuthenticationState.SEND_SUCCESS) }
-            process(SignUpUiAction.StartEmailAuthTimer)
-        }.onFailure {
-            updateState {
-                copy(
-                    emailAuthState = AuthenticationState.SEND_FAILED,
-                    authNumberSupportingTextResId = R.string.email_auth_sent_fail
-                )
+
+        when (val result = userRepository.requestEmailAuthNumber(uiState.value.email)) {
+            is ApiResult.Success -> {
+                sendEffect(SignUpUiEffect.ShowSnackBer(R.string.email_auth_sent))
+                updateState { copy(emailAuthState = AuthenticationState.SEND_SUCCESS) }
+                process(SignUpUiAction.StartEmailAuthTimer)
+            }
+
+            is ApiResult.NetworkError -> {
+                updateState {
+                    copy(
+                        failureDialogState = SignUpUiState.FailureDialogState(
+                            title = NETWORK_IS_UNSTABLE,
+                            message = CHECK_NETWORK_AND_TRY_AGAIN,
+                            retryAction = SignUpUiAction.ClickEmailAuthNumSend
+                        )
+                    )
+                }
+            }
+
+            is ApiResult.Failure, is ApiResult.UnknownError -> {
+                updateState {
+                    copy(
+                        emailAuthState = if (uiState.value.emailAuthState == AuthenticationState.NONE) AuthenticationState.SEND_FAILED
+                        else uiState.value.emailAuthState,
+                        authNumberSupportingTextResId = R.string.email_auth_sent_fail
+                    )
+                }
+
+                val message = if (result is ApiResult.Failure) result.message else UNKNOWN_ERROR
+                sendEffect(SignUpUiEffect.ShowSnackBer(defaultResId = R.string.empty, message = message))
             }
         }
     }
 
-    //TODO : 로딩 UI 추가되어야함
     private fun verifyEmailAuthNumber() {
         if (uiState.value.isSendFailedEmailAuth) return
 
         val authenticationNumber = uiState.value.emailAuthNumber
+        val email = uiState.value.email
 
         viewModelScope.launch {
-            runCatching { userRepository.verifyEmailAuthNumber(authenticationNumber) }.onSuccess { isVerified ->
-                if (isVerified) {
+            val result = userRepository.verifyEmailAuthNumber(
+                email,
+                authenticationNumber
+            )
+            when (result) {
+                is ApiResult.Success -> {
                     updateState {
                         copy(
                             emailAuthState = AuthenticationState.VERIFIED,
@@ -144,7 +174,9 @@ open class SignUpViewModel @Inject constructor(
                         )
                     }
                     cancelEmailAuthTimer()
-                } else {
+                }
+
+                is ApiResult.Failure -> {
                     updateState {
                         copy(
                             emailAuthState = AuthenticationState.REJECTED,
@@ -152,10 +184,29 @@ open class SignUpViewModel @Inject constructor(
                         )
                     }
                 }
-            }.onFailure {
-                //TODO : 재시도 가능하게 UI 구현되어야함 혹은 API 실패 유저에게 전달
-                // "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
-                // 수정 후 테스트 케이스 추가
+
+                is ApiResult.NetworkError -> {
+                    updateState {
+                        copy(
+                            failureDialogState = SignUpUiState.FailureDialogState(
+                                title = NETWORK_IS_UNSTABLE,
+                                message = CHECK_NETWORK_AND_TRY_AGAIN,
+                                retryAction = SignUpUiAction.ClickVerifyAuthNum
+                            )
+                        )
+                    }
+                }
+
+                is ApiResult.UnknownError -> {
+                    updateState {
+                        copy(
+                            failureDialogState = SignUpUiState.FailureDialogState(
+                                title = UNKNOWN_ERROR,
+                                message = CONTACT_DEVELOPER_IF_PERSISTS,
+                            )
+                        )
+                    }
+                }
             }
         }
     }
@@ -226,26 +277,47 @@ open class SignUpViewModel @Inject constructor(
         if (ID_REGEX.matches(uiState.value.id).not()) return
 
         viewModelScope.launch {
-            runCatching { userRepository.isNotDuplicateId(uiState.value.id) }.onSuccess { isNotDuplicated ->
-                val idErrorMessageResId =
-                    if (isNotDuplicated) R.string.empty else R.string.id_cannot_be_used
-                updateState {
-                    copy(
-                        idValidationState = if (isNotDuplicated) SignUpUiState.UserIdValidationState.AVAILABLE
-                        else SignUpUiState.UserIdValidationState.NOT_AVAILABLE,
-                        idErrorMessageResId = idErrorMessageResId,
-                    )
+            when (val result = userRepository.isNotDuplicateId(uiState.value.id)) {
+                is ApiResult.Success -> {
+                    updateState {
+                        copy(
+                            idValidationState = SignUpUiState.UserIdValidationState.AVAILABLE,
+                            idErrorMessageResId = R.string.empty,
+                        )
+                    }
                 }
-            }.onFailure { t ->
-                //TODO : 재시도 가능하게 UI 구현되어야함 혹은 API 실패 유저에게 전달
-                // "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
-                // 수정 후 테스트 케이스 추가
-                sendEffect(
-                    SignUpUiEffect.ShowSnackBer(
-                        defaultResId = R.string.id_duplication_check_failed,
-                        message = t.message
-                    )
-                )
+
+                is ApiResult.Failure -> {
+                    updateState {
+                        copy(
+                            idValidationState = SignUpUiState.UserIdValidationState.NOT_AVAILABLE,
+                            idErrorMessageResId = R.string.id_cannot_be_used
+                        )
+                    }
+                }
+
+                is ApiResult.NetworkError -> {
+                    updateState {
+                        copy(
+                            failureDialogState = SignUpUiState.FailureDialogState(
+                                title = NETWORK_IS_UNSTABLE,
+                                message = CHECK_NETWORK_AND_TRY_AGAIN,
+                                retryAction = SignUpUiAction.ClickIdDuplicateCheck
+                            )
+                        )
+                    }
+                }
+
+                is ApiResult.UnknownError -> {
+                    updateState {
+                        copy(
+                            failureDialogState = SignUpUiState.FailureDialogState(
+                                title = result.throwable?.message ?: UNKNOWN_ERROR,
+                                message = CONTACT_DEVELOPER_IF_PERSISTS,
+                            )
+                        )
+                    }
+                }
             }
         }
     }
@@ -303,6 +375,7 @@ open class SignUpViewModel @Inject constructor(
     }
 
     private fun onClickSignUp() {
+        updateState { copy(failureDialogState = null) }
         signUp()
     }
 
@@ -315,17 +388,52 @@ open class SignUpViewModel @Inject constructor(
     }
 
     private fun signUp() = viewModelScope.launch {
-        runCatching {
-//            userRepository.signUp(
-//                loginId = uiState.value.id,
-//                password = uiState.value.pw,
-//                nickname = uiState.value.name,
-//                email = uiState.value.email,
-//            )
-        }.onSuccess { sendEffect(SignUpUiEffect.SignUpUiComplete) }.onFailure {
-            //TODO : 재시도 가능하게 UI 구현되어야함 혹은 API 실패 유저에게 전달
-            // "네트워크 오류 발생" 혹은 "서버 오류 발생" 모달 다이얼로그 노출
-            // 수정 후 테스트 케이스 추가
+        val result = userRepository.signUp(
+            loginId = uiState.value.id,
+            email = uiState.value.email,
+            password = uiState.value.pw,
+            nickname = uiState.value.name,
+        )
+
+        when (result) {
+            is ApiResult.Success -> {
+                sendEffect(SignUpUiEffect.ShowSnackBer(R.string.sign_up_complete))
+                sendEffect(SignUpUiEffect.SignUpUiComplete)
+            }
+
+            is ApiResult.Failure -> {
+                updateState {
+                    copy(
+                        failureDialogState = SignUpUiState.FailureDialogState(
+                            title = result.message,
+                            message = "회원가입에 실패하였습니다."
+                        )
+                    )
+                }
+            }
+
+            is ApiResult.NetworkError -> {
+                updateState {
+                    copy(
+                        failureDialogState = SignUpUiState.FailureDialogState(
+                            title = NETWORK_IS_UNSTABLE,
+                            message = CHECK_NETWORK_AND_TRY_AGAIN,
+                            retryAction = SignUpUiAction.ClickSignUp
+                        )
+                    )
+                }
+            }
+
+            is ApiResult.UnknownError -> {
+                updateState {
+                    copy(
+                        failureDialogState = SignUpUiState.FailureDialogState(
+                            title = result.throwable?.message ?: UNKNOWN_ERROR,
+                            message = CONTACT_DEVELOPER_IF_PERSISTS,
+                        )
+                    )
+                }
+            }
         }
     }
 

@@ -19,10 +19,10 @@ fun Question.toQuestionTestItem(isSelectedOptionMap: Map<Long, Option>) =
         description = description,
         isOptionSelected = isSelectedOptionMap[id] != null,
         options = options.map { option ->
-            val isSelected = isSelectedOptionMap[this.id]?.description == option.description
+            val isSelected = isSelectedOptionMap[this.id]?.content == option.content
             when {
-                isSelected -> SelectedOrCorrectOptionItem(option.description)
-                else -> GeneralOptionItem(option.description)
+                isSelected -> SelectedOrCorrectOptionItem(option.id, option.content)
+                else -> GeneralOptionItem(option.id, option.content)
             }
         }.toImmutableList(),
     )

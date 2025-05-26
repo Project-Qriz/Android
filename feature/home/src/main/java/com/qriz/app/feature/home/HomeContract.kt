@@ -32,9 +32,11 @@ sealed interface HomeUiAction : UiAction {
     data class ChangeTodayStudyCard(val day: Int) : HomeUiAction
     data object ClickTestDateRegister : HomeUiAction
     data object DismissTestDateBottomSheet : HomeUiAction
+    data object MoveToPreviewTest : HomeUiAction
 }
 
 sealed interface HomeUiEffect : UiEffect {
+    data object MoveToPreviewTest: HomeUiEffect
     data class ShowSnackBar(
         @StringRes val defaultResId: Int,
         val message: String? = null

@@ -2,6 +2,7 @@ package com.qriz.app.feature.onboard.survey.model
 
 import androidx.compose.runtime.Immutable
 import com.qriz.app.core.data.test.test_api.model.SQLDConcept
+import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
 sealed class SurveyListItem(
@@ -11,7 +12,7 @@ sealed class SurveyListItem(
         return when (this) {
             is KnowsNothing -> KNOWS_NOTHING_ITEM_STABLE_ID
             is KnowsAll -> KNOWS_ALL_ITEM_STABLE_ID
-            is SurveyItem -> concept.hashCode()
+            is SurveyItemGroup -> SURVEY_ITEM_GROUP_ID
         }
     }
 
@@ -26,13 +27,20 @@ sealed class SurveyListItem(
     ) : SurveyListItem(isChecked)
 
     @Immutable
+    data class SurveyItemGroup(
+        override val isChecked: Boolean = false,
+        val list: ImmutableList<SurveyItem>
+    ) : SurveyListItem(isChecked)
+
+    @Immutable
     data class SurveyItem(
         val concept: SQLDConcept,
-        override val isChecked: Boolean
-    ) : SurveyListItem(isChecked)
+        val isChecked: Boolean
+    )
 
     companion object {
         const val KNOWS_NOTHING_ITEM_STABLE_ID = -1
         const val KNOWS_ALL_ITEM_STABLE_ID = -2
+        const val SURVEY_ITEM_GROUP_ID = -3
     }
 }

@@ -19,6 +19,7 @@ class HomeViewModel @Inject constructor(
             is HomeUiAction.ChangeTodayStudyCard -> onChangeTodayStudyCard(action.day)
             is HomeUiAction.ClickTestDateRegister -> onClickTestDateRegister()
             is HomeUiAction.DismissTestDateBottomSheet -> onDismissTestDateBottomSheet()
+            is HomeUiAction.MoveToPreviewTest -> sendEffect(HomeUiEffect.MoveToPreviewTest)
         }
     }
 

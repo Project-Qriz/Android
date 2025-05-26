@@ -14,10 +14,9 @@ import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus.SURVEY_COMPL
  * @property previewTestStatus      프리뷰 테스트 진행 상태
  */
 data class User(
-    val id: Long,
     val userId: String,
     val name: String,
-    val createdAt: String,
+    val email: String,
     val previewTestStatus: PreviewTestStatus
 ) {
     val isSurveyNeeded
@@ -25,10 +24,9 @@ data class User(
 
     companion object {
         val Default = User(
-            id = -1,
             userId = "",
             name = "",
-            createdAt = "",
+            email = "",
             previewTestStatus = NOT_STARTED
         )
     }

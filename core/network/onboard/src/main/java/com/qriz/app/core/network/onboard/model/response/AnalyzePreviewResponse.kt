@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AnalyzePreviewResponse(
     @SerialName("estimatedScore") val estimatedScore: Float,
-    @SerialName("scoreBreakDown") val scoreBreakdown: ScoreBreakdownResponseModel,
+    @SerialName("scoreBreakdown") val scoreBreakdown: ScoreBreakdownResponseModel,
     @SerialName("weakAreaAnalysis") val weakAreaAnalysis: WeakAreaAnalysisResponseModel,
     @SerialName("topConceptsToImprove") val topConceptsToImprove: List<String>,
 )

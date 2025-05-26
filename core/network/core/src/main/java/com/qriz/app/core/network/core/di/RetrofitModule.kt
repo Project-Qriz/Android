@@ -1,7 +1,10 @@
 package com.qriz.app.core.network.core.di
 
+import com.qriz.app.core.network.core.BuildConfig
+import com.qriz.app.core.network.core.adapter.QrizCallAdapterFactory
 import com.qriz.app.core.network.core.interceptor.AuthInterceptor
-import com.qriz.app.core.network.core.interceptor.TokenAuthenticator
+import com.qriz.app.core.network.core.interceptor.PrettyLoggingInterceptor
+import com.qriz.app.core.network.core.interceptor.ResponseConvertInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,29 +26,29 @@ object RetrofitModule {
     fun providesRetrofit(
         json: Json,
         okHttpClient: OkHttpClient,
+        callAdapterFactory: QrizCallAdapterFactory,
     ): Retrofit {
-        //TODO : 도메인주소 나오면 secretKey로 이동
-        val baseUrl = "https://www.qriz.com"
         return Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addCallAdapterFactory(callAdapterFactory)
             .build()
     }
 
     @Provides
     @Singleton
     fun provideOkHttpClient(
-        authenticator: TokenAuthenticator,
         authInterceptor: AuthInterceptor,
+        responseConvertInterceptor: ResponseConvertInterceptor,
     ): OkHttpClient {
         val builder = OkHttpClient.Builder()
 
-        val logging = HttpLoggingInterceptor()
+        val logging = HttpLoggingInterceptor(PrettyLoggingInterceptor())
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
         builder.addInterceptor(logging)
         builder.addInterceptor(authInterceptor)
-        builder.authenticator(authenticator)
+        builder.addInterceptor(responseConvertInterceptor)
         return builder.build()
     }
 

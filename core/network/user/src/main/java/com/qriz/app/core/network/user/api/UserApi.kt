@@ -1,52 +1,71 @@
 package com.qriz.app.core.network.user.api
 
-import com.qriz.app.core.network.common.NetworkResponse
+import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.network.user.model.request.EmailAuthenticationRequest
 import com.qriz.app.core.network.user.model.request.FindIdRequest
 import com.qriz.app.core.network.user.model.request.FindPwdRequest
 import com.qriz.app.core.network.user.model.request.JoinRequest
 import com.qriz.app.core.network.user.model.request.LoginRequest
 import com.qriz.app.core.network.user.model.request.ResetPwdRequest
+import com.qriz.app.core.network.user.model.request.SingleEmailRequest
 import com.qriz.app.core.network.user.model.request.VerifyPwdResetRequest
+import com.qriz.app.core.network.user.model.response.DuplicateResponse
 import com.qriz.app.core.network.user.model.response.UserProfileResponse
 import com.qriz.app.core.network.user.model.response.JoinResponse
 import com.qriz.app.core.network.user.model.response.LoginResponse
+import com.qriz.app.core.network.user.model.response.VerifyPwdResetRespoonse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface UserApi {
     @POST("/api/login")
     suspend fun login(
         @Body request: LoginRequest
-    ): NetworkResponse<LoginResponse>
+    ): ApiResult<LoginResponse>
 
-    //TODO : 서버 수정 대기 중
-    @GET("")
+    @GET("/api/v1/user/info")
     suspend fun getUserProfile(
-    ): NetworkResponse<UserProfileResponse>
+    ): ApiResult<UserProfileResponse>
+
+    @POST("/api/email-send")
+    suspend fun sendAuthEmail(
+        @Body request: SingleEmailRequest
+    ): ApiResult<Unit>
+
+    @POST("/api/email-authentication")
+    suspend fun verifyEmailAuthenticationNumber(
+        @Body request: EmailAuthenticationRequest
+    ): ApiResult<Unit>
+
+    @GET("/api/username-duplicate")
+    suspend fun checkDuplicateId(
+        @Query("username") userId: String
+    ): ApiResult<DuplicateResponse>
 
     @POST("/api/join")
     suspend fun signUp(
         @Body request: JoinRequest
-    ): NetworkResponse<JoinResponse>
+    ): ApiResult<JoinResponse>
 
     @POST("/api/find-username")
     suspend fun sendEmailToFindId(
         @Body request: FindIdRequest
-    ): NetworkResponse<Unit>
+    ): ApiResult<Unit>
 
     @POST("/api/find-pwd")
     suspend fun sendEmailToPwd(
         @Body request: FindPwdRequest
-    ): NetworkResponse<Unit>
+    ): ApiResult<Unit>
 
     @POST("/api/verify-pwd-reset")
     suspend fun verifyPwdReset(
         @Body request: VerifyPwdResetRequest
-    ): NetworkResponse<Unit>
+    ): ApiResult<VerifyPwdResetRespoonse>
 
     @POST("/api/pwd-reset")
     suspend fun resetPwd(
         @Body request: ResetPwdRequest
-    ): NetworkResponse<Unit>
+    ): ApiResult<Unit>
 }

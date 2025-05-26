@@ -1,4 +1,5 @@
 <resources>
     <string name="cancel">취소</string>
     <string name="confirmation">확인</string>
+    <string name="empty"/>
 </resources>

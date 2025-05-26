@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ResetPwdRequest(
-    @SerialName("password") val password: String
+    @SerialName("newPassword") val password: String,
+    @SerialName("resetToken") val resetToken: String,
 )

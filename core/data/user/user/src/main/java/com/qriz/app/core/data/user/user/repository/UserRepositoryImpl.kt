@@ -1,13 +1,17 @@
 package com.qriz.app.core.data.user.user.repository
 
-import com.qriz.app.core.network.common.util.verifyResponseCode
-import com.qriz.app.core.network.user.api.UserApi
 import com.qriz.app.core.data.user.user.mapper.toDataModel
+import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.model.flatMapSuspend
+import com.qriz.app.core.model.map
+import com.qriz.app.core.network.user.api.UserApi
+import com.qriz.app.core.network.user.model.request.EmailAuthenticationRequest
 import com.qriz.app.core.network.user.model.request.FindIdRequest
 import com.qriz.app.core.network.user.model.request.FindPwdRequest
 import com.qriz.app.core.network.user.model.request.JoinRequest
 import com.qriz.app.core.network.user.model.request.LoginRequest
 import com.qriz.app.core.network.user.model.request.ResetPwdRequest
+import com.qriz.app.core.network.user.model.request.SingleEmailRequest
 import com.qriz.app.core.network.user.model.request.VerifyPwdResetRequest
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
@@ -19,102 +23,113 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-//TODO : getUserProfile 함수 서버 수정 대기
 internal class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
 ) : UserRepository {
     private val user = MutableStateFlow<User?>(null)
 
-    override suspend fun login(id: String, password: String): User {
+    override suspend fun login(id: String, password: String): ApiResult<User> {
         val response = userApi.login(
             LoginRequest(
                 username = id,
                 password = password
             )
-        )
-        val newUser = response.data.toDataModel()
-        user.update { newUser }
-        return newUser
+        ).flatMapSuspend { getUser() }
+
+        return response
     }
 
     override fun getUserFlow(): Flow<User> {
         return user.asStateFlow().filterNotNull()
     }
 
-    override suspend fun getUser(): User {
-        return user.firstOrNull()
-            ?: getUserProfileFromServer()
+    override suspend fun getUser(): ApiResult<User> {
+        val cached = user.firstOrNull()
+        val result = if (cached != null) {
+            ApiResult.Success(cached)
+        } else {
+            val response = getUserProfileFromServer()
+            if (response is ApiResult.Success) {
+                user.update { response.data }
+            }
+            response
+        }
+
+        return result
     }
 
-    private suspend fun getUserProfileFromServer(): User {
-        return userApi.getUserProfile().data.toDataModel()
-            .also { newUser -> user.update { newUser } }
+    private suspend fun getUserProfileFromServer(): ApiResult<User> {
+        return userApi.getUserProfile().map { it.toDataModel() }
     }
 
-    /* TODO: 주소 값 나오면 실제 API 연결 */
-    override suspend fun requestEmailAuthNumber(email: String) {
+    override suspend fun requestEmailAuthNumber(email: String): ApiResult<Unit> =
+        userApi.sendAuthEmail(SingleEmailRequest(email))
+
+    override suspend fun verifyEmailAuthNumber(
+        email: String,
+        authenticationNumber: String,
+    ): ApiResult<Unit> {
+        return userApi.verifyEmailAuthenticationNumber(
+            EmailAuthenticationRequest(
+                email = email,
+                authNum = authenticationNumber,
+            )
+        )
     }
 
-    /* TODO: 주소 값 나오면 실제 API 연결 */
-    override suspend fun verifyEmailAuthNumber(authenticationNumber: String): Boolean {
-        return true
-    }
-
-    override suspend fun isNotDuplicateId(id: String): Boolean {
-        return true
+    override suspend fun isNotDuplicateId(id: String): ApiResult<Boolean> {
+        return userApi.checkDuplicateId(id).map { it.available }
     }
 
     override suspend fun signUp(
         loginId: String,
         password: String,
         email: String,
-        nickname: String
-    ): User {
-        userApi.signUp(
+        nickname: String,
+    ): ApiResult<User> {
+        return userApi.signUp(
             JoinRequest(
                 username = loginId,
                 password = password,
                 email = email,
                 nickname = nickname,
             )
-        )
-
-        val user = login(
-            id = loginId,
-            password = password
-        )
-        return user
+        ).flatMapSuspend {
+            login(loginId, password)
+        }
     }
 
-    override suspend fun sendEmailToFindId(email: String) {
-        userApi.sendEmailToFindId(
+    override suspend fun sendEmailToFindId(email: String): ApiResult<Unit> {
+        return userApi.sendEmailToFindId(
             request = FindIdRequest(
                 email = email
             )
-        ).verifyResponseCode()
+        )
     }
 
-    override suspend fun sendEmailToFindPassword(email: String) {
-        userApi.sendEmailToPwd(
+    override suspend fun sendEmailToFindPassword(email: String): ApiResult<Unit> {
+        return userApi.sendEmailToPwd(
             request = FindPwdRequest(
                 email = email
             )
-        ).verifyResponseCode()
+        )
     }
 
-    override suspend fun verifyPasswordAuthNumber(authNumber: String) {
-        userApi.verifyPwdReset(
+    override suspend fun verifyPasswordAuthNumber(email: String, authNumber: String): ApiResult<String> {
+        return userApi.verifyPwdReset(
             request = VerifyPwdResetRequest(
+                email = email,
                 authNumber = authNumber
             )
-        ).verifyResponseCode()
+        ).map { it.resetToken }
     }
 
-    override suspend fun resetPassword(password: String) {
-        userApi.resetPwd(
+    override suspend fun resetPassword(password: String, resetToken: String): ApiResult<Unit> {
+        return userApi.resetPwd(
             request = ResetPwdRequest(
-                password = password
+                password = password,
+                resetToken = resetToken,
             )
-        ).verifyResponseCode()
+        )
     }
 }

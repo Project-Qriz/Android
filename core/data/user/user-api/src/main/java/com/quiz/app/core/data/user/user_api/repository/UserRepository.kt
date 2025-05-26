@@ -1,5 +1,6 @@
 package com.quiz.app.core.data.user.user_api.repository
 
+import com.qriz.app.core.model.ApiResult
 import com.quiz.app.core.data.user.user_api.model.User
 import kotlinx.coroutines.flow.Flow
 
@@ -7,30 +8,30 @@ interface UserRepository {
     suspend fun login(
         id: String,
         password: String,
-    ): User
+    ): ApiResult<User>
 
     fun getUserFlow(): Flow<User>
 
-    suspend fun getUser(): User
+    suspend fun getUser(): ApiResult<User>
 
-    suspend fun requestEmailAuthNumber(email: String)
+    suspend fun requestEmailAuthNumber(email: String): ApiResult<Unit>
 
-    suspend fun verifyEmailAuthNumber(authenticationNumber: String): Boolean
+    suspend fun verifyEmailAuthNumber(email: String, authenticationNumber: String): ApiResult<Unit>
 
-    suspend fun isNotDuplicateId(id: String): Boolean
+    suspend fun isNotDuplicateId(id: String): ApiResult<Boolean>
 
     suspend fun signUp(
         loginId: String,
         password: String,
         email: String,
         nickname: String,
-    ): User
+    ): ApiResult<User>
 
-    suspend fun sendEmailToFindId(email: String)
+    suspend fun sendEmailToFindId(email: String): ApiResult<Unit>
 
-    suspend fun sendEmailToFindPassword(email: String)
+    suspend fun sendEmailToFindPassword(email: String): ApiResult<Unit>
 
-    suspend fun verifyPasswordAuthNumber(authNumber: String)
+    suspend fun verifyPasswordAuthNumber(email: String, authNumber: String): ApiResult<String>
 
-    suspend fun resetPassword(password: String)
+    suspend fun resetPassword(password: String, resetToken: String): ApiResult<Unit>
 }

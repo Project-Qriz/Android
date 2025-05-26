@@ -7,13 +7,13 @@ import com.qriz.app.core.ui.test.model.SelectedAndIncorrectOptionItem
 import com.qriz.app.core.ui.test.model.SelectedOrCorrectOptionItem
 
 fun Option.toSelectedOrCorrectOptionItem() =
-    SelectedOrCorrectOptionItem(description)
+    SelectedOrCorrectOptionItem(id, content)
 
 fun Option.toSelectedAndIncorrectOptionItem() =
-    SelectedAndIncorrectOptionItem(description)
+    SelectedAndIncorrectOptionItem(id, content)
 
 fun Option.toGeneralOptionItem() =
-    GeneralOptionItem(description)
+    GeneralOptionItem(id, content)
 
 fun OptionItem.toOption() =
-    Option(description)
+    Option(id, description)
