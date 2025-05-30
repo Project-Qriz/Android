@@ -10,4 +10,5 @@ android {
 
 dependencies {
     implementation(projects.core.data.application.applicationApi)
+    implementation(projects.core.network.application)
 }
