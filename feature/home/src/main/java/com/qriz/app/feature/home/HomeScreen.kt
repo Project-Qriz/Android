@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.base.extention.collectSideEffect
+import com.qriz.app.feature.home.component.ExamScheduleUiState
 import com.qriz.app.feature.home.component.TestDateBottomSheet
 import com.qriz.app.feature.home.component.TestScheduleCard
 import com.qriz.app.feature.home.component.TestStartCard
@@ -66,13 +67,12 @@ fun HomeScreen(
         previewTestStatus = uiState.user.previewTestStatus,
         currentTodayStudyDay = uiState.currentTodayStudyDay,
         todayStudyConcepts = uiState.todayStudyConcepts,
+        scheduleState = uiState.scheduleState,
         onInit = { viewModel.process(HomeUiAction.ObserveClient) },
         onClickTestDateChange = { },
         onClickTestDateRegister = { viewModel.process(HomeUiAction.ClickTestDateRegister) },
         onClickMockTest = {},
-        onClickPreviewTest = {
-            viewModel.process(HomeUiAction.MoveToPreviewTest)
-        },
+        onClickPreviewTest = { viewModel.process(HomeUiAction.MoveToPreviewTest) },
         onClickTodayStudyInit = {},
         onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeTodayStudyCard(it)) },
         onClickWeeklyCustomConcept = {},
@@ -85,6 +85,7 @@ fun HomeContent(
     previewTestStatus: PreviewTestStatus,
     currentTodayStudyDay: Int,
     todayStudyConcepts: List<Int>,
+    scheduleState: ExamScheduleUiState,
     onInit: () -> Unit,
     onClickTestDateChange: () -> Unit,
     onClickTestDateRegister: () -> Unit,
@@ -145,10 +146,8 @@ fun HomeContent(
                         top = 24.dp,
                         bottom = 32.dp
                     ),
-                isExistSchedule = true,
                 userName = userName,
-                examDateString = "3월9일(토)",
-                examPeriodString = "01.29(월) 10:00 ~ 02.02(금) 18:00",
+                scheduleState = scheduleState,
                 onClickTestDateRegister = onClickTestDateRegister,
             )
 
@@ -188,6 +187,7 @@ fun HomeContentPreview() {
             userName = "Qriz",
             previewTestStatus = NOT_STARTED,
             currentTodayStudyDay = 0,
+            scheduleState = ExamScheduleUiState.NoSchedule,
             todayStudyConcepts = List(30) { it + 1 },
             onInit = {},
             onClickTestDateChange = {},
