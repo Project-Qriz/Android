@@ -18,24 +18,36 @@ import javax.inject.Inject
 class ExamRepositoryImpl @Inject constructor(
     private val applicationApi: ApplicationApi,
 ) : ExamRepository {
-
     private var initialized = false
-    private val cached = MutableStateFlow<ApiResult<UserExam?>>(ApiResult.Success(null))
+    private val cachedUserExam = 
+        MutableStateFlow<ApiResult<UserExam?>>(ApiResult.Success(null))
+    
+    private lateinit var cachedExamSchedules: List<Schedule>
 
-    override fun getUserExams(): Flow<ApiResult<UserExam?>> = cached.onStart {
+    override fun getUserExams(): Flow<ApiResult<UserExam?>> = cachedUserExam.onStart {
         if (initialized.not()) {
             fetchUserExam()
             initialized = true
         }
     }
 
-    override suspend fun getExamSchedules(): ApiResult<List<Schedule>> =
-        applicationApi.applications().map { it.toDomain() }
+    override suspend fun getExamSchedules(): ApiResult<List<Schedule>> {
+        if (!::cachedExamSchedules.isInitialized) {
+            return ApiResult.Success(cachedExamSchedules)
+        }
+
+        val result = applicationApi.applications().map { it.toDomain() }
+        if (result is ApiResult.Success) {
+            cachedExamSchedules = result.data
+        }
+        
+        return result
+    }
 
     private suspend fun fetchUserExam() {
         val applicationResult = applicationApi.getUserApplicationInfo()
         if (applicationResult is ApiResult.Failure) {
-            cached.update { ApiResult.Success(null)}
+            cachedUserExam.update { ApiResult.Success(null)}
             return
         }
 
@@ -50,6 +62,6 @@ class ExamRepositoryImpl @Inject constructor(
                 )
             }
         }
-        cached.update { result }
+        cachedUserExam.update { result }
     }
 }
