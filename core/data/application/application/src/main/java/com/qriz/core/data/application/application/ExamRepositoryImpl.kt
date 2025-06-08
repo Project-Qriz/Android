@@ -8,7 +8,7 @@ import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.model.flatMapSuspend
 import com.qriz.app.core.model.map
 import com.qriz.app.core.network.application.api.ApplicationApi
-import com.qriz.core.data.application.application.mapper.toDomain
+import com.qriz.core.data.application.application.mapper.toScheduleList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
@@ -32,11 +32,11 @@ class ExamRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getExamSchedules(): ApiResult<List<Schedule>> {
-        if (!::cachedExamSchedules.isInitialized) {
+        if (::cachedExamSchedules.isInitialized) {
             return ApiResult.Success(cachedExamSchedules)
         }
 
-        val result = applicationApi.applications().map { it.toDomain() }
+        val result = applicationApi.applications().map { it.toScheduleList() }
         if (result is ApiResult.Success) {
             cachedExamSchedules = result.data
         }

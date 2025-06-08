@@ -1,7 +1,7 @@
 package com.qriz.app.core.network.application.api
 
 import com.qriz.app.core.model.ApiResult
-import com.qriz.app.core.network.application.model.ApplicationData
+import com.qriz.app.core.network.application.model.ExamListResponse
 import com.qriz.app.core.network.application.model.request.ApplicationModifyRequest
 import com.qriz.app.core.network.application.model.request.ApplicationRequest
 import com.qriz.app.core.network.application.model.response.DdayResponse
@@ -14,7 +14,7 @@ import retrofit2.http.Path
 
 interface ApplicationApi {
     @GET("/api/v1/applications")
-    suspend fun applications(): ApiResult<ApplicationData>
+    suspend fun applications(): ApiResult<ExamListResponse>
 
     @POST("/api/v1/applications")
     suspend fun apply(

@@ -4,14 +4,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApplicationData(
-    @SerialName("registeredApplicationId") val registeredApplicationId: Int,
+data class ExamListResponse(
+    @SerialName("registeredApplicationId") val registeredApplicationId: Int?,
     @SerialName("registeredUserApplyId") val registeredUserApplyId: Int?,
-    @SerialName("applications") val applications: List<Application>
+    @SerialName("applications") val applications: List<ExamSchedule>
 )
 
 @Serializable
-data class Application(
+data class ExamSchedule(
     @SerialName("applicationId") val applicationId: Int,
     @SerialName("userApplyId") val userApplyId: Int?,
     @SerialName("examName") val examName: String,
