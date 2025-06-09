@@ -167,4 +167,7 @@ fabric.properties
 ### Firebender ###
 firebender.json
 
+### MAC ###
+*.DS_Store
+
 # End of https://www.toptal.com/developers/gitignore/api/android,androidstudio
