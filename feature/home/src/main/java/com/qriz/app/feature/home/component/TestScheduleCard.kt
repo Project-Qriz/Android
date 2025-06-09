@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,13 +30,13 @@ import com.qriz.app.feature.home.R
 fun TestScheduleCard(
     modifier: Modifier = Modifier,
     userName: String,
-    scheduleState: ExamScheduleUiState,
+    scheduleState: UserExamUiState,
     onClickTestDateRegister: () -> Unit,
 ) {
     Column(
         modifier = modifier
     ) {
-        if (scheduleState is ExamScheduleUiState.Scheduled) DDayHeader(
+        if (scheduleState is UserExamUiState.Scheduled) DDayHeader(
             userName = userName,
             ddayCount = scheduleState.dday,
         )
@@ -44,7 +46,7 @@ fun TestScheduleCard(
                 modifier = Modifier.padding(24.dp)
             ) {
                 when(scheduleState) {
-                    is ExamScheduleUiState.NoSchedule -> {
+                    is UserExamUiState.NoSchedule -> {
                         Text(
                             text = stringResource(
                                 R.string.exam_register_message,
@@ -55,7 +57,7 @@ fun TestScheduleCard(
                         )
                     }
 
-                    is ExamScheduleUiState.PastExam -> {
+                    is UserExamUiState.PastExam -> {
                         Text(
                             text = stringResource(R.string.exam_date_expired),
                             style = QrizTheme.typography.heading1,
@@ -63,7 +65,7 @@ fun TestScheduleCard(
                         )
                     }
 
-                    is ExamScheduleUiState.Scheduled -> {
+                    is UserExamUiState.Scheduled -> {
                         Text(
                             text = stringResource(R.string.exam_date) + scheduleState.examDate,
                             style = QrizTheme.typography.headline1,
@@ -94,7 +96,7 @@ fun TestScheduleCard(
                 )
 
                 when(scheduleState) {
-                    is ExamScheduleUiState.NoSchedule -> {
+                    is UserExamUiState.NoSchedule -> {
                         Text(
                             text = stringResource(R.string.no_registered_schedule),
                             style = QrizTheme.typography.headline1,
@@ -108,7 +110,7 @@ fun TestScheduleCard(
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
-                    is ExamScheduleUiState.PastExam -> {
+                    is UserExamUiState.PastExam -> {
                         Text(
                             text = stringResource(R.string.re_register_schedule),
                             style = QrizTheme.typography.headline1,
@@ -122,7 +124,7 @@ fun TestScheduleCard(
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
-                    is ExamScheduleUiState.Scheduled -> {
+                    is UserExamUiState.Scheduled -> {
                         Text(
                             text = stringResource(R.string.change_schedule_prompt),
                             style = QrizTheme.typography.subhead,
@@ -210,24 +212,28 @@ private fun DDayHeader(
     }
 }
 
-sealed interface ExamScheduleUiState {
+@Stable
+sealed interface UserExamUiState {
     val isExistSchedule: Boolean
 
-    data object NoSchedule : ExamScheduleUiState {
+    @Immutable
+    data object NoSchedule : UserExamUiState {
         override val isExistSchedule: Boolean = false
     }
 
+    @Immutable
     data class Scheduled(
         val examName: String,
         val examDate: String,
         val examPeriod: String,
         val dday: Int,
         val ddayType: DdayType,
-    ) : ExamScheduleUiState {
+    ) : UserExamUiState {
         override val isExistSchedule: Boolean = true
     }
 
-    data object PastExam : ExamScheduleUiState {
+    @Immutable
+    data object PastExam : UserExamUiState {
         override val isExistSchedule: Boolean = false
     }
 }
@@ -238,7 +244,7 @@ private fun NoSchedulePreview() {
     QrizTheme {
         TestScheduleCard(
             userName = "Qriz",
-            scheduleState = ExamScheduleUiState.NoSchedule,
+            scheduleState = UserExamUiState.NoSchedule,
             onClickTestDateRegister = {},
         )
     }
@@ -250,7 +256,7 @@ private fun ScheduledPreview() {
     QrizTheme {
         TestScheduleCard(
             userName = "Qriz",
-            scheduleState = ExamScheduleUiState.Scheduled(
+            scheduleState = UserExamUiState.Scheduled(
                 examName = "SQL 개발자 자격시험",
                 examDate = "3월 9일 (토)",
                 examPeriod = "01.29 (월) 10:00 ~ 02.02 (금) 18:00",
@@ -268,7 +274,7 @@ private fun PassedPreview() {
     QrizTheme {
         TestScheduleCard(
             userName = "Qriz",
-            scheduleState = ExamScheduleUiState.PastExam,
+            scheduleState = UserExamUiState.PastExam,
             onClickTestDateRegister = {},
         )
     }

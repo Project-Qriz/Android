@@ -51,7 +51,6 @@ import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.home.R
 
-//TODO : API 수정 대기 중
 @Composable
 fun TodayStudyCardPager(
     modifier: Modifier = Modifier,

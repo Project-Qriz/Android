@@ -11,6 +11,8 @@
     <string name="internet_connection_is_unstable">인터넷 연결이 불안정해요.</string>
     <string name="check_network_and_try_again">Wi-Fi나 셀룰러 데이터 연결 상태를\n확인하고 다시 시도해주세요.</string>
 
+    <string name="try_again">다시 시도해주세요.</string>
+
     <string name="retry">재시도</string>
     <string name="confirm">확인</string>
 

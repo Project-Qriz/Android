@@ -8,8 +8,8 @@
     <string name="change_schedule_prompt">일정을 변경할까요?</string>
     <string name="no_registered_schedule">등록된 일정이 없어요.</string>
     <string name="register_schedule_now">지금 바로 등록할까요?</string>
-    <string name="exam_date">시험일: </string>
-    <string name="exam_application_period">접수기간: </string>
+    <string name="exam_date">시험일: %s</string>
+    <string name="exam_application_period">접수기간: %s</string>
     <string name="preview_exam">프리뷰 시험</string>
     <string name="test_skill_check">간단한 테스트로 실력을 확인해봐요!</string>
     <string name="take_mock_exam">모의고사 응시</string>
@@ -20,4 +20,7 @@
     <string name="go_to_study">학습하러 가기</string>
     <string name="weekly_custom_concept">주간 맞춤 개념</string>
     <string name="weekly_recommend_concept">주간 추천 개념</string>
+    <string name="schedule_is_empty">시험 일정이 아직 나오지 않았어요</string>
+    <string name="schedule_is_not_registered">공식 홈페이지에 등록된 시험일정이 없습니다.</string>
+    <string name="to_home">홈으로 가기</string>
 </resources>

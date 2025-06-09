@@ -22,21 +22,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.qriz.app.core.designsystem.component.QrizDialog
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.base.extention.collectSideEffect
-import com.qriz.app.feature.home.component.ExamScheduleUiState
 import com.qriz.app.feature.home.component.TestDateBottomSheet
 import com.qriz.app.feature.home.component.TestScheduleCard
 import com.qriz.app.feature.home.component.TestStartCard
 import com.qriz.app.feature.home.component.TodayStudyCardPager
+import com.qriz.app.feature.home.component.UserExamUiState
 import com.qriz.app.feature.home.component.WeeklyCustomConcept
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus.NOT_STARTED
 import com.qriz.app.core.designsystem.R as DSR
+import com.qriz.app.core.ui.common.R as UR
 
 @Composable
 fun HomeScreen(
@@ -56,8 +59,22 @@ fun HomeScreen(
         }
     }
 
+    if(uiState.examSchedulesErrorMessage != null) {
+        QrizDialog(
+            title = stringResource(UR.string.error_occurs),
+            description = uiState.examSchedulesErrorMessage!!,
+            confirmText = stringResource(UR.string.retry),
+            cancelText = stringResource(R.string.to_home),
+            onCancelClick = { viewModel.process(HomeUiAction.DismissExamSchedulesErrorDialog) },
+            onConfirmClick = { viewModel.process(HomeUiAction.LoadToExamSchedules) }
+        )
+    }
+
     if (uiState.isShowTestDateBottomSheet) {
         TestDateBottomSheet(
+            schedulesLoadState = uiState.schedulesState,
+            onClickRetry = { viewModel.process(HomeUiAction.LoadToExamSchedules) },
+            onSelectExamDate = { },
             onDismissRequest = { viewModel.process(HomeUiAction.DismissTestDateBottomSheet) },
         )
     }
@@ -67,7 +84,7 @@ fun HomeScreen(
         previewTestStatus = uiState.user.previewTestStatus,
         currentTodayStudyDay = uiState.currentTodayStudyDay,
         todayStudyConcepts = uiState.todayStudyConcepts,
-        scheduleState = uiState.scheduleState,
+        scheduleState = uiState.userExamState,
         onInit = { viewModel.process(HomeUiAction.ObserveClient) },
         onClickTestDateChange = { },
         onClickTestDateRegister = { viewModel.process(HomeUiAction.ClickTestDateRegister) },
@@ -85,7 +102,7 @@ fun HomeContent(
     previewTestStatus: PreviewTestStatus,
     currentTodayStudyDay: Int,
     todayStudyConcepts: List<Int>,
-    scheduleState: ExamScheduleUiState,
+    scheduleState: UserExamUiState,
     onInit: () -> Unit,
     onClickTestDateChange: () -> Unit,
     onClickTestDateRegister: () -> Unit,
@@ -187,7 +204,7 @@ fun HomeContentPreview() {
             userName = "Qriz",
             previewTestStatus = NOT_STARTED,
             currentTodayStudyDay = 0,
-            scheduleState = ExamScheduleUiState.NoSchedule,
+            scheduleState = UserExamUiState.NoSchedule,
             todayStudyConcepts = List(30) { it + 1 },
             onInit = {},
             onClickTestDateChange = {},
