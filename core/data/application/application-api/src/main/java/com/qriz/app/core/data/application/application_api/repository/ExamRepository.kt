@@ -9,4 +9,8 @@ interface ExamRepository {
     fun getUserExams(): Flow<ApiResult<UserExam?>>
 
     suspend fun getExamSchedules(): ApiResult<List<Schedule>>
+
+    suspend fun applyExam(examId: Long): ApiResult<Unit>
+
+    suspend fun editExam(uaid: Long, examId: Long): ApiResult<Unit>
 }

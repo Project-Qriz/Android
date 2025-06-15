@@ -8,6 +8,8 @@ import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.model.flatMapSuspend
 import com.qriz.app.core.model.map
 import com.qriz.app.core.network.application.api.ApplicationApi
+import com.qriz.app.core.network.application.model.request.ApplicationModifyRequest
+import com.qriz.app.core.network.application.model.request.ApplicationRequest
 import com.qriz.core.data.application.application.mapper.toScheduleList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,9 +21,8 @@ class ExamRepositoryImpl @Inject constructor(
     private val applicationApi: ApplicationApi,
 ) : ExamRepository {
     private var initialized = false
-    private val cachedUserExam = 
-        MutableStateFlow<ApiResult<UserExam?>>(ApiResult.Success(null))
-    
+    private val cachedUserExam = MutableStateFlow<ApiResult<UserExam?>>(ApiResult.Success(null))
+
     private lateinit var cachedExamSchedules: List<Schedule>
 
     override fun getUserExams(): Flow<ApiResult<UserExam?>> = cachedUserExam.onStart {
@@ -36,18 +37,27 @@ class ExamRepositoryImpl @Inject constructor(
             return ApiResult.Success(cachedExamSchedules)
         }
 
-        val result = applicationApi.applications().map { it.toScheduleList() }
-        if (result is ApiResult.Success) {
-            cachedExamSchedules = result.data
+        return applicationApi.applications().map { response ->
+            response.toScheduleList().also { cachedExamSchedules = it }
         }
-        
-        return result
+    }
+
+    override suspend fun applyExam(examId: Long): ApiResult<Unit> {
+        return applicationApi
+            .apply(request = ApplicationRequest(applyId = examId))
+            .map { fetchUserExam() }
+    }
+
+    override suspend fun editExam(uaid: Long, examId: Long): ApiResult<Unit> {
+        return applicationApi
+            .modify(id = uaid, request = ApplicationModifyRequest(newApplyId = examId))
+            .map { fetchUserExam() }
     }
 
     private suspend fun fetchUserExam() {
         val applicationResult = applicationApi.getUserApplicationInfo()
         if (applicationResult is ApiResult.Failure) {
-            cachedUserExam.update { ApiResult.Success(null)}
+            cachedUserExam.update { ApiResult.Success(null) }
             return
         }
 
@@ -58,7 +68,7 @@ class ExamRepositoryImpl @Inject constructor(
                     period = application.period,
                     examDate = application.examDate,
                     dday = ddayResponse.dday,
-                    ddayType = DdayType.fromStatus(ddayResponse.status)
+                    ddayType = DdayType.fromStatus(ddayResponse.status.uppercase())
                 )
             }
         }
