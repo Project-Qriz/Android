@@ -8,5 +8,5 @@ data class UserApplicationInfo(
     @SerialName("examName") val examName: String,  
     @SerialName("period") val period: String,  
     @SerialName("examDate") val examDate: String,
-    @SerialName("releaseDate") val releaseDate: String?,
+    @SerialName("releaseDate") val releaseDate: String? = null,
 )  
