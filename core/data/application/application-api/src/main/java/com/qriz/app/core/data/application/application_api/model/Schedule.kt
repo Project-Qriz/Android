@@ -4,8 +4,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 data class Schedule(
-    val applicationId: Int,
-    val userApplyId: Int?,
+    val applicationId: Long,
+    val userApplyId: Long?,
     val examName: String,
     val period: String,
     val examDate: String,

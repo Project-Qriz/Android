@@ -12,8 +12,8 @@ data class ExamListResponse(
 
 @Serializable
 data class ExamSchedule(
-    @SerialName("applicationId") val applicationId: Int,
-    @SerialName("userApplyId") val userApplyId: Int?,
+    @SerialName("applicationId") val applicationId: Long,
+    @SerialName("userApplyId") val userApplyId: Long?,
     @SerialName("examName") val examName: String,
     @SerialName("period") val period: String,
     @SerialName("examDate") val examDate: String,
