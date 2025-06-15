@@ -30,6 +30,6 @@ interface ApplicationApi {
     @GET("/api/v1/applications/applied")
     suspend fun getUserApplicationInfo(): ApiResult<UserApplicationInfo>
 
-    @GET("/api/v1/applications/d-day")
+    @GET("/api/v1/applications/applied/d-day")
     suspend fun getDday(): ApiResult<DdayResponse>
 }
