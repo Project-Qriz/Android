@@ -1,6 +1,5 @@
 package com.qriz.app.feature.home
 
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.application.application_api.model.DdayType
 import com.qriz.app.core.data.application.application_api.model.Schedule
@@ -52,8 +51,7 @@ class HomeViewModel @Inject constructor(
     private val lastTryApplyExamIdState = MutableStateFlow(0L)
     private val retryApplyExam = MutableStateFlow(true)
 
-    @VisibleForTesting
-    val applyExamFlow =
+    private val applyExamFlow =
         retryApplyExam
             .filter { it }
             .flatMapLatest { lastTryApplyExamIdState }
@@ -67,7 +65,7 @@ class HomeViewModel @Inject constructor(
         when (action) {
             is HomeUiAction.ObserveClient -> observeClient()
             is HomeUiAction.ChangeTodayStudyCard -> onChangeTodayStudyCard(action.day)
-            is HomeUiAction.ClickTestDateRegister -> onClickTestDateRegister()
+            is HomeUiAction.ClickApply -> showExamSchedules()
             is HomeUiAction.DismissTestDateBottomSheet -> onDismissTestDateBottomSheet()
             is HomeUiAction.MoveToPreviewTest -> sendEffect(HomeUiEffect.MoveToPreviewTest)
             is HomeUiAction.LoadToExamSchedules -> loadToExamSchedules()
@@ -87,13 +85,13 @@ class HomeViewModel @Inject constructor(
         applyExamFlow.launchIn(viewModelScope)
     }
 
-    private fun onClickTestDateRegister() {
-        updateState { copy(isShowTestDateBottomSheet = true) }
+    private fun showExamSchedules() {
+        updateState { copy(isShowExamScheduleBottomSheet = true) }
         loadToExamSchedules()
     }
 
     private fun onDismissTestDateBottomSheet() {
-        updateState { copy(isShowTestDateBottomSheet = false) }
+        updateState { copy(isShowExamScheduleBottomSheet = false) }
     }
 
     private fun onClickExamSchedule(examId: Long) {
@@ -119,7 +117,7 @@ class HomeViewModel @Inject constructor(
                 sendEffect(HomeUiEffect.ShowSnackBar(message = NETWORK_IS_UNSTABLE))
 
             is ApiResult.Success -> {
-                updateState { copy(isShowTestDateBottomSheet = false) }
+                updateState { copy(isShowExamScheduleBottomSheet = false) }
                 sendEffect(HomeUiEffect.ShowSnackBar(defaultResId = R.string.success_to_apply_exam))
             }
 
@@ -133,7 +131,7 @@ class HomeViewModel @Inject constructor(
         updateState {
             copy(
                 schedulesState = SchedulesLoadState.Loading,
-                isShowTestDateBottomSheet = true,
+                isShowExamScheduleBottomSheet = true,
                 examSchedulesErrorMessage = null,
             )
         }
@@ -142,7 +140,7 @@ class HomeViewModel @Inject constructor(
             is ApiResult.Failure -> updateState {
                 copy(
                     schedulesState = SchedulesLoadState.Failure(result.message),
-                    isShowTestDateBottomSheet = false,
+                    isShowExamScheduleBottomSheet = false,
                     examSchedulesErrorMessage = result.message
                 )
             }
@@ -150,7 +148,7 @@ class HomeViewModel @Inject constructor(
             is ApiResult.NetworkError -> updateState {
                 copy(
                     schedulesState = SchedulesLoadState.Failure(NETWORK_IS_UNSTABLE),
-                    isShowTestDateBottomSheet = false,
+                    isShowExamScheduleBottomSheet = false,
                     examSchedulesErrorMessage = NETWORK_IS_UNSTABLE,
                 )
             }
@@ -158,7 +156,7 @@ class HomeViewModel @Inject constructor(
             is ApiResult.UnknownError -> updateState {
                 copy(
                     schedulesState = SchedulesLoadState.Failure(UNKNOWN_ERROR),
-                    isShowTestDateBottomSheet = false,
+                    isShowExamScheduleBottomSheet = false,
                     examSchedulesErrorMessage = UNKNOWN_ERROR,
                 )
             }

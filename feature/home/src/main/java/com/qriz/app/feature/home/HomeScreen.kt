@@ -79,7 +79,7 @@ fun HomeScreen(
             onConfirmClick = { viewModel.process(HomeUiAction.LoadToExamSchedules) })
     }
 
-    if (uiState.isShowTestDateBottomSheet) {
+    if (uiState.isShowExamScheduleBottomSheet) {
         ExamScheduleBottomSheet(
             schedulesLoadState = uiState.schedulesState,
             onClickRetry = { viewModel.process(HomeUiAction.LoadToExamSchedules) },
@@ -95,7 +95,7 @@ fun HomeScreen(
         todayStudyConcepts = uiState.todayStudyConcepts,
         scheduleState = uiState.userExamState,
         onInit = { viewModel.process(HomeUiAction.ObserveClient) },
-        onClickExamApply = { viewModel.process(HomeUiAction.ClickTestDateRegister) },
+        onClickExamApply = { viewModel.process(HomeUiAction.ClickApply) },
         onClickMockTest = {},
         onClickPreviewTest = { viewModel.process(HomeUiAction.MoveToPreviewTest) },
         onClickTodayStudyInit = {},
