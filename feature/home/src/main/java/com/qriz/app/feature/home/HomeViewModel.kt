@@ -70,7 +70,7 @@ class HomeViewModel @Inject constructor(
             is HomeUiAction.MoveToPreviewTest -> sendEffect(HomeUiEffect.MoveToPreviewTest)
             is HomeUiAction.LoadToExamSchedules -> loadToExamSchedules()
             is HomeUiAction.DismissExamSchedulesErrorDialog -> updateState { copy(examSchedulesErrorMessage = null) }
-            is HomeUiAction.OnClickExamSchedule -> onClickExamSchedule(examId = action.examId)
+            is HomeUiAction.ClickExamSchedule -> onClickExamSchedule(examId = action.examId)
             is HomeUiAction.DismissApplyExamErrorDialog -> updateState { copy(applyExamErrorMessage = null) }
             is HomeUiAction.RetryApplyExam -> retryApplyExam.update { true }
         }

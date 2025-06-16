@@ -83,7 +83,7 @@ fun HomeScreen(
         ExamScheduleBottomSheet(
             schedulesLoadState = uiState.schedulesState,
             onClickRetry = { viewModel.process(HomeUiAction.LoadToExamSchedules) },
-            onSelectExamDate = { viewModel.process(HomeUiAction.OnClickExamSchedule(it)) },
+            onSelectExamDate = { viewModel.process(HomeUiAction.ClickExamSchedule(it)) },
             onDismissRequest = { viewModel.process(HomeUiAction.DismissTestDateBottomSheet) },
         )
     }

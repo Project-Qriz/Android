@@ -60,7 +60,7 @@ sealed interface HomeUiAction : UiAction {
     data object DismissTestDateBottomSheet : HomeUiAction
     data object MoveToPreviewTest : HomeUiAction
     data object LoadToExamSchedules: HomeUiAction
-    data class OnClickExamSchedule(val examId: Long) : HomeUiAction
+    data class ClickExamSchedule(val examId: Long) : HomeUiAction
     data object RetryApplyExam : HomeUiAction
     data object DismissExamSchedulesErrorDialog : HomeUiAction
     data object DismissApplyExamErrorDialog : HomeUiAction
