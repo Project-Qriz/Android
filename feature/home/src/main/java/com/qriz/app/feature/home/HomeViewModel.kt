@@ -86,7 +86,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun showExamSchedules() {
-        updateState { copy(isShowExamScheduleBottomSheet = true) }
         loadToExamSchedules()
     }
 
