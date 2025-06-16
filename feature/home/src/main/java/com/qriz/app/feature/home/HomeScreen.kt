@@ -22,20 +22,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.qriz.app.core.designsystem.component.QrizDialog
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.base.extention.collectSideEffect
-import com.qriz.app.feature.home.component.TestDateBottomSheet
-import com.qriz.app.feature.home.component.TestScheduleCard
+import com.qriz.app.feature.home.component.ExamScheduleBottomSheet
+import com.qriz.app.feature.home.component.ExamScheduleCard
 import com.qriz.app.feature.home.component.TestStartCard
 import com.qriz.app.feature.home.component.TodayStudyCardPager
+import com.qriz.app.feature.home.component.UserExamUiState
 import com.qriz.app.feature.home.component.WeeklyCustomConcept
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus.NOT_STARTED
 import com.qriz.app.core.designsystem.R as DSR
+import com.qriz.app.core.ui.common.R as UR
 
 @Composable
 fun HomeScreen(
@@ -55,8 +59,31 @@ fun HomeScreen(
         }
     }
 
-    if (uiState.isShowTestDateBottomSheet) {
-        TestDateBottomSheet(
+    if (uiState.applyExamErrorMessage != null) {
+        QrizDialog(
+            title = stringResource(UR.string.error_occurs),
+            description = uiState.applyExamErrorMessage!!,
+            confirmText = stringResource(UR.string.retry),
+            cancelText = stringResource(R.string.to_home),
+            onCancelClick = { viewModel.process(HomeUiAction.DismissApplyExamErrorDialog) },
+            onConfirmClick = {  },
+        )
+    }
+
+    if (uiState.examSchedulesErrorMessage != null) {
+        QrizDialog(title = stringResource(UR.string.error_occurs),
+            description = uiState.examSchedulesErrorMessage!!,
+            confirmText = stringResource(UR.string.retry),
+            cancelText = stringResource(R.string.to_home),
+            onCancelClick = { viewModel.process(HomeUiAction.DismissExamSchedulesErrorDialog) },
+            onConfirmClick = { viewModel.process(HomeUiAction.LoadToExamSchedules) })
+    }
+
+    if (uiState.isShowExamScheduleBottomSheet) {
+        ExamScheduleBottomSheet(
+            schedulesLoadState = uiState.schedulesState,
+            onClickRetry = { viewModel.process(HomeUiAction.LoadToExamSchedules) },
+            onSelectExamDate = { viewModel.process(HomeUiAction.ClickExamSchedule(it)) },
             onDismissRequest = { viewModel.process(HomeUiAction.DismissTestDateBottomSheet) },
         )
     }
@@ -66,13 +93,11 @@ fun HomeScreen(
         previewTestStatus = uiState.user.previewTestStatus,
         currentTodayStudyDay = uiState.currentTodayStudyDay,
         todayStudyConcepts = uiState.todayStudyConcepts,
+        scheduleState = uiState.userExamState,
         onInit = { viewModel.process(HomeUiAction.ObserveClient) },
-        onClickTestDateChange = { },
-        onClickTestDateRegister = { viewModel.process(HomeUiAction.ClickTestDateRegister) },
+        onClickExamApply = { viewModel.process(HomeUiAction.ClickApply) },
         onClickMockTest = {},
-        onClickPreviewTest = {
-            viewModel.process(HomeUiAction.MoveToPreviewTest)
-        },
+        onClickPreviewTest = { viewModel.process(HomeUiAction.MoveToPreviewTest) },
         onClickTodayStudyInit = {},
         onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeTodayStudyCard(it)) },
         onClickWeeklyCustomConcept = {},
@@ -85,9 +110,9 @@ fun HomeContent(
     previewTestStatus: PreviewTestStatus,
     currentTodayStudyDay: Int,
     todayStudyConcepts: List<Int>,
+    scheduleState: UserExamUiState,
     onInit: () -> Unit,
-    onClickTestDateChange: () -> Unit,
-    onClickTestDateRegister: () -> Unit,
+    onClickExamApply: () -> Unit,
     onClickMockTest: () -> Unit,
     onClickPreviewTest: () -> Unit,
     onClickTodayStudyInit: () -> Unit,
@@ -105,8 +130,7 @@ fun HomeContent(
 
     val horizontalPadding = remember { 18.dp }
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Row(
             modifier = Modifier
@@ -138,18 +162,16 @@ fun HomeContent(
                 .weight(1f)
                 .verticalScroll(rememberScrollState()),
         ) {
-            TestScheduleCard(
+            ExamScheduleCard(
                 modifier = Modifier
                     .padding(horizontal = horizontalPadding)
                     .padding(
                         top = 24.dp,
                         bottom = 32.dp
                     ),
-                isExistSchedule = true,
                 userName = userName,
-                examDateString = "3월9일(토)",
-                examPeriodString = "01.29(월) 10:00 ~ 02.02(금) 18:00",
-                onClickTestDateRegister = onClickTestDateRegister,
+                scheduleState = scheduleState,
+                onClickApply = onClickExamApply,
             )
 
             TestStartCard(
@@ -180,7 +202,10 @@ fun HomeContent(
 }
 
 
-@Preview(showBackground = true, heightDp = 1500)
+@Preview(
+    showBackground = true,
+    heightDp = 1500
+)
 @Composable
 fun HomeContentPreview() {
     QrizTheme {
@@ -188,10 +213,10 @@ fun HomeContentPreview() {
             userName = "Qriz",
             previewTestStatus = NOT_STARTED,
             currentTodayStudyDay = 0,
+            scheduleState = UserExamUiState.NoSchedule,
             todayStudyConcepts = List(30) { it + 1 },
             onInit = {},
-            onClickTestDateChange = {},
-            onClickTestDateRegister = {},
+            onClickExamApply = {},
             onClickPreviewTest = {},
             onClickMockTest = {},
             onClickTodayStudyInit = {},
