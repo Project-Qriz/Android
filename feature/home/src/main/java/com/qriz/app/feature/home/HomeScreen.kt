@@ -30,8 +30,8 @@ import com.qriz.app.core.designsystem.component.QrizDialog
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.feature.base.extention.collectSideEffect
-import com.qriz.app.feature.home.component.TestDateBottomSheet
-import com.qriz.app.feature.home.component.TestScheduleCard
+import com.qriz.app.feature.home.component.ExamScheduleBottomSheet
+import com.qriz.app.feature.home.component.ExamScheduleCard
 import com.qriz.app.feature.home.component.TestStartCard
 import com.qriz.app.feature.home.component.TodayStudyCardPager
 import com.qriz.app.feature.home.component.UserExamUiState
@@ -59,22 +59,31 @@ fun HomeScreen(
         }
     }
 
-    if(uiState.examSchedulesErrorMessage != null) {
+    if (uiState.applyExamErrorMessage != null) {
         QrizDialog(
             title = stringResource(UR.string.error_occurs),
+            description = uiState.applyExamErrorMessage!!,
+            confirmText = stringResource(UR.string.retry),
+            cancelText = stringResource(R.string.to_home),
+            onCancelClick = { viewModel.process(HomeUiAction.DismissApplyExamErrorDialog) },
+            onConfirmClick = {  },
+        )
+    }
+
+    if (uiState.examSchedulesErrorMessage != null) {
+        QrizDialog(title = stringResource(UR.string.error_occurs),
             description = uiState.examSchedulesErrorMessage!!,
             confirmText = stringResource(UR.string.retry),
             cancelText = stringResource(R.string.to_home),
             onCancelClick = { viewModel.process(HomeUiAction.DismissExamSchedulesErrorDialog) },
-            onConfirmClick = { viewModel.process(HomeUiAction.LoadToExamSchedules) }
-        )
+            onConfirmClick = { viewModel.process(HomeUiAction.LoadToExamSchedules) })
     }
 
     if (uiState.isShowTestDateBottomSheet) {
-        TestDateBottomSheet(
+        ExamScheduleBottomSheet(
             schedulesLoadState = uiState.schedulesState,
             onClickRetry = { viewModel.process(HomeUiAction.LoadToExamSchedules) },
-            onSelectExamDate = { },
+            onSelectExamDate = { viewModel.process(HomeUiAction.OnClickExamSchedule(it)) },
             onDismissRequest = { viewModel.process(HomeUiAction.DismissTestDateBottomSheet) },
         )
     }
@@ -86,8 +95,7 @@ fun HomeScreen(
         todayStudyConcepts = uiState.todayStudyConcepts,
         scheduleState = uiState.userExamState,
         onInit = { viewModel.process(HomeUiAction.ObserveClient) },
-        onClickTestDateChange = { },
-        onClickTestDateRegister = { viewModel.process(HomeUiAction.ClickTestDateRegister) },
+        onClickExamApply = { viewModel.process(HomeUiAction.ClickTestDateRegister) },
         onClickMockTest = {},
         onClickPreviewTest = { viewModel.process(HomeUiAction.MoveToPreviewTest) },
         onClickTodayStudyInit = {},
@@ -104,8 +112,7 @@ fun HomeContent(
     todayStudyConcepts: List<Int>,
     scheduleState: UserExamUiState,
     onInit: () -> Unit,
-    onClickTestDateChange: () -> Unit,
-    onClickTestDateRegister: () -> Unit,
+    onClickExamApply: () -> Unit,
     onClickMockTest: () -> Unit,
     onClickPreviewTest: () -> Unit,
     onClickTodayStudyInit: () -> Unit,
@@ -123,8 +130,7 @@ fun HomeContent(
 
     val horizontalPadding = remember { 18.dp }
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Row(
             modifier = Modifier
@@ -156,7 +162,7 @@ fun HomeContent(
                 .weight(1f)
                 .verticalScroll(rememberScrollState()),
         ) {
-            TestScheduleCard(
+            ExamScheduleCard(
                 modifier = Modifier
                     .padding(horizontal = horizontalPadding)
                     .padding(
@@ -165,7 +171,7 @@ fun HomeContent(
                     ),
                 userName = userName,
                 scheduleState = scheduleState,
-                onClickTestDateRegister = onClickTestDateRegister,
+                onClickApply = onClickExamApply,
             )
 
             TestStartCard(
@@ -196,7 +202,10 @@ fun HomeContent(
 }
 
 
-@Preview(showBackground = true, heightDp = 1500)
+@Preview(
+    showBackground = true,
+    heightDp = 1500
+)
 @Composable
 fun HomeContentPreview() {
     QrizTheme {
@@ -207,8 +216,7 @@ fun HomeContentPreview() {
             scheduleState = UserExamUiState.NoSchedule,
             todayStudyConcepts = List(30) { it + 1 },
             onInit = {},
-            onClickTestDateChange = {},
-            onClickTestDateRegister = {},
+            onClickExamApply = {},
             onClickPreviewTest = {},
             onClickMockTest = {},
             onClickTodayStudyInit = {},

@@ -1,24 +1,33 @@
 package com.qriz.app.feature.home
 
-import android.util.Log
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.application.application_api.model.DdayType
+import com.qriz.app.core.data.application.application_api.model.Schedule
 import com.qriz.app.core.data.application.application_api.model.UserExam
 import com.qriz.app.core.data.application.application_api.repository.ExamRepository
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
 import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.feature.base.BaseViewModel
+import com.qriz.app.feature.home.HomeUiState.SchedulesLoadState
 import com.qriz.app.feature.home.component.UserExamUiState
-import com.qriz.app.feature.home.HomeUiState.*
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     userRepository: UserRepository,
@@ -40,6 +49,20 @@ class HomeViewModel @Inject constructor(
         )
     }
 
+    private val lastTryApplyExamIdState = MutableStateFlow(0L)
+    private val retryApplyExam = MutableStateFlow(true)
+
+    @VisibleForTesting
+    val applyExamFlow =
+        retryApplyExam
+            .filter { it }
+            .flatMapLatest { lastTryApplyExamIdState }
+            .filter { it > 0 }
+            .onEach { examId ->
+                applyExam(examId)
+                retryApplyExam.value = false
+            }
+
     override fun process(action: HomeUiAction): Job = viewModelScope.launch {
         when (action) {
             is HomeUiAction.ObserveClient -> observeClient()
@@ -48,9 +71,10 @@ class HomeViewModel @Inject constructor(
             is HomeUiAction.DismissTestDateBottomSheet -> onDismissTestDateBottomSheet()
             is HomeUiAction.MoveToPreviewTest -> sendEffect(HomeUiEffect.MoveToPreviewTest)
             is HomeUiAction.LoadToExamSchedules -> loadToExamSchedules()
-            is HomeUiAction.DismissExamSchedulesErrorDialog -> updateState {
-                copy(examSchedulesErrorMessage = null)
-            }
+            is HomeUiAction.DismissExamSchedulesErrorDialog -> updateState { copy(examSchedulesErrorMessage = null) }
+            is HomeUiAction.OnClickExamSchedule -> onClickExamSchedule(examId = action.examId)
+            is HomeUiAction.DismissApplyExamErrorDialog -> updateState { copy(applyExamErrorMessage = null) }
+            is HomeUiAction.RetryApplyExam -> retryApplyExam.update { true }
         }
     }
 
@@ -58,8 +82,9 @@ class HomeViewModel @Inject constructor(
         updateState { copy(currentTodayStudyDay = day) }
     }
 
-    private fun observeClient() = viewModelScope.launch {
-        dataFlow.collect { updateState { it } }
+    private fun observeClient() {
+        viewModelScope.launch { dataFlow.collect { updateState { it } } }
+        applyExamFlow.launchIn(viewModelScope)
     }
 
     private fun onClickTestDateRegister() {
@@ -69,6 +94,39 @@ class HomeViewModel @Inject constructor(
 
     private fun onDismissTestDateBottomSheet() {
         updateState { copy(isShowTestDateBottomSheet = false) }
+    }
+
+    private fun onClickExamSchedule(examId: Long) {
+        lastTryApplyExamIdState.update { examId }
+    }
+
+    private fun applyExam(examId: Long) = viewModelScope.launch {
+        val uaid = uiState.value.userApplicationId
+        val result = if (uaid != null && uaid > 0) {
+            examRepository.editExam(
+                uaid,
+                examId
+            )
+        } else {
+            examRepository.applyExam(examId)
+        }
+
+        when (result) {
+            is ApiResult.Failure ->
+                sendEffect(HomeUiEffect.ShowSnackBar(message = result.message))
+
+            is ApiResult.NetworkError ->
+                sendEffect(HomeUiEffect.ShowSnackBar(message = NETWORK_IS_UNSTABLE))
+
+            is ApiResult.Success -> {
+                updateState { copy(isShowTestDateBottomSheet = false) }
+                sendEffect(HomeUiEffect.ShowSnackBar(defaultResId = R.string.success_to_apply_exam))
+            }
+
+            is ApiResult.UnknownError -> {
+                sendEffect(HomeUiEffect.ShowSnackBar(message = UNKNOWN_ERROR))
+            }
+        }
     }
 
     private fun loadToExamSchedules() = viewModelScope.launch {
@@ -108,7 +166,8 @@ class HomeViewModel @Inject constructor(
             is ApiResult.Success -> {
                 updateState {
                     copy(
-                        schedulesState = SchedulesLoadState.Success(result.data.toImmutableList())
+                        schedulesState = SchedulesLoadState.Success(result.data.toImmutableList()),
+                        userApplicationId = result.data.findUaid(),
                     )
                 }
             }
@@ -116,15 +175,12 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun handleError(result: ApiResult<*>) {
-        Log.d(
-            "HandlingError",
-            "Error :: ${result}"
-        )
+
     }
 
     private fun UserExam?.toUiState(): UserExamUiState {
         if (this == null) return UserExamUiState.NoSchedule
-        if (this.ddayType == DdayType.AFTER) return UserExamUiState.NoSchedule
+        if (this.ddayType == DdayType.AFTER) return UserExamUiState.PastExam
 
         return UserExamUiState.Scheduled(
             ddayType = this.ddayType,
@@ -133,5 +189,9 @@ class HomeViewModel @Inject constructor(
             examPeriod = this.period,
             dday = this.dday,
         )
+    }
+
+    private fun List<Schedule>.findUaid(): Long? {
+        return this.firstOrNull { it.userApplyId != null }?.userApplyId
     }
 }

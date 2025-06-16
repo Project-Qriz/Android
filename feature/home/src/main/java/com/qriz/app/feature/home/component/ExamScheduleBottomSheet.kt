@@ -1,6 +1,5 @@
 package com.qriz.app.feature.home.component
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,20 +10,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,8 +28,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.data.application.application_api.model.Schedule
-import com.qriz.app.core.designsystem.R
-import com.qriz.app.core.designsystem.component.QrizRadioButton
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Gray100
 import com.qriz.app.core.designsystem.theme.Gray200
@@ -48,16 +40,13 @@ import com.qriz.app.core.ui.common.const.ErrorScreen
 import com.qriz.app.feature.home.HomeUiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TestDateBottomSheet(
+fun ExamScheduleBottomSheet(
     schedulesLoadState: HomeUiState.SchedulesLoadState,
-    onSelectExamDate: (Int) -> Unit,
+    onSelectExamDate: (Long) -> Unit,
     onDismissRequest: () -> Unit,
     onClickRetry: () -> Unit = {},
 ) {
@@ -67,7 +56,7 @@ fun TestDateBottomSheet(
         tonalElevation = 0.dp,
         dragHandle = null,
     ) {
-        TestDateBottomSheetContent(
+        ExamScheduleBottomSheetContent(
             schedulesLoadState = schedulesLoadState,
             onSelectExamDate = onSelectExamDate,
             onClickRetry = onClickRetry,
@@ -76,14 +65,11 @@ fun TestDateBottomSheet(
 }
 
 @Composable
-fun TestDateBottomSheetContent(
+private fun ExamScheduleBottomSheetContent(
     schedulesLoadState: HomeUiState.SchedulesLoadState,
-    onSelectExamDate: (Int) -> Unit,
+    onSelectExamDate: (Long) -> Unit,
     onClickRetry: () -> Unit,
 ) {
-    val scrollState = rememberScrollState()
-    val checkedButtonId = remember { mutableStateOf(0) }
-
     Column(
         modifier = Modifier.clip(
             RoundedCornerShape(
@@ -150,7 +136,7 @@ fun TestDateBottomSheetContent(
 @Composable
 private fun ScheduleContent(
     data: ImmutableList<Schedule>,
-    onSelect: (Int) -> Unit,
+    onSelect: (Long) -> Unit,
 ) {
     LazyColumn {
         items(
@@ -159,9 +145,8 @@ private fun ScheduleContent(
         ) {
             val item = data[it]
 
-            //접수기간 내에 들어오지 못하는 지
-            val isPeriodExpired =
-                item.periodStartEpochMilli > System.currentTimeMillis() || item.periodEndEpochMilli < System.currentTimeMillis()
+            val currentTimeMillis = System.currentTimeMillis()
+            val isPeriodExpired = item.periodStartEpochMilli > currentTimeMillis || item.periodEndEpochMilli < currentTimeMillis
 
             TestDateItem(
                 isChecked = item.applicationId == item.userApplyId,
@@ -236,6 +221,7 @@ private fun TestDateItem(
     val textColor = if (isPeriodExpired) Gray300 else Gray800
     Box(
         modifier = Modifier.background(if (isPeriodExpired) Gray100 else White)
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier
@@ -246,14 +232,6 @@ private fun TestDateItem(
                 .padding(horizontal = 18.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-//            QrizRadioButton(
-//                modifier = Modifier
-//                    .size(24.dp)
-//                    .padding(end = 16.dp),
-//                selected = isChecked,
-//                enabled = isPeriodExpired.not(),
-//                onClick = onClick,
-//            )
             ExamCheckBox(
                 size = 24.dp,
                 isChecked = isChecked,
@@ -339,7 +317,7 @@ private fun TestDateItemPreview3() {
 @Composable
 private fun TestDateBottomSheetContentPreview() {
     QrizTheme {
-        TestDateBottomSheetContent(
+        ExamScheduleBottomSheetContent(
             schedulesLoadState = HomeUiState.SchedulesLoadState.Success(
                 persistentListOf(
                     Schedule(
@@ -364,7 +342,7 @@ private fun TestDateBottomSheetContentPreview() {
 @Composable
 private fun TestDateBottomSheetEmptyContentPreview() {
     QrizTheme {
-        TestDateBottomSheetContent(
+        ExamScheduleBottomSheetContent(
             schedulesLoadState = HomeUiState.SchedulesLoadState.Success(persistentListOf()),
             onSelectExamDate = {},
             onClickRetry = {},

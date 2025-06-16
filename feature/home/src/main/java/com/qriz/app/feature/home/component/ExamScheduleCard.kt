@@ -27,11 +27,11 @@ import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.home.R
 
 @Composable
-fun TestScheduleCard(
+fun ExamScheduleCard(
     modifier: Modifier = Modifier,
     userName: String,
     scheduleState: UserExamUiState,
-    onClickTestDateRegister: () -> Unit,
+    onClickApply: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -67,7 +67,7 @@ fun TestScheduleCard(
 
                     is UserExamUiState.Scheduled -> {
                         Text(
-                            text = stringResource(R.string.exam_date) + scheduleState.examDate,
+                            text = stringResource(R.string.exam_date,  scheduleState.examDate),
                             style = QrizTheme.typography.headline1,
                             color = Gray800,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -80,7 +80,7 @@ fun TestScheduleCard(
                         )
 
                         Text(
-                            text = stringResource(R.string.exam_application_period) + scheduleState.examPeriod,
+                            text = stringResource(R.string.exam_application_period, scheduleState.examPeriod),
                             style = QrizTheme.typography.subhead,
                             color = Gray500,
                         )
@@ -142,7 +142,7 @@ fun TestScheduleCard(
                         .fillMaxWidth()
                         .padding(top = 12.dp),
                     text = buttonText,
-                    onClick = onClickTestDateRegister,
+                    onClick = onClickApply,
                     textColor = Gray800,
                     containerColor = White,
                     strokeColor = Gray200,
@@ -242,10 +242,10 @@ sealed interface UserExamUiState {
 @Composable
 private fun NoSchedulePreview() {
     QrizTheme {
-        TestScheduleCard(
+        ExamScheduleCard(
             userName = "Qriz",
             scheduleState = UserExamUiState.NoSchedule,
-            onClickTestDateRegister = {},
+            onClickApply = {},
         )
     }
 }
@@ -254,7 +254,7 @@ private fun NoSchedulePreview() {
 @Composable
 private fun ScheduledPreview() {
     QrizTheme {
-        TestScheduleCard(
+        ExamScheduleCard(
             userName = "Qriz",
             scheduleState = UserExamUiState.Scheduled(
                 examName = "SQL 개발자 자격시험",
@@ -263,7 +263,7 @@ private fun ScheduledPreview() {
                 dday = 29,
                 ddayType = DdayType.BEFORE
             ),
-            onClickTestDateRegister = {},
+            onClickApply = {},
         )
     }
 }
@@ -272,10 +272,10 @@ private fun ScheduledPreview() {
 @Composable
 private fun PassedPreview() {
     QrizTheme {
-        TestScheduleCard(
+        ExamScheduleCard(
             userName = "Qriz",
             scheduleState = UserExamUiState.PastExam,
-            onClickTestDateRegister = {},
+            onClickApply = {},
         )
     }
 }
