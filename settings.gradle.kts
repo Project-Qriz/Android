@@ -44,6 +44,7 @@ include(":core:data:conceptbook:conceptbook")
 include(":core:data:conceptbook:conceptbook-api")
 include(":core:data:application:application")
 include(":core:data:application:application-api")
+include("core:data:daily-study:daily-study-api")
 
 include(":core:ui:test")
 include(":core:ui:common")
