@@ -32,6 +32,7 @@ include(":core:network:core")
 include(":core:network:common")
 include(":core:network:user")
 include(":core:network:onboard")
+include(":core:network:daily-study")
 
 include(":core:data:user:user-api")
 include(":core:data:user:user")
