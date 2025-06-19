@@ -1,13 +1,12 @@
 package com.qriz.app.core.data.daily_study.daily_study_api.model
 
-import androidx.compose.runtime.Immutable
+import java.time.LocalDate
 
-@Immutable
 data class DailyStudyPlan(
     val id: Long,
     val completed: Boolean,
-    val planDate: String,
-    val completionDate: String?,
+    val planDate: LocalDate,
+    val completionDate: LocalDate?,
     val plannedSkills: List<PlannedSkill>,
     val reviewDay: Boolean,
     val comprehensiveReviewDay: Boolean

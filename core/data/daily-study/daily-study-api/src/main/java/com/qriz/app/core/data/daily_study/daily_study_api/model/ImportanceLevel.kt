@@ -5,8 +5,9 @@ enum class ImportanceLevel(val displayName: String) {
     LOW("하");
 
     companion object {
-        fun fromDisplayName(displayName: String): ImportanceLevel? {
+        fun fromDisplayName(displayName: String): ImportanceLevel {
             return entries.find { it.displayName == displayName }
+                ?: throw IllegalArgumentException("Unknown ImportanceLevel: $displayName")
         }
     }
 }

@@ -10,5 +10,4 @@ android {
 
 dependencies {
     api(projects.core.model)
-    implementation(libs.compose.stable.marker)
 }
