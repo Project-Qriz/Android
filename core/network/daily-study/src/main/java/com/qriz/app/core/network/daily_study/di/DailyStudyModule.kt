@@ -13,6 +13,6 @@ import javax.inject.Singleton
 internal object DailyStudyModule {
     @Provides
     @Singleton
-    fun getDailyStudyApi(retrofit: Retrofit): DailyStudyApi =
+    fun providesDailyStudyApi(retrofit: Retrofit): DailyStudyApi =
         retrofit.create(DailyStudyApi::class.java)
 }
