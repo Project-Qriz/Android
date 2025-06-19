@@ -24,6 +24,7 @@ dependencies {
     implementation(projects.core.data.token.token)
     implementation(projects.core.data.conceptbook.conceptbook)
     implementation(projects.core.data.application.application)
+    implementation(projects.core.data.dailyStudy.dailyStudy)
     implementation(projects.feature.main)
     implementation(projects.feature.splash)
     implementation(projects.core.ui.common)
