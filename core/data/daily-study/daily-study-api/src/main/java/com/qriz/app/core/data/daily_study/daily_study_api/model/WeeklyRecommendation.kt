@@ -6,5 +6,5 @@ data class WeeklyRecommendation(
     val description: String,
     val importanceLevel: ImportanceLevel,
     val frequency: Int,
-    val incorrectRate: Double
+    val incorrectRate: Double?,
 )

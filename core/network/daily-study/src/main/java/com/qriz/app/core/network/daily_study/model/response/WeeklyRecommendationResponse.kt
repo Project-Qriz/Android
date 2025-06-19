@@ -15,5 +15,5 @@ data class WeeklyRecommendationResponse(
     @SerialName("description") val description: String,
     @SerialName("importanceLevel") val importanceLevel: String,
     @SerialName("frequency") val frequency: Int,
-    @SerialName("incorrectRate") val incorrectRate: Double
+    @SerialName("incorrectRate") val incorrectRate: Double?
 )
