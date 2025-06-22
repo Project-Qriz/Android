@@ -5,14 +5,22 @@ import com.qriz.app.core.data.application.application_api.model.DdayType
 import com.qriz.app.core.data.application.application_api.model.Schedule
 import com.qriz.app.core.data.application.application_api.model.UserExam
 import com.qriz.app.core.data.application.application_api.repository.ExamRepository
+import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
+import com.qriz.app.core.data.daily_study.daily_study_api.model.ImportanceLevel
+import com.qriz.app.core.data.daily_study.daily_study_api.model.PlannedSkill
+import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
+import com.qriz.app.core.data.daily_study.daily_study_api.repository.DailyStudyRepository
 import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.model.requireValue
 import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
 import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.home.HomeUiState.SchedulesLoadState
 import com.qriz.app.feature.home.component.UserExamUiState
+import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -20,10 +28,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,31 +41,105 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     userRepository: UserRepository,
     private val examRepository: ExamRepository,
+    dailyStudyRepository: DailyStudyRepository,
 ) : BaseViewModel<HomeUiState, HomeUiEffect, HomeUiAction>(HomeUiState.Default) {
 
-    private val dataFlow = combine(
-        userRepository.getUserFlow(),
-        examRepository.getUserExams(),
-    ) { user, exam ->
-        if (exam !is ApiResult.Success) {
-            handleError(exam)
-            return@combine uiState.value
-        }
+    private var isInitialized = false
+    private val homeDataLoad = MutableStateFlow(true)
 
-        uiState.value.copy(
-            user = user,
-            userExamState = exam.data.toUiState()
-        )
-    }
+    private val dataFlow = homeDataLoad.filter { it }.flatMapLatest { userRepository.getUserFlow() }
+        .flatMapLatest { user ->
+            val dailyStudyPlanFlow =
+                if (user.previewTestStatus == PreviewTestStatus.PREVIEW_COMPLETED) dailyStudyRepository.getDailyStudyPlanFlow()
+                else flowOf(
+                    //블러 처리를 위한 fake data
+                    ApiResult.Success(
+                        listOf(
+                            DailyStudyPlan(
+                                id = 0,
+                                completed = false,
+                                planDate = LocalDate.now(),
+                                completionDate = null,
+                                plannedSkills = listOf(
+                                    PlannedSkill(
+                                        id = 0,
+                                        type = "SQL 기본",
+                                        keyConcept = "WHERE 절",
+                                        description = ""
+                                    ),
+                                    PlannedSkill(
+                                        id = 0,
+                                        type = "SQL 기본",
+                                        keyConcept = "WHERE 절",
+                                        description = ""
+                                    )
+                                ),
+                                reviewDay = false,
+                                comprehensiveReviewDay = false
+                            )
+                        ),
+                    ),
+                )
+            val weeklyRecommendationFlow =
+                if (user.previewTestStatus == PreviewTestStatus.PREVIEW_COMPLETED) dailyStudyRepository.getWeeklyRecommendation()
+                else flowOf(
+                    //블러 처리를 위한 fake data
+                    ApiResult.Success(
+                        listOf(
+                            WeeklyRecommendation(
+                                skillId = 1,
+                                keyConcepts = "데이터 모델의 이해",
+                                description = "",
+                                frequency = 1,
+                                incorrectRate = null,
+                                importanceLevel = ImportanceLevel.HIGH,
+                            ),
+                            WeeklyRecommendation(
+                                skillId = 1,
+                                keyConcepts = "SELECT 문",
+                                description = "",
+                                frequency = 1,
+                                incorrectRate = null,
+                                importanceLevel = ImportanceLevel.LOW,
+                            )
+                        )
+                    )
+                )
+
+            combine(
+                dailyStudyPlanFlow,
+                weeklyRecommendationFlow,
+                examRepository.getUserExams(),
+            ) { dailyStudyPlan, weeklyRecommendation, exam ->
+                val isAllSuccess = handleError(
+                    dailyStudyPlan,
+                    weeklyRecommendation,
+                    exam
+                )
+
+                val dailyStudyPlans = dailyStudyPlan.requireValue.toImmutableList()
+
+                initializePlanDate(dailyStudyPlans)
+
+                if (isAllSuccess) {
+                    uiState.value.copy(
+                        user = user,
+                        userExamState = exam.requireValue.toUiState(),
+                        dataLoadState = HomeUiState.HomeDataLoadState.Success,
+                        dailyStudyPlans = dailyStudyPlans,
+                        weeklyRecommendation = weeklyRecommendation.requireValue.toImmutableList(),
+                    )
+                } else {
+                    uiState.value
+                }
+            }
+        }
 
     private val lastTryApplyExamIdState = MutableStateFlow(0L)
     private val retryApplyExam = MutableStateFlow(true)
 
     private val applyExamFlow =
-        retryApplyExam
-            .filter { it }
-            .flatMapLatest { lastTryApplyExamIdState }
-            .filter { it > 0 }
+        retryApplyExam.filter { it }.flatMapLatest { lastTryApplyExamIdState }.filter { it > 0 }
             .onEach { examId ->
                 applyExam(examId)
                 retryApplyExam.value = false
@@ -73,15 +157,21 @@ class HomeViewModel @Inject constructor(
             is HomeUiAction.ClickExamSchedule -> onClickExamSchedule(examId = action.examId)
             is HomeUiAction.DismissApplyExamErrorDialog -> updateState { copy(applyExamErrorMessage = null) }
             is HomeUiAction.RetryApplyExam -> retryApplyExam.update { true }
+            is HomeUiAction.ClickRetryDataLoad -> homeDataLoad.update { true }
         }
     }
 
     private fun onChangeTodayStudyCard(day: Int) {
-        updateState { copy(currentTodayStudyDay = day) }
+        updateState { copy(selectedPlanDay = day) }
     }
 
     private fun observeClient() {
-        viewModelScope.launch { dataFlow.collect { updateState { it } } }
+        viewModelScope.launch {
+            dataFlow.collect {
+                updateState { it }
+                homeDataLoad.update { false }
+            }
+        }
         applyExamFlow.launchIn(viewModelScope)
     }
 
@@ -109,11 +199,9 @@ class HomeViewModel @Inject constructor(
         }
 
         when (result) {
-            is ApiResult.Failure ->
-                sendEffect(HomeUiEffect.ShowSnackBar(message = result.message))
+            is ApiResult.Failure -> sendEffect(HomeUiEffect.ShowSnackBar(message = result.message))
 
-            is ApiResult.NetworkError ->
-                sendEffect(HomeUiEffect.ShowSnackBar(message = NETWORK_IS_UNSTABLE))
+            is ApiResult.NetworkError -> sendEffect(HomeUiEffect.ShowSnackBar(message = NETWORK_IS_UNSTABLE))
 
             is ApiResult.Success -> {
                 updateState { copy(isShowExamScheduleBottomSheet = false) }
@@ -171,8 +259,48 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun handleError(result: ApiResult<*>) {
+    private fun handleError(vararg result: ApiResult<*>): Boolean {
+        fun updateDataLoadState(message: String) {
+            updateState { copy(dataLoadState = HomeUiState.HomeDataLoadState.Failure(message)) }
+        }
 
+        for (res in result) {
+            when (res) {
+                is ApiResult.Failure -> {
+                    updateDataLoadState(res.message)
+                    return false
+                }
+
+                is ApiResult.NetworkError -> {
+                    updateDataLoadState(NETWORK_IS_UNSTABLE)
+                    return false
+                }
+
+                is ApiResult.UnknownError -> {
+                    updateDataLoadState(UNKNOWN_ERROR)
+                    return false
+                }
+
+                is ApiResult.Success -> continue
+            }
+        }
+
+        return true
+    }
+
+    private fun initializePlanDate(dailyStudyPlans: ImmutableList<DailyStudyPlan>) {
+        if (isInitialized || dailyStudyPlans.isEmpty()) return
+
+        val todayPlanIndex = dailyStudyPlans.indexOfFirst { it.planDate == LocalDate.now() }
+        val todayPlanIsReview =
+            if (todayPlanIndex >= 0) dailyStudyPlans[todayPlanIndex].reviewDay else false
+
+        updateState {
+            copy(
+                selectedPlanDay = todayPlanIndex + 1,
+                todayPlanIsReview = todayPlanIsReview,
+            )
+        }
     }
 
     private fun UserExam?.toUiState(): UserExamUiState {

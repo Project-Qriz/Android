@@ -4,12 +4,15 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.qriz.app.core.data.application.application_api.model.Schedule
+import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
+import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
 import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
 import com.qriz.app.feature.home.component.UserExamUiState
 import com.quiz.app.core.data.user.user_api.model.User
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import com.qriz.app.core.designsystem.R as DSR
 
 @Immutable
@@ -18,10 +21,13 @@ data class HomeUiState(
     val isShowExamScheduleBottomSheet: Boolean,
     val user: User,
     val userApplicationId: Long?,
+    val dataLoadState: HomeDataLoadState,
     val userExamState: UserExamUiState,
+    val selectedPlanDay: Int,
+    val todayPlanIsReview: Boolean,
     val schedulesState: SchedulesLoadState,
-    val todayStudyConcepts: List<Int>,
-    val currentTodayStudyDay: Int,
+    val dailyStudyPlans: ImmutableList<DailyStudyPlan>,
+    val weeklyRecommendation: ImmutableList<WeeklyRecommendation>,
     val examSchedulesErrorMessage: String?,
     val applyExamErrorMessage: String?,
 ) : UiState {
@@ -30,14 +36,29 @@ data class HomeUiState(
             isLoading = false,
             isShowExamScheduleBottomSheet = false,
             user = User.Default,
+            dataLoadState = HomeDataLoadState.Loading,
             schedulesState = SchedulesLoadState.Loading,
             userExamState = UserExamUiState.NoSchedule,
-            todayStudyConcepts = List(30) { it + 1 },
-            currentTodayStudyDay = 1,
+            dailyStudyPlans = persistentListOf(),
+            weeklyRecommendation = persistentListOf(),
             examSchedulesErrorMessage = null,
             userApplicationId = null,
             applyExamErrorMessage = null,
+            selectedPlanDay = 0,
+            todayPlanIsReview = false,
         )
+    }
+
+    @Stable
+    sealed interface HomeDataLoadState {
+        @Immutable
+        data object Success: HomeDataLoadState
+
+        @Immutable
+        data class Failure(val message: String): HomeDataLoadState
+
+        @Immutable
+        data object Loading: HomeDataLoadState
     }
 
     @Stable
@@ -64,6 +85,7 @@ sealed interface HomeUiAction : UiAction {
     data object RetryApplyExam : HomeUiAction
     data object DismissExamSchedulesErrorDialog : HomeUiAction
     data object DismissApplyExamErrorDialog : HomeUiAction
+    data object ClickRetryDataLoad : HomeUiAction
 }
 
 sealed interface HomeUiEffect : UiEffect {
