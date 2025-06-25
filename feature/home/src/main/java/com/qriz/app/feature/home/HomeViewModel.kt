@@ -24,6 +24,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
@@ -148,7 +149,7 @@ class HomeViewModel @Inject constructor(
     override fun process(action: HomeUiAction): Job = viewModelScope.launch {
         when (action) {
             is HomeUiAction.ObserveClient -> observeClient()
-            is HomeUiAction.ChangeTodayStudyCard -> onChangeTodayStudyCard(action.day)
+            is HomeUiAction.ChangeStudyPlanDate -> onChangeTodayStudyCard(action.day)
             is HomeUiAction.ClickApply -> showExamSchedules()
             is HomeUiAction.DismissTestDateBottomSheet -> onDismissTestDateBottomSheet()
             is HomeUiAction.MoveToPreviewTest -> sendEffect(HomeUiEffect.MoveToPreviewTest)
@@ -158,11 +159,32 @@ class HomeViewModel @Inject constructor(
             is HomeUiAction.DismissApplyExamErrorDialog -> updateState { copy(applyExamErrorMessage = null) }
             is HomeUiAction.RetryApplyExam -> retryApplyExam.update { true }
             is HomeUiAction.ClickRetryDataLoad -> homeDataLoad.update { true }
+            is HomeUiAction.DismissPlanDayFilterBottomSheet -> { updateState { copy(showPlanDayFilterBottomSheet = false) } }
+            is HomeUiAction.ShowPlanDayFilterBottomSheet -> { updateState { copy(showPlanDayFilterBottomSheet = true) } }
+            is HomeUiAction.ChangeStudyPlanDateToToday -> onChangeStudyPlanDayToToday()
         }
     }
 
-    private fun onChangeTodayStudyCard(day: Int) {
+    private suspend fun onChangeTodayStudyCard(day: Int) {
         updateState { copy(selectedPlanDay = day) }
+
+        //DayFilter를 통해 선택한 경우
+        if (uiState.value.showPlanDayFilterBottomSheet) {
+            delay(300)
+            updateState { copy(showPlanDayFilterBottomSheet = false) }
+        }
+    }
+
+    private suspend fun onChangeStudyPlanDayToToday() {
+        val today = LocalDate.now()
+        val plans = uiState.value.dailyStudyPlans
+        updateState {
+            copy(
+                selectedPlanDay = plans.indexOfFirst { it.planDate == today } + 1
+            )
+        }
+        delay(300)
+        updateState { copy(showPlanDayFilterBottomSheet = false) }
     }
 
     private fun observeClient() {

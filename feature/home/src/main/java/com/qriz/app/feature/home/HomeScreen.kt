@@ -1,5 +1,6 @@
 package com.qriz.app.feature.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,11 +42,15 @@ import com.qriz.app.feature.home.component.TestStartCard
 import com.qriz.app.feature.home.component.TodayStudyCardPager
 import com.qriz.app.feature.home.component.UserExamUiState
 import com.qriz.app.feature.home.HomeUiState.HomeDataLoadState
+import com.qriz.app.feature.home.component.DailyStudyPlanDayFilterBottomSheet
 import com.qriz.app.feature.home.component.WeeklyCustomConcept
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus.NOT_STARTED
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import com.qriz.app.core.designsystem.R as DSR
 import com.qriz.app.core.ui.common.R as UR
 
@@ -65,6 +71,7 @@ fun HomeScreen(
             )
         }
     }
+
 
     if (uiState.applyExamErrorMessage != null) {
         QrizDialog(
@@ -95,6 +102,15 @@ fun HomeScreen(
         )
     }
 
+    if (uiState.showPlanDayFilterBottomSheet) {
+        DailyStudyPlanDayFilterBottomSheet(
+            selectedDay = uiState.selectedPlanDay,
+            onSelectDay = { viewModel.process(HomeUiAction.ChangeStudyPlanDate(it)) },
+            onClickToday = { viewModel.process(HomeUiAction.ChangeStudyPlanDateToToday) },
+            onDismissRequest = { viewModel.process(HomeUiAction.DismissPlanDayFilterBottomSheet) },
+        )
+    }
+
     HomeContent(
         userName = uiState.user.name,
         previewTestStatus = uiState.user.previewTestStatus,
@@ -108,8 +124,9 @@ fun HomeScreen(
         onClickMockTest = {},
         onClickPreviewTest = { viewModel.process(HomeUiAction.MoveToPreviewTest) },
         onClickTodayStudyInit = {},
-        onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeTodayStudyCard(it)) },
+        onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeStudyPlanDate(it)) },
         onClickWeeklyCustomConcept = {},
+        onClickPlanDayFilter = { viewModel.process(HomeUiAction.ShowPlanDayFilterBottomSheet) },
         onClickRetryLoadHomeData = {},
     )
 }
@@ -125,6 +142,7 @@ fun HomeContent(
     weeklyRecommendation: ImmutableList<WeeklyRecommendation>,
     onInit: () -> Unit,
     onClickExamApply: () -> Unit,
+    onClickPlanDayFilter: () -> Unit,
     onClickMockTest: () -> Unit,
     onClickPreviewTest: () -> Unit,
     onClickTodayStudyInit: () -> Unit,
@@ -216,7 +234,8 @@ fun HomeContent(
                         selectedPlanDay = selectedPlanDay,
                         dailyStudyPlans = dailyStudyPlans,
                         onClickInit = onClickTodayStudyInit,
-                        onChangeTodayStudyCard = onChangeTodayStudyCard
+                        onChangeTodayStudyCard = onChangeTodayStudyCard,
+                        onClickDayFilter = onClickPlanDayFilter,
                     )
 
                     WeeklyCustomConcept(
@@ -253,6 +272,7 @@ fun HomeContentPreview() {
             onClickTodayStudyInit = {},
             onChangeTodayStudyCard = {},
             onClickWeeklyCustomConcept = {},
+            onClickPlanDayFilter = {},
             onClickRetryLoadHomeData = {},
         )
     }

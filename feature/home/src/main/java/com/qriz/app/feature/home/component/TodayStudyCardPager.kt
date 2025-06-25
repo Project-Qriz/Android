@@ -34,16 +34,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
 import com.qriz.app.core.data.daily_study.daily_study_api.model.PlannedSkill
 import com.qriz.app.core.designsystem.component.QrizButton
@@ -55,10 +51,12 @@ import com.qriz.app.core.designsystem.theme.Gray100
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Gray500
+import com.qriz.app.core.designsystem.theme.Gray600
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.feature.home.R
+import com.qriz.app.core.designsystem.R as DSR
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDate
@@ -72,6 +70,7 @@ fun TodayStudyCardPager(
     isNeedPreviewTest: Boolean,
     onClickInit: () -> Unit,
     onChangeTodayStudyCard: (Int) -> Unit,
+    onClickDayFilter: () -> Unit,
 ) {
     val pagerState = rememberPagerState { dailyStudyPlans.size }
 
@@ -149,13 +148,22 @@ fun TodayStudyCardPager(
                 }
             }
 
+            DayFilter(
+                selectedPlanDay = selectedPlanDay,
+                onClick = onClickDayFilter,
+                modifier = Modifier.padding(top = 12.dp)
+            )
+
             if (isNeedPreviewTest.not()) {
                 Row(
-                    modifier = Modifier.padding(top = 19.dp).fillMaxWidth(),
+                    modifier = Modifier
+                        .padding(top = 19.dp)
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    val startDay = if (selectedPlanDay == 1) selectedPlanDay else selectedPlanDay - 1
+                    val startDay =
+                        if (selectedPlanDay == 1) selectedPlanDay else selectedPlanDay - 1
                     for (day in startDay..startDay + 2) {
                         DateCard(
                             day = day,
@@ -172,7 +180,7 @@ fun TodayStudyCardPager(
             modifier = Modifier
                 .blur(if (isNeedPreviewTest) 4.dp else 0.dp)
                 .padding(
-                    top = 12.dp,
+                    top = 16.dp,
                     bottom = if (isNeedPreviewTest) 32.dp else 16.dp
                 ),
             state = pagerState,
@@ -198,6 +206,34 @@ fun TodayStudyCardPager(
                     )
             )
         }
+    }
+}
+
+@Composable
+private fun DayFilter(
+    modifier: Modifier = Modifier,
+    selectedPlanDay: Int,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = modifier.clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(
+            text = stringResource(
+                R.string.day,
+                selectedPlanDay
+            ),
+            style = QrizTheme.typography.body1.copy(color = Gray600)
+        )
+
+        Icon(
+            imageVector = ImageVector.vectorResource(DSR.drawable.ic_keyboard_arrow_down),
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = Gray600
+        )
     }
 }
 
@@ -250,11 +286,12 @@ private fun TodayStudyCard(
             if (plan.comprehensiveReviewDay) {
                 Text(
                     text = stringResource(R.string.comprehensive_review_description),
-                    style = QrizTheme.typography.body2.copy(color = Gray500)
+                    style = QrizTheme.typography.body2.copy(color = Gray500),
+                    modifier = Modifier.padding(bottom = 17.5.dp)
                 )
             }
 
-            plan.plannedSkills.forEach {
+            plan.plannedSkills.take(2).forEach {
                 ConceptCard(
                     type = it.type,
                     keyConcept = it.keyConcept,
@@ -391,33 +428,13 @@ fun DateCard(
     }
 }
 
-fun String.asBulletListText(
-    bullet: String = "•  ",
-    restLine: TextUnit = 12.sp,
-) = buildAnnotatedString {
-    split("\n").forEach {
-        val txt = it.trim()
-        if (txt.isBlank()) return@forEach
-
-        withStyle(
-            style = ParagraphStyle(
-                textIndent = TextIndent(
-                    restLine = restLine
-                )
-            )
-        ) {
-            append(bullet + txt)
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun TodayStudyCardPreview() {
     QrizTheme {
         TodayStudyCardPager(
             isNeedPreviewTest = false,
-            selectedPlanDay = 0,
+            selectedPlanDay = 1,
             dailyStudyPlans = persistentListOf(
                 DailyStudyPlan(
                     id = 1,
@@ -428,8 +445,8 @@ private fun TodayStudyCardPreview() {
                     plannedSkills = listOf(
                         PlannedSkill(
                             id = 1,
-                            keyConcept = "",
-                            type = "",
+                            keyConcept = "WHERE절",
+                            type = "SQL기본",
                             description = "",
                         )
                     ),
@@ -438,6 +455,7 @@ private fun TodayStudyCardPreview() {
             ),
             onClickInit = {},
             onChangeTodayStudyCard = {},
+            onClickDayFilter = {},
         )
     }
 }
@@ -448,7 +466,7 @@ private fun TodayStudyCardPreview2() {
     QrizTheme {
         TodayStudyCardPager(
             isNeedPreviewTest = true,
-            selectedPlanDay = 0,
+            selectedPlanDay = 1,
             dailyStudyPlans = persistentListOf(
                 DailyStudyPlan(
                     id = 1,
@@ -469,6 +487,7 @@ private fun TodayStudyCardPreview2() {
             ),
             onClickInit = {},
             onChangeTodayStudyCard = {},
+            onClickDayFilter = {},
         )
     }
 }

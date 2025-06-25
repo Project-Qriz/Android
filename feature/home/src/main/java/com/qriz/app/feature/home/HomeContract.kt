@@ -30,6 +30,7 @@ data class HomeUiState(
     val weeklyRecommendation: ImmutableList<WeeklyRecommendation>,
     val examSchedulesErrorMessage: String?,
     val applyExamErrorMessage: String?,
+    val showPlanDayFilterBottomSheet: Boolean,
 ) : UiState {
     companion object {
         val Default = HomeUiState(
@@ -46,6 +47,7 @@ data class HomeUiState(
             applyExamErrorMessage = null,
             selectedPlanDay = 0,
             todayPlanIsReview = false,
+            showPlanDayFilterBottomSheet = false,
         )
     }
 
@@ -76,7 +78,8 @@ data class HomeUiState(
 
 sealed interface HomeUiAction : UiAction {
     data object ObserveClient : HomeUiAction
-    data class ChangeTodayStudyCard(val day: Int) : HomeUiAction
+    data class ChangeStudyPlanDate(val day: Int) : HomeUiAction
+    data object ChangeStudyPlanDateToToday : HomeUiAction
     data object ClickApply : HomeUiAction
     data object DismissTestDateBottomSheet : HomeUiAction
     data object MoveToPreviewTest : HomeUiAction
@@ -86,6 +89,8 @@ sealed interface HomeUiAction : UiAction {
     data object DismissExamSchedulesErrorDialog : HomeUiAction
     data object DismissApplyExamErrorDialog : HomeUiAction
     data object ClickRetryDataLoad : HomeUiAction
+    data object ShowPlanDayFilterBottomSheet : HomeUiAction
+    data object DismissPlanDayFilterBottomSheet : HomeUiAction
 }
 
 sealed interface HomeUiEffect : UiEffect {

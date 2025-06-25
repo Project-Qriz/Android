@@ -19,6 +19,10 @@
     <string name="comprehensive_review">종학복습 시간!</string>
     <string name="comprehensive_review_description">지금까지의 정답률을 토대로 부족한 부분의\n개념을 복습하는 날입니다.</string>
     <string name="go_to_study">학습하러 가기</string>
+    <string name="today">오늘</string>
+    <string name="day">Day%d</string>
+    <string name="select_day">Day를 설정해 주세요.</string>
+    <string name="week">%d주차</string>
     <string name="go_to_review">복습하러 가기</string>
     <string name="review_concept">복습해야하는 개념 </string>
     <string name="study_concept">학습해야하는 개념 </string>
