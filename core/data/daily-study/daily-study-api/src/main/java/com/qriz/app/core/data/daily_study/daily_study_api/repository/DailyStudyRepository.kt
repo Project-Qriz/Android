@@ -9,4 +9,6 @@ interface DailyStudyRepository {
     fun getDailyStudyPlanFlow(): Flow<ApiResult<List<DailyStudyPlan>>>
 
     fun getWeeklyRecommendation(): Flow<ApiResult<List<WeeklyRecommendation>>>
+
+    suspend fun resetDailyStudyPlan(): ApiResult<Unit>
 }

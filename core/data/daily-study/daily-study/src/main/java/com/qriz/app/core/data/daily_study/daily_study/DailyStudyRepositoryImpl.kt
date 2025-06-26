@@ -22,4 +22,8 @@ class DailyStudyRepositoryImpl @Inject constructor(
     override fun getWeeklyRecommendation(): Flow<ApiResult<List<WeeklyRecommendation>>> = flow {
         emit(dailyStudyApi.getWeeklyRecommendation().map { it.toWeeklyRecommendation() })
     }
+
+    override suspend fun resetDailyStudyPlan(): ApiResult<Unit> {
+        return dailyStudyApi.resetDailyStudyPlan()
+    }
 }

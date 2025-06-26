@@ -4,6 +4,7 @@ import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.network.daily_study.model.response.DailyStudyPlanResponse
 import com.qriz.app.core.network.daily_study.model.response.WeeklyRecommendationResponseContainer
 import retrofit2.http.GET
+import retrofit2.http.POST
 
 interface DailyStudyApi {
     @GET("/api/v1/daily/plan")
@@ -11,4 +12,7 @@ interface DailyStudyApi {
 
     @GET("/api/v1/recommend/weekly")
     suspend fun getWeeklyRecommendation(): ApiResult<WeeklyRecommendationResponseContainer>
+
+    @POST("/api/v1/daily/regenerate")
+    suspend fun resetDailyStudyPlan(): ApiResult<Unit>
 }
