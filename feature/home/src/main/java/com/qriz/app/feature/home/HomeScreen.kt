@@ -1,6 +1,5 @@
 package com.qriz.app.feature.home
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,7 +16,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,21 +34,18 @@ import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.ui.common.const.ErrorScreen
 import com.qriz.app.feature.base.extention.collectSideEffect
+import com.qriz.app.feature.home.HomeUiState.HomeDataLoadState
+import com.qriz.app.feature.home.component.DailyStudyPlanDayFilterBottomSheet
 import com.qriz.app.feature.home.component.ExamScheduleBottomSheet
 import com.qriz.app.feature.home.component.ExamScheduleCard
 import com.qriz.app.feature.home.component.TestStartCard
 import com.qriz.app.feature.home.component.TodayStudyCardPager
 import com.qriz.app.feature.home.component.UserExamUiState
-import com.qriz.app.feature.home.HomeUiState.HomeDataLoadState
-import com.qriz.app.feature.home.component.DailyStudyPlanDayFilterBottomSheet
 import com.qriz.app.feature.home.component.WeeklyCustomConcept
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus.NOT_STARTED
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import com.qriz.app.core.designsystem.R as DSR
 import com.qriz.app.core.ui.common.R as UR
 
@@ -72,7 +67,6 @@ fun HomeScreen(
         }
     }
 
-
     if (uiState.applyExamErrorMessage != null) {
         QrizDialog(
             title = stringResource(UR.string.error_occurs),
@@ -85,12 +79,14 @@ fun HomeScreen(
     }
 
     if (uiState.examSchedulesErrorMessage != null) {
-        QrizDialog(title = stringResource(UR.string.error_occurs),
+        QrizDialog(
+            title = stringResource(UR.string.error_occurs),
             description = uiState.examSchedulesErrorMessage!!,
             confirmText = stringResource(UR.string.retry),
             cancelText = stringResource(R.string.to_home),
             onCancelClick = { viewModel.process(HomeUiAction.DismissExamSchedulesErrorDialog) },
-            onConfirmClick = { viewModel.process(HomeUiAction.LoadToExamSchedules) })
+            onConfirmClick = { viewModel.process(HomeUiAction.LoadToExamSchedules) },
+        )
     }
 
     if (uiState.isShowExamScheduleBottomSheet) {
@@ -111,6 +107,37 @@ fun HomeScreen(
         )
     }
 
+    if (uiState.showResetPlanConfirmationDialog) {
+        QrizDialog(
+            title = stringResource(R.string.reset_plan),
+            description = stringResource(R.string.plan_will_be_reset),
+            cancelText = stringResource(DSR.string.cancel),
+            onConfirmClick = {
+                viewModel.process(HomeUiAction.ResetDailyStudyPlans)
+                viewModel.process(HomeUiAction.DismissResetPlanConfirmationDialog)
+            },
+            onCancelClick = {
+                viewModel.process(HomeUiAction.DismissResetPlanConfirmationDialog)
+            },
+            onDismissRequest = {
+                viewModel.process(HomeUiAction.DismissResetPlanConfirmationDialog)
+            },
+        )
+    }
+
+    uiState.resetPlanErrorMessage?.let {
+        QrizDialog(
+            title = stringResource(R.string.plan_reset_fail),
+            description = it,
+            onConfirmClick = {
+                viewModel.process(HomeUiAction.DismissResetPlanErrorDialog)
+            },
+            onDismissRequest = {
+                viewModel.process(HomeUiAction.DismissResetPlanErrorDialog)
+            }
+        )
+    }
+
     HomeContent(
         userName = uiState.user.name,
         previewTestStatus = uiState.user.previewTestStatus,
@@ -128,6 +155,7 @@ fun HomeScreen(
         onClickWeeklyCustomConcept = {},
         onClickPlanDayFilter = { viewModel.process(HomeUiAction.ShowPlanDayFilterBottomSheet) },
         onClickRetryLoadHomeData = {},
+        onClickResetDailyStudyPlan = { viewModel.process(HomeUiAction.ShowResetPlanConfirmationDialog) },
     )
 }
 
@@ -149,6 +177,7 @@ fun HomeContent(
     onChangeTodayStudyCard: (Int) -> Unit,
     onClickWeeklyCustomConcept: () -> Unit,
     onClickRetryLoadHomeData: () -> Unit,
+    onClickResetDailyStudyPlan: () -> Unit,
 ) {
     val isInitialized = rememberSaveable { mutableStateOf(false) }
 
@@ -233,9 +262,9 @@ fun HomeContent(
                         isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
                         selectedPlanDay = selectedPlanDay,
                         dailyStudyPlans = dailyStudyPlans,
-                        onClickInit = onClickTodayStudyInit,
                         onChangeTodayStudyCard = onChangeTodayStudyCard,
                         onClickDayFilter = onClickPlanDayFilter,
+                        onClickResetDailyStudyPlan = onClickResetDailyStudyPlan,
                     )
 
                     WeeklyCustomConcept(
@@ -274,6 +303,7 @@ fun HomeContentPreview() {
             onClickWeeklyCustomConcept = {},
             onClickPlanDayFilter = {},
             onClickRetryLoadHomeData = {},
+            onClickResetDailyStudyPlan = {},
         )
     }
 }

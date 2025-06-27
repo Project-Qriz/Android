@@ -34,4 +34,8 @@
     <string name="to_home">홈으로 가기</string>
     <string name="success_to_apply_exam">시험일정을 등록했어요!</string>
     <string name="error_occurred">오류가 발생했습니다.</string>
+    <string name="reset_plan">플랜을 초기화 할까요?</string>
+    <string name="plan_will_be_reset">지금까지의 플랜이 초기화되며,\nDay1부터 다시 시작됩니다.</string>
+    <string name="plan_is_reset">플랜이 초기화 되었습니다.</string>
+    <string name="plan_reset_fail">초기화할 수 없습니다.</string>
 </resources>

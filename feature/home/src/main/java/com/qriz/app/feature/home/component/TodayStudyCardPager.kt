@@ -68,9 +68,9 @@ fun TodayStudyCardPager(
     selectedPlanDay: Int,
     dailyStudyPlans: ImmutableList<DailyStudyPlan>,
     isNeedPreviewTest: Boolean,
-    onClickInit: () -> Unit,
     onChangeTodayStudyCard: (Int) -> Unit,
     onClickDayFilter: () -> Unit,
+    onClickResetDailyStudyPlan: () -> Unit,
 ) {
     val pagerState = rememberPagerState { dailyStudyPlans.size }
 
@@ -137,7 +137,7 @@ fun TodayStudyCardPager(
                 if (isNeedPreviewTest.not()) {
                     IconButton(
                         modifier = Modifier.size(24.dp),
-                        onClick = onClickInit,
+                        onClick = onClickResetDailyStudyPlan,
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.renew_icon),
@@ -453,9 +453,9 @@ private fun TodayStudyCardPreview() {
                     planDate = LocalDate.now(),
                 )
             ),
-            onClickInit = {},
             onChangeTodayStudyCard = {},
             onClickDayFilter = {},
+            onClickResetDailyStudyPlan = {},
         )
     }
 }
@@ -485,9 +485,9 @@ private fun TodayStudyCardPreview2() {
                     planDate = LocalDate.now(),
                 )
             ),
-            onClickInit = {},
             onChangeTodayStudyCard = {},
             onClickDayFilter = {},
+            onClickResetDailyStudyPlan = {},
         )
     }
 }

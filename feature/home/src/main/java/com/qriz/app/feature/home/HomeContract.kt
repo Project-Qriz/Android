@@ -31,6 +31,8 @@ data class HomeUiState(
     val examSchedulesErrorMessage: String?,
     val applyExamErrorMessage: String?,
     val showPlanDayFilterBottomSheet: Boolean,
+    val showResetPlanConfirmationDialog: Boolean,
+    val resetPlanErrorMessage: String?,
 ) : UiState {
     companion object {
         val Default = HomeUiState(
@@ -48,6 +50,8 @@ data class HomeUiState(
             selectedPlanDay = 0,
             todayPlanIsReview = false,
             showPlanDayFilterBottomSheet = false,
+            showResetPlanConfirmationDialog = false,
+            resetPlanErrorMessage = null,
         )
     }
 
@@ -91,6 +95,10 @@ sealed interface HomeUiAction : UiAction {
     data object ClickRetryDataLoad : HomeUiAction
     data object ShowPlanDayFilterBottomSheet : HomeUiAction
     data object DismissPlanDayFilterBottomSheet : HomeUiAction
+    data object ShowResetPlanConfirmationDialog : HomeUiAction
+    data object DismissResetPlanConfirmationDialog : HomeUiAction
+    data object ResetDailyStudyPlans : HomeUiAction
+    data object DismissResetPlanErrorDialog : HomeUiAction
 }
 
 sealed interface HomeUiEffect : UiEffect {

@@ -42,70 +42,22 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     userRepository: UserRepository,
     private val examRepository: ExamRepository,
-    dailyStudyRepository: DailyStudyRepository,
+    private val dailyStudyRepository: DailyStudyRepository,
 ) : BaseViewModel<HomeUiState, HomeUiEffect, HomeUiAction>(HomeUiState.Default) {
 
     private var isInitialized = false
     private val homeDataLoad = MutableStateFlow(true)
 
-    private val dataFlow = homeDataLoad.filter { it }.flatMapLatest { userRepository.getUserFlow() }
+    private val dataFlow = homeDataLoad
+        .filter { it }
+        .flatMapLatest { userRepository.getUserFlow() }
         .flatMapLatest { user ->
             val dailyStudyPlanFlow =
                 if (user.previewTestStatus == PreviewTestStatus.PREVIEW_COMPLETED) dailyStudyRepository.getDailyStudyPlanFlow()
-                else flowOf(
-                    //블러 처리를 위한 fake data
-                    ApiResult.Success(
-                        listOf(
-                            DailyStudyPlan(
-                                id = 0,
-                                completed = false,
-                                planDate = LocalDate.now(),
-                                completionDate = null,
-                                plannedSkills = listOf(
-                                    PlannedSkill(
-                                        id = 0,
-                                        type = "SQL 기본",
-                                        keyConcept = "WHERE 절",
-                                        description = ""
-                                    ),
-                                    PlannedSkill(
-                                        id = 0,
-                                        type = "SQL 기본",
-                                        keyConcept = "WHERE 절",
-                                        description = ""
-                                    )
-                                ),
-                                reviewDay = false,
-                                comprehensiveReviewDay = false
-                            )
-                        ),
-                    ),
-                )
+                else flowOf(fakeDailyStudyPlanResult)
             val weeklyRecommendationFlow =
                 if (user.previewTestStatus == PreviewTestStatus.PREVIEW_COMPLETED) dailyStudyRepository.getWeeklyRecommendation()
-                else flowOf(
-                    //블러 처리를 위한 fake data
-                    ApiResult.Success(
-                        listOf(
-                            WeeklyRecommendation(
-                                skillId = 1,
-                                keyConcepts = "데이터 모델의 이해",
-                                description = "",
-                                frequency = 1,
-                                incorrectRate = null,
-                                importanceLevel = ImportanceLevel.HIGH,
-                            ),
-                            WeeklyRecommendation(
-                                skillId = 1,
-                                keyConcepts = "SELECT 문",
-                                description = "",
-                                frequency = 1,
-                                incorrectRate = null,
-                                importanceLevel = ImportanceLevel.LOW,
-                            )
-                        )
-                    )
-                )
+                else flowOf(fakeWeeklyRecommendationResult)
 
             combine(
                 dailyStudyPlanFlow,
@@ -162,6 +114,10 @@ class HomeViewModel @Inject constructor(
             is HomeUiAction.DismissPlanDayFilterBottomSheet -> { updateState { copy(showPlanDayFilterBottomSheet = false) } }
             is HomeUiAction.ShowPlanDayFilterBottomSheet -> { updateState { copy(showPlanDayFilterBottomSheet = true) } }
             is HomeUiAction.ChangeStudyPlanDateToToday -> onChangeStudyPlanDayToToday()
+            is HomeUiAction.ShowResetPlanConfirmationDialog -> updateState { copy(showResetPlanConfirmationDialog = true) }
+            is HomeUiAction.DismissResetPlanConfirmationDialog -> updateState { copy(showResetPlanConfirmationDialog = false) }
+            is HomeUiAction.ResetDailyStudyPlans -> resetDailyStudyPlan()
+            is HomeUiAction.DismissResetPlanErrorDialog -> { updateState { copy(resetPlanErrorMessage = null) } }
         }
     }
 
@@ -325,6 +281,27 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private suspend fun resetDailyStudyPlan() {
+        when(val result = dailyStudyRepository.resetDailyStudyPlan()) {
+            is ApiResult.Success -> {
+                sendEffect(HomeUiEffect.ShowSnackBar(R.string.plan_is_reset))
+                homeDataLoad.update { true }
+            }
+
+            is ApiResult.Failure -> {
+                updateState { copy(resetPlanErrorMessage = result.message) }
+            }
+
+            is ApiResult.NetworkError -> {
+                updateState { copy(resetPlanErrorMessage = NETWORK_IS_UNSTABLE) }
+            }
+
+            is ApiResult.UnknownError -> {
+                updateState { copy(resetPlanErrorMessage = UNKNOWN_ERROR) }
+            }
+        }
+    }
+
     private fun UserExam?.toUiState(): UserExamUiState {
         if (this == null) return UserExamUiState.NoSchedule
         if (this.ddayType == DdayType.AFTER) return UserExamUiState.PastExam
@@ -340,5 +317,55 @@ class HomeViewModel @Inject constructor(
 
     private fun List<Schedule>.findUaid(): Long? {
         return this.firstOrNull { it.userApplyId != null }?.userApplyId
+    }
+
+    companion object {
+        private val fakeDailyStudyPlanResult = ApiResult.Success(
+            listOf(
+                DailyStudyPlan(
+                    id = 0,
+                    completed = false,
+                    planDate = LocalDate.now(),
+                    completionDate = null,
+                    plannedSkills = listOf(
+                        PlannedSkill(
+                            id = 0,
+                            type = "SQL 기본",
+                            keyConcept = "WHERE 절",
+                            description = ""
+                        ),
+                        PlannedSkill(
+                            id = 0,
+                            type = "SQL 기본",
+                            keyConcept = "WHERE 절",
+                            description = ""
+                        )
+                    ),
+                    reviewDay = false,
+                    comprehensiveReviewDay = false
+                )
+            ),
+        )
+
+        private val fakeWeeklyRecommendationResult = ApiResult.Success(
+            listOf(
+                WeeklyRecommendation(
+                    skillId = 1,
+                    keyConcepts = "데이터 모델의 이해",
+                    description = "",
+                    frequency = 1,
+                    incorrectRate = null,
+                    importanceLevel = ImportanceLevel.HIGH,
+                ),
+                WeeklyRecommendation(
+                    skillId = 1,
+                    keyConcepts = "SELECT 문",
+                    description = "",
+                    frequency = 1,
+                    incorrectRate = null,
+                    importanceLevel = ImportanceLevel.LOW,
+                )
+            )
+        )
     }
 }
