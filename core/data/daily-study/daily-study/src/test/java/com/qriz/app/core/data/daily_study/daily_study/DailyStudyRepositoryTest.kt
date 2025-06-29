@@ -2,14 +2,19 @@ package com.qriz.app.core.data.daily_study.daily_study
 
 import app.cash.turbine.test
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
+import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlanDetail
 import com.qriz.app.core.data.daily_study.daily_study_api.model.ImportanceLevel
 import com.qriz.app.core.data.daily_study.daily_study_api.model.PlannedSkill
+import com.qriz.app.core.data.daily_study.daily_study_api.model.SimplePlannedSkill
 import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.model.requireValue
 import com.qriz.app.core.network.daily_study.DailyStudyApi
+import com.qriz.app.core.network.daily_study.model.response.DailyStudyDetailResponse
 import com.qriz.app.core.network.daily_study.model.response.DailyStudyPlanResponse
+import com.qriz.app.core.network.daily_study.model.response.DailyStudyStatusResponse
 import com.qriz.app.core.network.daily_study.model.response.PlannedSkillResponse
+import com.qriz.app.core.network.daily_study.model.response.SimplePlannedSkillResponse
 import com.qriz.app.core.network.daily_study.model.response.WeeklyRecommendationResponse
 import com.qriz.app.core.network.daily_study.model.response.WeeklyRecommendationResponseContainer
 import io.kotest.matchers.shouldBe
@@ -18,6 +23,7 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import java.io.IOException
 import java.time.LocalDate
 
 class DailyStudyRepositoryTest {
@@ -128,5 +134,63 @@ class DailyStudyRepositoryTest {
         //then
         coVerify { mockApi.resetDailyStudyPlan() }
         result shouldBe ApiResult.Success(Unit)
+    }
+
+    @Test
+    fun `일일 공부 플랜 상세 정보를 성공적으로 가져온다`() = runTest {
+        //given
+        val day = 1
+        val mockResponse = DailyStudyDetailResponse(
+            dayNumber = "Day1",
+            skills = listOf(
+                SimplePlannedSkillResponse(
+                    id = 1,
+                    keyConcept = "SQL 기본",
+                    description = "SELECT문과 WHERE절 사용법"
+                ),
+                SimplePlannedSkillResponse(
+                    id = 2,
+                    keyConcept = "JOIN",
+                    description = "INNER JOIN과 LEFT JOIN 차이점"
+                )
+            ),
+            status = DailyStudyStatusResponse(
+                attemptCount = 2,
+                passed = true,
+                retestEligible = false,
+                totalScore = 85.5,
+                available = true
+            )
+        )
+        
+        coEvery { mockApi.getDailyStudyDetail("Day1") } returns ApiResult.Success(mockResponse)
+
+        val expected = DailyStudyPlanDetail(
+            dayNumber = "Day1",
+            skills = listOf(
+                SimplePlannedSkill(
+                    id = 1,
+                    keyConcept = "SQL 기본",
+                    description = "SELECT문과 WHERE절 사용법"
+                ),
+                SimplePlannedSkill(
+                    id = 2,
+                    keyConcept = "JOIN",
+                    description = "INNER JOIN과 LEFT JOIN 차이점"
+                )
+            ),
+            attemptCount = 2,
+            passed = true,
+            retestEligible = false,
+            totalScore = 85.5,
+            available = true
+        )
+
+        //when
+        val result = repository.getDailyStudyPlanDetail(day)
+
+        //then
+        coVerify { mockApi.getDailyStudyDetail("Day1") }
+        result shouldBe ApiResult.Success(expected)
     }
 }
