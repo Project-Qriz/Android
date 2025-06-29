@@ -5,6 +5,11 @@ import com.qriz.app.core.data.application.application_api.model.DdayType
 import com.qriz.app.core.data.application.application_api.model.Schedule
 import com.qriz.app.core.data.application.application_api.model.UserExam
 import com.qriz.app.core.data.application.application_api.repository.ExamRepository
+import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
+import com.qriz.app.core.data.daily_study.daily_study_api.model.ImportanceLevel
+import com.qriz.app.core.data.daily_study.daily_study_api.model.PlannedSkill
+import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
+import com.qriz.app.core.data.daily_study.daily_study_api.repository.DailyStudyRepository
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
@@ -17,17 +22,18 @@ import com.qriz.app.feature.home.component.UserExamUiState
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
+import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Month
 import kotlin.test.assertEquals
@@ -40,10 +46,12 @@ class HomeViewModelTest {
 
     private val userRepository = mockk<UserRepository>()
     private val examRepository = mockk<ExamRepository>()
+    private val dailyStudyRepository = mockk<DailyStudyRepository>()
 
-    fun TestScope.homeViewModel() = HomeViewModel(
+    private fun homeViewModel() = HomeViewModel(
         userRepository = userRepository,
         examRepository = examRepository,
+        dailyStudyRepository = dailyStudyRepository,
     )
 
     @Test
@@ -99,6 +107,8 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess(dday = 10, ddayType = DdayType.AFTER)
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         val viewModel = homeViewModel()
 
         //when
@@ -109,8 +119,31 @@ class HomeViewModelTest {
             uiState.test {
                 assertEquals(
                     UserExamUiState.PastExam,
-                    awaitItem().userExamState
+                    expectMostRecentItem().userExamState
                 )
+            }
+        }
+    }
+    
+    @Test
+    fun `dataFlow - 프리뷰 테스트를 완료한 경우 DailyStudyPlan, WeeklyRecommendation을 불러온다`() = runTest {
+        //given
+        mockUserFlow(PreviewTestStatus.PREVIEW_COMPLETED)
+        mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
+        val viewModel = homeViewModel()
+
+        //when
+        viewModel.process(HomeUiAction.ObserveClient)
+
+        //then
+        with(viewModel) {
+            uiState.test {
+                with(awaitItem()) {
+                    dailyStudyPlans shouldBe dailyStudyPlans
+                    weeklyRecommendations shouldBe weeklyRecommendations
+                }
             }
         }
     }
@@ -557,6 +590,16 @@ class HomeViewModelTest {
         )
     }
 
+    private fun mockDailyStudyPlanSuccess() {
+        coEvery { dailyStudyRepository.getDailyStudyPlanFlow() } returns
+                flowOf(ApiResult.Success(dailyStudyPlans))
+    }
+
+    private fun mockWeeklyRecommendation() {
+        coEvery { dailyStudyRepository.getWeeklyRecommendation() } returns
+                flowOf(ApiResult.Success(weeklyRecommendations))
+    }
+
     private fun assertExamSchedulesLoadingState(state: HomeUiState) {
         print("${state.schedulesState} // ${state.isShowExamScheduleBottomSheet} // ${state.examSchedulesErrorMessage}")
         assertEquals(
@@ -683,6 +726,36 @@ class HomeViewModelTest {
                     0,
                     0,
                 ),
+            )
+        )
+
+        private val dailyStudyPlans = listOf(
+            DailyStudyPlan(
+                id = 1,
+                planDate = LocalDate.parse("2025-07-01"),
+                completionDate = null,
+                reviewDay = false,
+                comprehensiveReviewDay = false,
+                completed = false,
+                plannedSkills = listOf(
+                    PlannedSkill(
+                        id = 1,
+                        type = "SQL기본",
+                        keyConcept = "WHERE절",
+                        description = ""
+                    )
+                )
+            )
+        )
+
+        private val weeklyRecommendations = listOf(
+            WeeklyRecommendation(
+                skillId = 1,
+                keyConcepts = "WHERE절",
+                description = "",
+                importanceLevel = ImportanceLevel.HIGH,
+                frequency = 2,
+                incorrectRate = 1.1,
             )
         )
     }
