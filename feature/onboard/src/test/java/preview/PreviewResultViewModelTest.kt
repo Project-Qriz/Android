@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.qriz.app.core.data.onboard.onboard_api.model.PreviewTestResult
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.data.test.test_api.model.SQLDConcept
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.feature.onboard.previewresult.PreviewResultUiAction
 import com.qriz.app.feature.onboard.previewresult.PreviewResultUiEffect
@@ -50,7 +51,7 @@ class PreviewResultViewModelTest {
     fun `Action_LoadPreviewResult process 성공 - 상태 업데이트`() = runTest {
         with(previewResultViewModel()) {
             // given
-            coEvery { fakeOnBoardRepository.getPreviewTestResult() } returns fakeTestResult
+            coEvery { fakeOnBoardRepository.getPreviewTestResult() } returns ApiResult.Success(fakeTestResult)
 
             // when
             process(PreviewResultUiAction.LoadPreviewResult)
@@ -69,7 +70,7 @@ class PreviewResultViewModelTest {
     fun `Action_LoadPreviewResult process 실패 - 상태 업데이트`() = runTest {
         with(previewResultViewModel()) {
             // given
-            coEvery { fakeOnBoardRepository.getPreviewTestResult() } throws Exception()
+            coEvery { fakeOnBoardRepository.getPreviewTestResult() } returns ApiResult.Failure(code = -1, message = "")
 
             // when
             process(PreviewResultUiAction.LoadPreviewResult)
