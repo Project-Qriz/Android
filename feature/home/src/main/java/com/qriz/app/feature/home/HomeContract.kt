@@ -4,12 +4,15 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.qriz.app.core.data.application.application_api.model.Schedule
+import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
+import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
 import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
 import com.qriz.app.feature.home.component.UserExamUiState
 import com.quiz.app.core.data.user.user_api.model.User
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import com.qriz.app.core.designsystem.R as DSR
 
 @Immutable
@@ -18,26 +21,50 @@ data class HomeUiState(
     val isShowExamScheduleBottomSheet: Boolean,
     val user: User,
     val userApplicationId: Long?,
+    val dataLoadState: HomeDataLoadState,
     val userExamState: UserExamUiState,
+    val selectedPlanDay: Int,
+    val todayPlanIsReview: Boolean,
     val schedulesState: SchedulesLoadState,
-    val todayStudyConcepts: List<Int>,
-    val currentTodayStudyDay: Int,
+    val dailyStudyPlans: ImmutableList<DailyStudyPlan>,
+    val weeklyRecommendation: ImmutableList<WeeklyRecommendation>,
     val examSchedulesErrorMessage: String?,
     val applyExamErrorMessage: String?,
+    val showPlanDayFilterBottomSheet: Boolean,
+    val showResetPlanConfirmationDialog: Boolean,
+    val resetPlanErrorMessage: String?,
 ) : UiState {
     companion object {
         val Default = HomeUiState(
             isLoading = false,
             isShowExamScheduleBottomSheet = false,
             user = User.Default,
+            dataLoadState = HomeDataLoadState.Loading,
             schedulesState = SchedulesLoadState.Loading,
             userExamState = UserExamUiState.NoSchedule,
-            todayStudyConcepts = List(30) { it + 1 },
-            currentTodayStudyDay = 1,
+            dailyStudyPlans = persistentListOf(),
+            weeklyRecommendation = persistentListOf(),
             examSchedulesErrorMessage = null,
             userApplicationId = null,
             applyExamErrorMessage = null,
+            selectedPlanDay = 0,
+            todayPlanIsReview = false,
+            showPlanDayFilterBottomSheet = false,
+            showResetPlanConfirmationDialog = false,
+            resetPlanErrorMessage = null,
         )
+    }
+
+    @Stable
+    sealed interface HomeDataLoadState {
+        @Immutable
+        data object Success: HomeDataLoadState
+
+        @Immutable
+        data class Failure(val message: String): HomeDataLoadState
+
+        @Immutable
+        data object Loading: HomeDataLoadState
     }
 
     @Stable
@@ -55,7 +82,8 @@ data class HomeUiState(
 
 sealed interface HomeUiAction : UiAction {
     data object ObserveClient : HomeUiAction
-    data class ChangeTodayStudyCard(val day: Int) : HomeUiAction
+    data class ChangeStudyPlanDate(val day: Int) : HomeUiAction
+    data object ChangeStudyPlanDateToToday : HomeUiAction
     data object ClickApply : HomeUiAction
     data object DismissTestDateBottomSheet : HomeUiAction
     data object MoveToPreviewTest : HomeUiAction
@@ -64,6 +92,13 @@ sealed interface HomeUiAction : UiAction {
     data object RetryApplyExam : HomeUiAction
     data object DismissExamSchedulesErrorDialog : HomeUiAction
     data object DismissApplyExamErrorDialog : HomeUiAction
+    data object ClickRetryDataLoad : HomeUiAction
+    data object ShowPlanDayFilterBottomSheet : HomeUiAction
+    data object DismissPlanDayFilterBottomSheet : HomeUiAction
+    data object ShowResetPlanConfirmationDialog : HomeUiAction
+    data object DismissResetPlanConfirmationDialog : HomeUiAction
+    data object ResetDailyStudyPlans : HomeUiAction
+    data object DismissResetPlanErrorDialog : HomeUiAction
 }
 
 sealed interface HomeUiEffect : UiEffect {

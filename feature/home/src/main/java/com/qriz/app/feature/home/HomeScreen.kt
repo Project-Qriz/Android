@@ -26,10 +26,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
+import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
 import com.qriz.app.core.designsystem.component.QrizDialog
+import com.qriz.app.core.designsystem.component.QrizLoading
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.QrizTheme
+import com.qriz.app.core.ui.common.const.ErrorScreen
 import com.qriz.app.feature.base.extention.collectSideEffect
+import com.qriz.app.feature.home.HomeUiState.HomeDataLoadState
+import com.qriz.app.feature.home.component.DailyStudyPlanDayFilterBottomSheet
 import com.qriz.app.feature.home.component.ExamScheduleBottomSheet
 import com.qriz.app.feature.home.component.ExamScheduleCard
 import com.qriz.app.feature.home.component.TestStartCard
@@ -38,6 +44,8 @@ import com.qriz.app.feature.home.component.UserExamUiState
 import com.qriz.app.feature.home.component.WeeklyCustomConcept
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus.NOT_STARTED
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import com.qriz.app.core.designsystem.R as DSR
 import com.qriz.app.core.ui.common.R as UR
 
@@ -66,17 +74,19 @@ fun HomeScreen(
             confirmText = stringResource(UR.string.retry),
             cancelText = stringResource(R.string.to_home),
             onCancelClick = { viewModel.process(HomeUiAction.DismissApplyExamErrorDialog) },
-            onConfirmClick = {  },
+            onConfirmClick = { },
         )
     }
 
     if (uiState.examSchedulesErrorMessage != null) {
-        QrizDialog(title = stringResource(UR.string.error_occurs),
+        QrizDialog(
+            title = stringResource(UR.string.error_occurs),
             description = uiState.examSchedulesErrorMessage!!,
             confirmText = stringResource(UR.string.retry),
             cancelText = stringResource(R.string.to_home),
             onCancelClick = { viewModel.process(HomeUiAction.DismissExamSchedulesErrorDialog) },
-            onConfirmClick = { viewModel.process(HomeUiAction.LoadToExamSchedules) })
+            onConfirmClick = { viewModel.process(HomeUiAction.LoadToExamSchedules) },
+        )
     }
 
     if (uiState.isShowExamScheduleBottomSheet) {
@@ -88,19 +98,64 @@ fun HomeScreen(
         )
     }
 
+    if (uiState.showPlanDayFilterBottomSheet) {
+        DailyStudyPlanDayFilterBottomSheet(
+            selectedDay = uiState.selectedPlanDay,
+            onSelectDay = { viewModel.process(HomeUiAction.ChangeStudyPlanDate(it)) },
+            onClickToday = { viewModel.process(HomeUiAction.ChangeStudyPlanDateToToday) },
+            onDismissRequest = { viewModel.process(HomeUiAction.DismissPlanDayFilterBottomSheet) },
+        )
+    }
+
+    if (uiState.showResetPlanConfirmationDialog) {
+        QrizDialog(
+            title = stringResource(R.string.reset_plan),
+            description = stringResource(R.string.plan_will_be_reset),
+            cancelText = stringResource(DSR.string.cancel),
+            onConfirmClick = {
+                viewModel.process(HomeUiAction.ResetDailyStudyPlans)
+                viewModel.process(HomeUiAction.DismissResetPlanConfirmationDialog)
+            },
+            onCancelClick = {
+                viewModel.process(HomeUiAction.DismissResetPlanConfirmationDialog)
+            },
+            onDismissRequest = {
+                viewModel.process(HomeUiAction.DismissResetPlanConfirmationDialog)
+            },
+        )
+    }
+
+    uiState.resetPlanErrorMessage?.let {
+        QrizDialog(
+            title = stringResource(R.string.plan_reset_fail),
+            description = it,
+            onConfirmClick = {
+                viewModel.process(HomeUiAction.DismissResetPlanErrorDialog)
+            },
+            onDismissRequest = {
+                viewModel.process(HomeUiAction.DismissResetPlanErrorDialog)
+            }
+        )
+    }
+
     HomeContent(
         userName = uiState.user.name,
         previewTestStatus = uiState.user.previewTestStatus,
-        currentTodayStudyDay = uiState.currentTodayStudyDay,
-        todayStudyConcepts = uiState.todayStudyConcepts,
+        selectedPlanDay = uiState.selectedPlanDay,
         scheduleState = uiState.userExamState,
+        dataLoadState = uiState.dataLoadState,
+        dailyStudyPlans = uiState.dailyStudyPlans,
+        weeklyRecommendation = uiState.weeklyRecommendation,
         onInit = { viewModel.process(HomeUiAction.ObserveClient) },
         onClickExamApply = { viewModel.process(HomeUiAction.ClickApply) },
         onClickMockTest = {},
         onClickPreviewTest = { viewModel.process(HomeUiAction.MoveToPreviewTest) },
         onClickTodayStudyInit = {},
-        onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeTodayStudyCard(it)) },
+        onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeStudyPlanDate(it)) },
         onClickWeeklyCustomConcept = {},
+        onClickPlanDayFilter = { viewModel.process(HomeUiAction.ShowPlanDayFilterBottomSheet) },
+        onClickRetryLoadHomeData = {},
+        onClickResetDailyStudyPlan = { viewModel.process(HomeUiAction.ShowResetPlanConfirmationDialog) },
     )
 }
 
@@ -108,16 +163,21 @@ fun HomeScreen(
 fun HomeContent(
     userName: String,
     previewTestStatus: PreviewTestStatus,
-    currentTodayStudyDay: Int,
-    todayStudyConcepts: List<Int>,
+    selectedPlanDay: Int,
+    dataLoadState: HomeDataLoadState,
     scheduleState: UserExamUiState,
+    dailyStudyPlans: ImmutableList<DailyStudyPlan>,
+    weeklyRecommendation: ImmutableList<WeeklyRecommendation>,
     onInit: () -> Unit,
     onClickExamApply: () -> Unit,
+    onClickPlanDayFilter: () -> Unit,
     onClickMockTest: () -> Unit,
     onClickPreviewTest: () -> Unit,
     onClickTodayStudyInit: () -> Unit,
     onChangeTodayStudyCard: (Int) -> Unit,
     onClickWeeklyCustomConcept: () -> Unit,
+    onClickRetryLoadHomeData: () -> Unit,
+    onClickResetDailyStudyPlan: () -> Unit,
 ) {
     val isInitialized = rememberSaveable { mutableStateOf(false) }
 
@@ -162,41 +222,58 @@ fun HomeContent(
                 .weight(1f)
                 .verticalScroll(rememberScrollState()),
         ) {
-            ExamScheduleCard(
-                modifier = Modifier
-                    .padding(horizontal = horizontalPadding)
-                    .padding(
-                        top = 24.dp,
-                        bottom = 32.dp
-                    ),
-                userName = userName,
-                scheduleState = scheduleState,
-                onClickApply = onClickExamApply,
-            )
+            when (dataLoadState) {
+                is HomeDataLoadState.Loading -> {
+                    QrizLoading()
+                }
 
-            TestStartCard(
-                modifier = Modifier
-                    .padding(horizontal = horizontalPadding)
-                    .padding(bottom = 32.dp),
-                isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
-                onClickMockTest = onClickMockTest,
-                onClickPreviewTest = onClickPreviewTest
-            )
+                is HomeDataLoadState.Failure -> {
+                    ErrorScreen(
+                        title = stringResource(R.string.error_occurred),
+                        description = dataLoadState.message,
+                        onClickRetry = onClickRetryLoadHomeData,
+                    )
+                }
 
-            TodayStudyCardPager(
-                horizontalPadding = horizontalPadding,
-                isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
-                currentDay = currentTodayStudyDay,
-                todayStudyConcepts = todayStudyConcepts,
-                onClickInit = onClickTodayStudyInit,
-                onChangeTodayStudyCard = onChangeTodayStudyCard
-            )
+                is HomeDataLoadState.Success -> {
+                    ExamScheduleCard(
+                        modifier = Modifier
+                            .padding(horizontal = horizontalPadding)
+                            .padding(
+                                top = 24.dp,
+                                bottom = 32.dp
+                            ),
+                        userName = userName,
+                        scheduleState = scheduleState,
+                        onClickApply = onClickExamApply,
+                    )
 
-            WeeklyCustomConcept(
-                isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
-                onClick = onClickWeeklyCustomConcept,
-            )
+                    TestStartCard(
+                        modifier = Modifier
+                            .padding(horizontal = horizontalPadding)
+                            .padding(bottom = 32.dp),
+                        isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
+                        onClickMockTest = onClickMockTest,
+                        onClickPreviewTest = onClickPreviewTest
+                    )
 
+                    TodayStudyCardPager(
+                        horizontalPadding = horizontalPadding,
+                        isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
+                        selectedPlanDay = selectedPlanDay,
+                        dailyStudyPlans = dailyStudyPlans,
+                        onChangeTodayStudyCard = onChangeTodayStudyCard,
+                        onClickDayFilter = onClickPlanDayFilter,
+                        onClickResetDailyStudyPlan = onClickResetDailyStudyPlan,
+                    )
+
+                    WeeklyCustomConcept(
+                        isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
+                        recommendations = weeklyRecommendation,
+                        onClick = onClickWeeklyCustomConcept,
+                    )
+                }
+            }
         }
     }
 }
@@ -212,9 +289,11 @@ fun HomeContentPreview() {
         HomeContent(
             userName = "Qriz",
             previewTestStatus = NOT_STARTED,
-            currentTodayStudyDay = 0,
+            selectedPlanDay = 0,
+            dataLoadState = HomeDataLoadState.Success,
             scheduleState = UserExamUiState.NoSchedule,
-            todayStudyConcepts = List(30) { it + 1 },
+            dailyStudyPlans = persistentListOf(),
+            weeklyRecommendation = persistentListOf(),
             onInit = {},
             onClickExamApply = {},
             onClickPreviewTest = {},
@@ -222,6 +301,9 @@ fun HomeContentPreview() {
             onClickTodayStudyInit = {},
             onChangeTodayStudyCard = {},
             onClickWeeklyCustomConcept = {},
+            onClickPlanDayFilter = {},
+            onClickRetryLoadHomeData = {},
+            onClickResetDailyStudyPlan = {},
         )
     }
 }

@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Question
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.core.ui.test.mapper.toGeneralOptionItem
 import com.qriz.app.core.ui.test.mapper.toQuestionTestItem
@@ -39,7 +40,10 @@ class PreviewViewModelTest {
 
     private fun TestScope.previewViewModel() = PreviewViewModel(
         savedStateHandle = SavedStateHandle().apply {
-            set(IS_TEST_FLAG, true)
+            set(
+                IS_TEST_FLAG,
+                true
+            )
         },
         onBoardRepository = fakeOnBoardRepository
     )
@@ -48,7 +52,8 @@ class PreviewViewModelTest {
     fun `Action_ObservePreviewTestItem process 성공 - 상태 업데이트, 타이머 시작`() = runTest {
         with(previewViewModel()) {
             // given
-            coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
+            coEvery { fakeOnBoardRepository.getPreviewTest() } returns ApiResult.Success(fakeTest)
+            coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } returns ApiResult.Success(Unit)
 
             // when
             process(PreviewUiAction.ObservePreviewTestItem)
@@ -60,7 +65,7 @@ class PreviewViewModelTest {
                         .toImmutableList()
                     remainTimeMs shouldBe fakeTest.totalTimeLimit.toMilliSecond()
                     totalTimeLimitMs shouldBe fakeTest.totalTimeLimit.toMilliSecond()
-                    isLoading shouldBe false
+                    loadStatus shouldBe PreviewUiState.LoadStatus.Success
                 }
                 timerJob.shouldNotBeNull()
             }
@@ -72,41 +77,21 @@ class PreviewViewModelTest {
         runTest {
             with(previewViewModel()) {
                 // given
-                coEvery { fakeOnBoardRepository.getPreviewTest() } throws Exception()
+                coEvery { fakeOnBoardRepository.getPreviewTest() } returns ApiResult.Failure(code = -1, message = "")
                 // when
                 process(PreviewUiAction.ObservePreviewTestItem)
                 //then
-                uiState.test { awaitItem().isLoading shouldBe false }
-                effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBar) shouldBe true }
+                uiState.test { awaitItem().loadStatus shouldBe PreviewUiState.LoadStatus.Failure }
                 timerJob.shouldBeNull()
             }
         }
 
     @Test
-    fun `Action_ObservePreviewTestItem process 로딩 상태 - API호출되지 않음`() = runTest {
-        // given
-        coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
-        val previewViewModel = object : PreviewViewModel(
-            savedStateHandle = SavedStateHandle().apply { set(IS_TEST_FLAG, true) },
-            onBoardRepository = fakeOnBoardRepository
-        ) {
-            init {
-                updateState { copy(isLoading = true) }
-            }
-        }
-        with(previewViewModel) {
-            // when
-            process(PreviewUiAction.ObservePreviewTestItem)
-            //then
-            coVerify(exactly = 0) { fakeOnBoardRepository.getPreviewTest() }
-        }
-    }
-
-    @Test
     fun `Action_SelectOption process - 해당 질문의 선택된 옵션이 업데이트 됨`() = runTest {
         with(previewViewModel()) {
             // given
-            coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
+            coEvery { fakeOnBoardRepository.getPreviewTest() } returns ApiResult.Success(fakeTest)
+            coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } returns ApiResult.Success(Unit)
             val selectedQuestion = fakeTest.questions.first()
             val selectedOption1 = selectedQuestion.options.first().toGeneralOptionItem()
             process(PreviewUiAction.ObservePreviewTestItem)
@@ -191,14 +176,25 @@ class PreviewViewModelTest {
     fun `Action_ClickSubmit process 성공 - 로딩 해제, Effect_MoveToResult 발생`() = runTest {
         with(previewViewModel()) {
             // given
-            coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } returns Unit
+            coEvery { fakeOnBoardRepository.getPreviewTest() } returns ApiResult.Success(fakeTest)
+            coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } returns ApiResult.Success(Unit)
 
             // when
+            process(PreviewUiAction.ObservePreviewTestItem)
+            for (question in fakeTest.questions) {
+                process(
+                    PreviewUiAction.SelectOption(
+                        questionID = question.id,
+                        option = question.options.first().toGeneralOptionItem(),
+                    ),
+                )
+            }
+
             process(PreviewUiAction.ClickSubmit)
 
+
             // then
-            uiState.test { awaitItem().isLoading shouldBe false }
-            effect.test { (awaitItem() is PreviewUiEffect.MoveToResult) shouldBe true }
+            effect.test { awaitItem() shouldBe PreviewUiEffect.MoveToResult }
         }
     }
 
@@ -206,13 +202,24 @@ class PreviewViewModelTest {
     fun `Action_ClickSubmit process 실패 - 로딩 해제, Effect_ShowSnackBar 발생`() = runTest {
         with(previewViewModel()) {
             // given
-            coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } throws Exception()
+            coEvery { fakeOnBoardRepository.getPreviewTest() } returns ApiResult.Success(fakeTest)
+            coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } returns ApiResult.Failure(code = -1, message = "")
 
             // when
+            process(PreviewUiAction.ObservePreviewTestItem)
+            for (question in fakeTest.questions) {
+                process(
+                    PreviewUiAction.SelectOption(
+                        questionID = question.id,
+                        option = question.options.first().toGeneralOptionItem(),
+                    ),
+                )
+            }
             process(PreviewUiAction.ClickSubmit)
 
+
             // then
-            uiState.test { awaitItem().isLoading shouldBe false }
+            uiState.test { awaitItem().loadStatus shouldBe PreviewUiState.LoadStatus.Success }
             effect.test { (awaitItem() is PreviewUiEffect.ShowSnackBar) shouldBe true }
         }
     }
@@ -221,11 +228,16 @@ class PreviewViewModelTest {
     fun `Action_ClickSubmit process 로딩 상태 - API호출되지 않음`() = runTest {
         // given
         val previewViewModel = object : PreviewViewModel(
-            savedStateHandle = SavedStateHandle().apply { set(IS_TEST_FLAG, true) },
+            savedStateHandle = SavedStateHandle().apply {
+                set(
+                    IS_TEST_FLAG,
+                    true
+                )
+            },
             onBoardRepository = fakeOnBoardRepository
         ) {
             init {
-                updateState { copy(isLoading = true) }
+                updateState { copy(loadStatus = PreviewUiState.LoadStatus.Loading) }
             }
         }
         with(previewViewModel) {
@@ -241,7 +253,7 @@ class PreviewViewModelTest {
         runTest {
             with(previewViewModel()) {
                 // given
-                coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
+                coEvery { fakeOnBoardRepository.getPreviewTest() } returns ApiResult.Success(fakeTest)
                 process(PreviewUiAction.ObservePreviewTestItem)
 
                 fakeTest.questions.dropLast(1).forEach { selectedQuestion ->
@@ -253,7 +265,7 @@ class PreviewViewModelTest {
                     )
                 }
 
-                coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } returns Unit
+                coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } returns ApiResult.Success(Unit)
 
                 // when
                 process(PreviewUiAction.ClickSubmit)
@@ -328,7 +340,9 @@ class PreviewViewModelTest {
     fun `타이머가 시작 후 - remainTimeMs는 1초씩 감소`() = runTest {
         with(previewViewModel()) {
             // given
-            coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
+            coEvery { fakeOnBoardRepository.getPreviewTest() } returns ApiResult.Success(fakeTest)
+            coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } returns ApiResult.Success(Unit)
+
             process(PreviewUiAction.ObservePreviewTestItem)
             (1..5).forEach { seconds ->
                 // when
@@ -348,7 +362,8 @@ class PreviewViewModelTest {
     fun `타이머 만료 - 체크하지 않은 문제는 공백 처리 후, submitPreviewTest 호출`() = runTest {
         with(previewViewModel()) {
             // given
-            coEvery { fakeOnBoardRepository.getPreviewTest() } returns fakeTest
+            coEvery { fakeOnBoardRepository.getPreviewTest() } returns ApiResult.Success(fakeTest)
+            coEvery { fakeOnBoardRepository.submitPreviewTest(any()) } returns ApiResult.Success(Unit)
             process(PreviewUiAction.ObservePreviewTestItem)
 
             fakeTest.questions.dropLast(1).forEach { selectedQuestion ->
@@ -361,7 +376,12 @@ class PreviewViewModelTest {
             }
             val expected = fakeTest.questions.associate {
                 it.id to it.options.first()
-            } + mapOf(fakeTest.questions.last().id to Option(""))
+            } + mapOf(
+                fakeTest.questions.last().id to Option(
+                    id = 0,
+                    content = ""
+                )
+            )
 
             // when
             advanceTimeBy(fakeTest.totalTimeLimit.toMilliSecond() + 100)
@@ -379,10 +399,22 @@ class PreviewViewModelTest {
                     id = 1,
                     question = "다음 중 트랜잭션 모델링에서 '긴 트랜잭션(Long Transaction)'을 처리하는 방법으로 가장 적절한 것은?",
                     options = listOf(
-                        Option("트랜잭션을 더 작은 단위로 분할"),
-                        Option("트랜잭션의 타임아웃 시간을 늘림"),
-                        Option("모든 데이터를 메모리에 로드"),
-                        Option("트랜잭션의 격리 수준을 낮춤"),
+                        Option(
+                            id = 1,
+                            "트랜잭션을 더 작은 단위로 분할"
+                        ),
+                        Option(
+                            id = 2,
+                            "트랜잭션의 타임아웃 시간을 늘림"
+                        ),
+                        Option(
+                            id = 3,
+                            "모든 데이터를 메모리에 로드"
+                        ),
+                        Option(
+                            id = 4,
+                            "트랜잭션의 격리 수준을 낮춤"
+                        ),
                     ),
                     timeLimit = 60,
                 ),
@@ -390,10 +422,22 @@ class PreviewViewModelTest {
                     id = 2,
                     question = "다음 중 트랜잭션 모델링에서 '긴 트랜잭션(Long Transaction)'을 처리하는 방법으로 가장 적절한 것은?@2",
                     options = listOf(
-                        Option("트랜잭션을 더 작은 단위로 분할#2"),
-                        Option("트랜잭션의 타임아웃 시간을 늘림#2"),
-                        Option("모든 데이터를 메모리에 로드#2"),
-                        Option("트랜잭션의 격리 수준을 낮춤#2"),
+                        Option(
+                            id = 5,
+                            "트랜잭션을 더 작은 단위로 분할#2"
+                        ),
+                        Option(
+                            id = 6,
+                            "트랜잭션의 타임아웃 시간을 늘림#2"
+                        ),
+                        Option(
+                            id = 7,
+                            "모든 데이터를 메모리에 로드#2"
+                        ),
+                        Option(
+                            id = 8,
+                            "트랜잭션의 격리 수준을 낮춤#2"
+                        ),
                     ),
                     timeLimit = 60,
                 ),

@@ -27,3 +27,6 @@ suspend inline fun <T, R> ApiResult<T>.flatMapSuspend(
     is ApiResult.NetworkError -> this
     is ApiResult.UnknownError -> this
 }
+
+val <T> ApiResult<T>.requireValue: T
+    get() = (this as ApiResult.Success).data

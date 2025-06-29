@@ -45,6 +45,7 @@ import com.qriz.app.feature.onboard.survey.model.SurveyListItem.SurveyItem
 import com.qriz.app.feature.onboard.survey.model.SurveyListItem.SurveyItemGroup
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import com.qriz.app.core.designsystem.R as DSR
 
 //TODO: 각 아이템 UI 구조 변경 필요
 @Composable
@@ -173,8 +174,8 @@ private fun ConceptCheckContent(
                                 ) {
                                     Icon(
                                         imageVector = ImageVector.vectorResource(
-                                            if (isExpandSurveyItemGroup) R.drawable.ic_keyboard_arrow_up
-                                            else R.drawable.ic_keyboard_arrow_down
+                                            if (isExpandSurveyItemGroup) DSR.drawable.ic_keyboard_arrow_up
+                                            else DSR.drawable.ic_keyboard_arrow_down
                                         ),
                                         contentDescription = null,
                                     )

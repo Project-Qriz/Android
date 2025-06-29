@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.qriz.app.core.data.test.test_api.model.SQLDConcept
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
+import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.testing.MainDispatcherRule
 import com.qriz.app.feature.onboard.survey.SurveyUiAction
 import com.qriz.app.feature.onboard.survey.SurveyUiEffect
@@ -59,7 +60,8 @@ class SurveyViewModelTest {
                     surveyItems.isNotEmpty() shouldBe true
                     surveyItems.first { it is SurveyListItem.KnowsAll }.isChecked shouldBe true
                     surveyItems.first { it is SurveyListItem.KnowsNothing }.isChecked shouldBe false
-                    surveyItems.count { it.isChecked } shouldBe surveyItems.size - 1
+                    surveyItems.count { it.isChecked } shouldBe 1 //KnowsAll만 체크되고 세부 아이템들은 따로 체크
+                    (surveyItems.last() as SurveyListItem.SurveyItemGroup).list.count { it.isChecked } shouldBe SQLDConcept.entries.size
                 }
             }
         }
@@ -132,8 +134,7 @@ class SurveyViewModelTest {
                 with(awaitItem()) {
                     surveyItems.isNotEmpty() shouldBe true
                     surveyItems.first { it is SurveyListItem.KnowsNothing }.isChecked shouldBe false
-                    surveyItems.filterIsInstance<SurveyListItem.SurveyItem>()
-                        .count { it.isChecked } shouldBe fakeSelectedConcepts.size
+                    (surveyItems.last() as SurveyListItem.SurveyItemGroup).list.count { it.isChecked } shouldBe fakeSelectedConcepts.size
                 }
             }
         }
@@ -163,8 +164,7 @@ class SurveyViewModelTest {
                 with(awaitItem()) {
                     surveyItems.isNotEmpty() shouldBe true
                     surveyItems.first { it is SurveyListItem.KnowsNothing }.isChecked shouldBe false
-                    surveyItems.filterIsInstance<SurveyListItem.SurveyItem>()
-                        .count { it.isChecked } shouldBe fakeSelectedConcepts.size - 1
+                    (surveyItems.last() as SurveyListItem.SurveyItemGroup).list.count { it.isChecked }shouldBe fakeSelectedConcepts.size - 1
                 }
             }
         }
@@ -190,7 +190,7 @@ class SurveyViewModelTest {
                         surveyItems.isNotEmpty() shouldBe true
                         surveyItems.first { it is SurveyListItem.KnowsAll }.isChecked shouldBe true
                         surveyItems.first { it is SurveyListItem.KnowsNothing }.isChecked shouldBe false
-                        surveyItems.count { it.isChecked } shouldBe surveyItems.size - 1
+                        (surveyItems.last() as SurveyListItem.SurveyItemGroup).list.count { it.isChecked } shouldBe SQLDConcept.entries.size
                     }
                 }
             }
@@ -200,7 +200,7 @@ class SurveyViewModelTest {
     fun `Action_ClickSubmit process 아무것도 선택하지 않음 - submitSurvey 호출되지 않음`() = runTest {
         with(surveyViewModel()) {
             // given
-            coEvery { fakeOnBoardRepository.submitSurvey(emptyList()) } returns Unit
+            coEvery { fakeOnBoardRepository.submitSurvey(emptyList()) } returns ApiResult.Success(Unit)
             // when
             process(SurveyUiAction.ObserveSurveyItems)
             process(SurveyUiAction.ClickSubmit)
@@ -213,7 +213,7 @@ class SurveyViewModelTest {
     fun `Action_ClickSubmit process 전혀 모름 선택 - submitSurvey 호출, Effect_MoveToGuide 발생`() = runTest {
         with(surveyViewModel()) {
             // given
-            coEvery { fakeOnBoardRepository.submitSurvey(emptyList()) } returns Unit
+            coEvery { fakeOnBoardRepository.submitSurvey(emptyList()) } returns ApiResult.Success(Unit)
             // when
             process(SurveyUiAction.ObserveSurveyItems)
             process(SurveyUiAction.ClickKnowsNothing(true))
@@ -231,7 +231,7 @@ class SurveyViewModelTest {
         runTest {
             with(surveyViewModel()) {
                 // given
-                coEvery { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) } returns Unit
+                coEvery { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) } returns ApiResult.Success(Unit)
                 // when
                 process(SurveyUiAction.ObserveSurveyItems)
                 for (concept in fakeSelectedConcepts) {
@@ -256,7 +256,7 @@ class SurveyViewModelTest {
         runTest {
             with(surveyViewModel()) {
                 // given
-                coEvery { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) } throws Exception()
+                coEvery { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) } returns ApiResult.Failure(code = -1, message = "")
                 // when
                 process(SurveyUiAction.ObserveSurveyItems)
                 for (concept in fakeSelectedConcepts) {
@@ -270,9 +270,7 @@ class SurveyViewModelTest {
                 process(SurveyUiAction.ClickSubmit)
                 // then
                 coVerify { fakeOnBoardRepository.submitSurvey(fakeSelectedConcepts) }
-                effect.test {
-                    (awaitItem() is SurveyUiEffect.ShowSnackBar) shouldBe true
-                }
+                uiState.test { awaitItem().showErrorDialog shouldBe true }
             }
         }
 
@@ -281,7 +279,7 @@ class SurveyViewModelTest {
         runTest {
             with(surveyViewModel()) {
                 // given
-                coEvery { fakeOnBoardRepository.submitSurvey(SQLDConcept.entries.toList()) } returns Unit
+                coEvery { fakeOnBoardRepository.submitSurvey(SQLDConcept.entries.toList()) } returns ApiResult.Success(Unit)
                 //when
                 process(SurveyUiAction.ObserveSurveyItems)
                 process(SurveyUiAction.ClickKnowsAll(true))

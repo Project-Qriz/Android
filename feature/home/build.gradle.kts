@@ -11,4 +11,5 @@ android {
 dependencies {
     implementation(projects.core.data.user.userApi)
     implementation(projects.core.data.application.applicationApi)
+    implementation(projects.core.data.dailyStudy.dailyStudyApi)
 }
