@@ -31,7 +31,7 @@ class DailyStudyRepositoryImpl @Inject constructor(
 
     override suspend fun getDailyStudyPlanDetail(day: Int): ApiResult<DailyStudyPlanDetail> {
         return dailyStudyApi
-            .getDailyStudyDetail("Day${day}")
+            .getDailyStudyDetail(day.toString())
             .map { it.toDailyStudyDetail() }
     }
 }
