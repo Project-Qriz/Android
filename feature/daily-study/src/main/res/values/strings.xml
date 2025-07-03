@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="daily_study">오늘의 공부</string>
+    <string name="today_study_skills">오늘 공부할 내용</string>
+    <string name="weekly_review_skills">주간 복습 내용</string>
+    <string name="comprehensive_review_skills">종합 복습 내용</string>
+    <string name="related_test">관련된 테스트</string>
+    <string name="need_test_to_next_plan">아래의 테스트를 학습 완료해야만, 다음 데일리 테스트를\n진행할 수 있습니다!</string>
+    <string name="can_retry">점수 미달인 경우 재시험을 볼 수 있습니다.</string>
+    <string name="completed_plan">학습완료. 수고하셨어요!</string>
+    <string name="please_check_before_plan">이전 테스트를 학습 완료했는지 확인해 주세요!</string>
+    <string name="before_study">학습 전</string>
+    <string name="study_complete">학습 완료</string>
+    <string name="study_not_available">학습 불가</string>
+    <string name="daily_test">데일리 테스트</string>
+    <string name="score_low">점수 미달</string>
+    <string name="total_scroe">총 점수: %.1f점</string>
+    <string name="go_to_result">학습 완료된 테스트를 누르면 결과 화면으로 넘어갑니다.</string>
+    <string name="test_retry">시험을 다시 보겠습니까?</string>
+    <string name="test_already_taken_warning">이미 한번 봤던 시험입니다.\n만약 미달인 경우 재시험의 기회가 없습니다.</string>
+</resources>

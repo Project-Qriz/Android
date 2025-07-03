@@ -1,8 +1,10 @@
 package com.qriz.app.core.data.daily_study.daily_study
 
+import com.qriz.app.core.data.daily_study.daily_study.mapper.toDailyStudyDetail
 import com.qriz.app.core.data.daily_study.daily_study.mapper.toDailyStudyPlan
 import com.qriz.app.core.data.daily_study.daily_study.mapper.toWeeklyRecommendation
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
+import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlanDetail
 import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
 import com.qriz.app.core.data.daily_study.daily_study_api.repository.DailyStudyRepository
 import com.qriz.app.core.model.ApiResult
@@ -25,5 +27,11 @@ class DailyStudyRepositoryImpl @Inject constructor(
 
     override suspend fun resetDailyStudyPlan(): ApiResult<Unit> {
         return dailyStudyApi.resetDailyStudyPlan()
+    }
+
+    override suspend fun getDailyStudyPlanDetail(day: Int): ApiResult<DailyStudyPlanDetail> {
+        return dailyStudyApi
+            .getDailyStudyDetail(day.toString())
+            .map { it.toDailyStudyDetail() }
     }
 }

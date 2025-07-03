@@ -53,6 +53,7 @@ import com.qriz.app.core.ui.common.R as UR
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     moveToPreviewTest: () -> Unit,
+    moveToDailyStudy: (Int, Boolean, Boolean) -> Unit,
     onShowSnackBar: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -61,6 +62,11 @@ fun HomeScreen(
     viewModel.collectSideEffect {
         when (it) {
             is HomeUiEffect.MoveToPreviewTest -> moveToPreviewTest()
+            is HomeUiEffect.MoveToDailyStudy -> moveToDailyStudy(
+                it.dayNumber,
+                it.isReview,
+                it.isComprehensiveReview
+            )
             is HomeUiEffect.ShowSnackBar -> onShowSnackBar(
                 it.message ?: context.getString(it.defaultResId)
             )
@@ -150,12 +156,12 @@ fun HomeScreen(
         onClickExamApply = { viewModel.process(HomeUiAction.ClickApply) },
         onClickMockTest = {},
         onClickPreviewTest = { viewModel.process(HomeUiAction.MoveToPreviewTest) },
-        onClickTodayStudyInit = {},
         onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeStudyPlanDate(it)) },
         onClickWeeklyCustomConcept = {},
         onClickPlanDayFilter = { viewModel.process(HomeUiAction.ShowPlanDayFilterBottomSheet) },
         onClickRetryLoadHomeData = {},
         onClickResetDailyStudyPlan = { viewModel.process(HomeUiAction.ShowResetPlanConfirmationDialog) },
+        onClickGoToStudy = { viewModel.process(HomeUiAction.ClickMoveToDailyStudy) }
     )
 }
 
@@ -173,11 +179,11 @@ fun HomeContent(
     onClickPlanDayFilter: () -> Unit,
     onClickMockTest: () -> Unit,
     onClickPreviewTest: () -> Unit,
-    onClickTodayStudyInit: () -> Unit,
     onChangeTodayStudyCard: (Int) -> Unit,
     onClickWeeklyCustomConcept: () -> Unit,
     onClickRetryLoadHomeData: () -> Unit,
     onClickResetDailyStudyPlan: () -> Unit,
+    onClickGoToStudy: () -> Unit,
 ) {
     val isInitialized = rememberSaveable { mutableStateOf(false) }
 
@@ -265,6 +271,7 @@ fun HomeContent(
                         onChangeTodayStudyCard = onChangeTodayStudyCard,
                         onClickDayFilter = onClickPlanDayFilter,
                         onClickResetDailyStudyPlan = onClickResetDailyStudyPlan,
+                        onClickGoToStudy = onClickGoToStudy
                     )
 
                     WeeklyCustomConcept(
@@ -298,12 +305,12 @@ fun HomeContentPreview() {
             onClickExamApply = {},
             onClickPreviewTest = {},
             onClickMockTest = {},
-            onClickTodayStudyInit = {},
             onChangeTodayStudyCard = {},
             onClickWeeklyCustomConcept = {},
             onClickPlanDayFilter = {},
             onClickRetryLoadHomeData = {},
             onClickResetDailyStudyPlan = {},
+            onClickGoToStudy = {},
         )
     }
 }

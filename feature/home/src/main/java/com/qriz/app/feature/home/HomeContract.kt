@@ -99,10 +99,16 @@ sealed interface HomeUiAction : UiAction {
     data object DismissResetPlanConfirmationDialog : HomeUiAction
     data object ResetDailyStudyPlans : HomeUiAction
     data object DismissResetPlanErrorDialog : HomeUiAction
+    data object ClickMoveToDailyStudy : HomeUiAction
 }
 
 sealed interface HomeUiEffect : UiEffect {
     data object MoveToPreviewTest: HomeUiEffect
+    data class MoveToDailyStudy(
+        val dayNumber: Int,
+        val isReview: Boolean,
+        val isComprehensiveReview: Boolean,
+    ) : HomeUiEffect
     data class ShowSnackBar(
         @StringRes val defaultResId: Int = DSR.string.empty,
         val message: String? = null
