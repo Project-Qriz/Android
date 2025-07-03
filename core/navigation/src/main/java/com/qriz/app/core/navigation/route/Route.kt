@@ -71,3 +71,12 @@ sealed interface MainTabRoute : Route {
     @Serializable
     data object MyPage : MainTabRoute
 }
+
+sealed interface DailyStudyRoute : Route {
+    @Serializable
+    data class DailyStudyPlanStatus(
+        val dayNumber: Int,
+        val isReview: Boolean,
+        val isComprehensiveReview: Boolean,
+    ) : DailyStudyRoute
+}

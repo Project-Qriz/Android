@@ -48,9 +48,7 @@ class HomeViewModel @Inject constructor(
     private var isInitialized = false
     private val homeDataLoad = MutableStateFlow(true)
 
-    private val dataFlow = homeDataLoad
-        .filter { it }
-        .flatMapLatest { userRepository.getUserFlow() }
+    private val dataFlow = homeDataLoad.filter { it }.flatMapLatest { userRepository.getUserFlow() }
         .flatMapLatest { user ->
             val dailyStudyPlanFlow =
                 if (user.previewTestStatus == PreviewTestStatus.PREVIEW_COMPLETED) dailyStudyRepository.getDailyStudyPlanFlow()
@@ -118,6 +116,19 @@ class HomeViewModel @Inject constructor(
             is HomeUiAction.DismissResetPlanConfirmationDialog -> updateState { copy(showResetPlanConfirmationDialog = false) }
             is HomeUiAction.ResetDailyStudyPlans -> resetDailyStudyPlan()
             is HomeUiAction.DismissResetPlanErrorDialog -> { updateState { copy(resetPlanErrorMessage = null) } }
+            is HomeUiAction.ClickMoveToDailyStudy -> moveToDailyStudy()
+        }
+    }
+
+    private fun moveToDailyStudy() {
+        with(uiState.value) {
+            sendEffect(
+                HomeUiEffect.MoveToDailyStudy(
+                    dayNumber = selectedPlanDay,
+                    isReview = dailyStudyPlans[selectedPlanDay - 1].reviewDay,
+                    isComprehensiveReview = dailyStudyPlans[selectedPlanDay - 1].comprehensiveReviewDay,
+                ),
+            )
         }
     }
 
@@ -135,9 +146,7 @@ class HomeViewModel @Inject constructor(
         val today = LocalDate.now()
         val plans = uiState.value.dailyStudyPlans
         updateState {
-            copy(
-                selectedPlanDay = plans.indexOfFirst { it.planDate == today } + 1
-            )
+            copy(selectedPlanDay = plans.indexOfFirst { it.planDate == today } + 1)
         }
         delay(300)
         updateState { copy(showPlanDayFilterBottomSheet = false) }
@@ -282,7 +291,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun resetDailyStudyPlan() {
-        when(val result = dailyStudyRepository.resetDailyStudyPlan()) {
+        when (val result = dailyStudyRepository.resetDailyStudyPlan()) {
             is ApiResult.Success -> {
                 sendEffect(HomeUiEffect.ShowSnackBar(R.string.plan_is_reset))
                 homeDataLoad.update { true }

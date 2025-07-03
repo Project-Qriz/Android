@@ -71,6 +71,7 @@ fun TodayStudyCardPager(
     onChangeTodayStudyCard: (Int) -> Unit,
     onClickDayFilter: () -> Unit,
     onClickResetDailyStudyPlan: () -> Unit,
+    onClickGoToStudy: () -> Unit,
 ) {
     val pagerState = rememberPagerState { dailyStudyPlans.size }
 
@@ -197,7 +198,7 @@ fun TodayStudyCardPager(
         if (isNeedPreviewTest.not()) {
             QrizButton(
                 text = stringResource(R.string.go_to_study),
-                onClick = {},
+                onClick = onClickGoToStudy,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = horizontalPadding)
@@ -456,6 +457,7 @@ private fun TodayStudyCardPreview() {
             onChangeTodayStudyCard = {},
             onClickDayFilter = {},
             onClickResetDailyStudyPlan = {},
+            onClickGoToStudy = {},
         )
     }
 }
@@ -488,6 +490,7 @@ private fun TodayStudyCardPreview2() {
             onChangeTodayStudyCard = {},
             onClickDayFilter = {},
             onClickResetDailyStudyPlan = {},
+            onClickGoToStudy = {},
         )
     }
 }
