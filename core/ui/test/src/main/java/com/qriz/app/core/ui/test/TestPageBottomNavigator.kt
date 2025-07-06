@@ -26,6 +26,7 @@ fun TestPageBottomNavigator(
     currentIndex: Int,
     lastIndex: Int,
     canTurnNextPage: Boolean,
+    canTurnPreviousPage: Boolean,
     onClickNextPage: () -> Unit,
     onClickSubmit: () -> Unit,
     onClickPreviousPage: () -> Unit,
@@ -39,7 +40,7 @@ fun TestPageBottomNavigator(
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (currentIndex > 0) {
+        if (currentIndex > 0 && canTurnPreviousPage) {
             QrizButton(
                 text = stringResource(R.string.previous),
                 modifier = Modifier.width(90.dp),
@@ -107,6 +108,7 @@ private fun TestPageBottomNavigatorFirstPagePreview() {
             currentIndex = 0,
             lastIndex = 19,
             canTurnNextPage = false,
+            canTurnPreviousPage = false,
             onClickNextPage = {},
             onClickPreviousPage = {},
             onClickSubmit = {}
@@ -123,6 +125,7 @@ private fun TestPageBottomNavigatorSelectedFirstPagePreview() {
             currentIndex = 0,
             lastIndex = 19,
             canTurnNextPage = true,
+            canTurnPreviousPage = false,
             onClickNextPage = {},
             onClickPreviousPage = {},
             onClickSubmit = {}
@@ -138,6 +141,7 @@ private fun TestPageBottomNavigatorSelectedMiddlePagePreview() {
             currentIndex = 5,
             lastIndex = 19,
             canTurnNextPage = true,
+            canTurnPreviousPage = true,
             onClickNextPage = {},
             onClickPreviousPage = {},
             onClickSubmit = {}
@@ -152,6 +156,7 @@ private fun TestPageBottomNavigatorSelectedLastPagePreview() {
         TestPageBottomNavigator(
             currentIndex = 19,
             lastIndex = 19,
+            canTurnPreviousPage = false,
             canTurnNextPage = true,
             onClickNextPage = {},
             onClickPreviousPage = {},
