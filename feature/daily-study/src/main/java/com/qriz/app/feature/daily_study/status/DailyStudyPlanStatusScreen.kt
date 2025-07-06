@@ -27,17 +27,18 @@ import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.core.ui.common.const.ErrorScreen
 import com.qriz.app.featrue.daily_study.R
-import com.qriz.app.core.designsystem.R as DSR
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.daily_study.status.component.PlannedSkillCard
 import com.qriz.app.feature.daily_study.status.component.TestCompleteTooltip
 import com.qriz.app.feature.daily_study.status.component.TestStatusCard
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import com.qriz.app.core.designsystem.R as DSR
 
 @Composable
 fun DailyStudyPlanStatusScreen(
     viewModel: DailyStudyPlanStatusViewModel = hiltViewModel(),
+    moveToTest: (Int) -> Unit,
     moveToBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
 ) {
@@ -45,7 +46,7 @@ fun DailyStudyPlanStatusScreen(
 
     viewModel.collectSideEffect {
         when (it) {
-            is DailyStudyPlanStatusUiEffect.MoveToTest -> {}
+            is DailyStudyPlanStatusUiEffect.MoveToTest -> moveToTest(it.day)
         }
     }
 
@@ -53,14 +54,14 @@ fun DailyStudyPlanStatusScreen(
         viewModel.process(DailyStudyPlanStatusUiAction.LoadData)
     }
 
-    if (uiState.showRetryConfirmDialog) {
+    if (uiState.showRetryConfirmationDialog) {
         QrizDialog(
             title = stringResource(R.string.test_retry),
             description = stringResource(R.string.test_already_taken_warning),
             confirmText = stringResource(DSR.string.confirmation),
             cancelText = stringResource(DSR.string.cancel),
-            onConfirmClick = {},
-            onCancelClick = {},
+            onConfirmClick = { viewModel.process(DailyStudyPlanStatusUiAction.MoveToTest) },
+            onCancelClick = { viewModel.process(DailyStudyPlanStatusUiAction.DismissRetryConfirmDialog) },
         )
     }
 
@@ -77,7 +78,9 @@ fun DailyStudyPlanStatusScreen(
         testStatusIconColor = uiState.testCardIconColor,
         testStatusBackgroundColor = uiState.testCardBackgroundColor,
         complete = uiState.isComplete,
+        canTest = uiState.canTest,
         onClickRetry = { viewModel.process(DailyStudyPlanStatusUiAction.LoadData) },
+        onClickStatusCard = { viewModel.process(DailyStudyPlanStatusUiAction.ClickTestCard) },
         moveToBack = moveToBack,
     )
 }
@@ -96,6 +99,8 @@ private fun DailyStudyPlanStatusContent(
     testScore: Double,
     canRetry: Boolean,
     complete: Boolean,
+    canTest: Boolean,
+    onClickStatusCard: () -> Unit,
     onClickRetry: () -> Unit,
     moveToBack: () -> Unit,
 ) {
@@ -122,7 +127,8 @@ private fun DailyStudyPlanStatusContent(
 
         if (errorMessage == null && isLoading.not()) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .padding(
                         vertical = 32.dp,
                         horizontal = 18.dp,
@@ -145,7 +151,10 @@ private fun DailyStudyPlanStatusContent(
                 Text(
                     text = stringResource(R.string.related_test),
                     style = QrizTheme.typography.heading2.copy(color = Gray800),
-                    modifier = Modifier.padding(top = 24.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(
+                        top = 24.dp,
+                        bottom = 8.dp
+                    )
                 )
 
                 Text(
@@ -153,6 +162,7 @@ private fun DailyStudyPlanStatusContent(
                     style = QrizTheme.typography.body2.copy(color = Gray500),
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
+
                 TestStatusCard(
                     score = testScore,
                     canRetry = canRetry,
@@ -160,7 +170,7 @@ private fun DailyStudyPlanStatusContent(
                     statusTextColor = testStatusTextColor,
                     iconColor = testStatusIconColor,
                     backgroundColor = testStatusBackgroundColor,
-                    onClick = {},
+                    onClick = if (canTest) onClickStatusCard else null,
                 )
 
                 if (complete) {
@@ -173,7 +183,6 @@ private fun DailyStudyPlanStatusContent(
         }
     }
 }
-
 
 
 @Preview(showBackground = true)
@@ -197,7 +206,7 @@ private fun DailyStudyStudyPlanStatusContentPreview() {
                     description = "JOIN은 두 개 이상의 테이블을 연결하여 데이터를 출력하는 것을 의미한다."
                 ),
 
-            ),
+                ),
             testScore = 40.0,
             canRetry = false,
             onClickRetry = {},
@@ -206,6 +215,8 @@ private fun DailyStudyStudyPlanStatusContentPreview() {
             testStatusBackgroundColor = White,
             testStatusIconColor = Gray800,
             complete = true,
+            canTest = true,
+            onClickStatusCard = {},
             moveToBack = {},
         )
     }

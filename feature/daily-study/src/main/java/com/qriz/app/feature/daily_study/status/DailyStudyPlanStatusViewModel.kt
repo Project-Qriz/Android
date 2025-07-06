@@ -32,9 +32,10 @@ class DailyStudyPlanStatusViewModel @Inject constructor(
     override fun process(action: DailyStudyPlanStatusUiAction): Job = viewModelScope.launch {
         when (action) {
             is DailyStudyPlanStatusUiAction.LoadData -> loadData()
-            is DailyStudyPlanStatusUiAction.DismissRetryConfirmDialog -> updateState { copy(showRetryConfirmDialog = false) }
-            is DailyStudyPlanStatusUiAction.ShowRetryConfirmDialog -> updateState { copy(showRetryConfirmDialog = true) }
-            is DailyStudyPlanStatusUiAction.MoveToTest -> sendEffect(DailyStudyPlanStatusUiEffect.MoveToTest)
+            is DailyStudyPlanStatusUiAction.DismissRetryConfirmDialog -> updateState { copy(showRetryConfirmationDialog = false) }
+            is DailyStudyPlanStatusUiAction.ShowRetryConfirmDialog -> updateState { copy(showRetryConfirmationDialog = true) }
+            is DailyStudyPlanStatusUiAction.MoveToTest -> moveToTest()
+            is DailyStudyPlanStatusUiAction.ClickTestCard -> onClickTestCard()
         }
     }
 
@@ -67,5 +68,24 @@ class DailyStudyPlanStatusViewModel @Inject constructor(
             is ApiResult.NetworkError -> convertError(NETWORK_IS_UNSTABLE)
             is ApiResult.UnknownError -> convertError(UNKNOWN_ERROR)
         }
+    }
+
+    private fun onClickTestCard() {
+        val state = uiState.value
+        if (state.available.not()) {
+            return
+        }
+
+        if (state.canRetry) {
+            updateState { copy(showRetryConfirmationDialog = true) }
+            return
+        }
+
+        process(DailyStudyPlanStatusUiAction.MoveToTest)
+    }
+
+    private fun moveToTest() {
+        updateState { copy(showRetryConfirmationDialog = false) }
+        sendEffect(DailyStudyPlanStatusUiEffect.MoveToTest(day = dayNumber))
     }
 }
