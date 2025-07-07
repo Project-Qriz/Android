@@ -350,6 +350,8 @@ class HomeViewModelTest {
         mockUserExamSuccess()
         mockExamSchedulesSuccess(isApplied = false)
         mockApplyExamFailure()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
@@ -376,6 +378,8 @@ class HomeViewModelTest {
         mockUserExamSuccess()
         mockExamSchedulesSuccess(isApplied = false)
         mockApplyExamNetworkError()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
@@ -402,6 +406,8 @@ class HomeViewModelTest {
         mockUserExamSuccess()
         mockExamSchedulesSuccess(isApplied = false)
         mockApplyExamUnknownError()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
