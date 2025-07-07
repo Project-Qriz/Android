@@ -146,8 +146,8 @@ class HomeViewModelTest {
         with(viewModel) {
             uiState.test {
                 with(awaitItem()) {
-                    dailyStudyPlans shouldBe Companion.dailyStudyPlans
-                    weeklyRecommendations shouldBe Companion.weeklyRecommendations
+                    dailyStudyPlans shouldBe dailyStudyPlans
+                    weeklyRecommendations shouldBe weeklyRecommendations
                 }
             }
         }
@@ -165,7 +165,6 @@ class HomeViewModelTest {
 
         //when
         viewModel.process(HomeUiAction.ObserveClient)
-        testScheduler.advanceUntilIdle()
 
         //then
         with(viewModel) {
@@ -322,7 +321,6 @@ class HomeViewModelTest {
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
-        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
         testScheduler.advanceUntilIdle()
 
@@ -355,7 +353,6 @@ class HomeViewModelTest {
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
-        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
         testScheduler.advanceUntilIdle()
 
@@ -383,7 +380,6 @@ class HomeViewModelTest {
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
-        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
         testScheduler.advanceUntilIdle()
 
@@ -411,7 +407,6 @@ class HomeViewModelTest {
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
-        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
         testScheduler.advanceUntilIdle()
 
@@ -439,7 +434,6 @@ class HomeViewModelTest {
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
-        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
         testScheduler.advanceUntilIdle()
 
@@ -467,7 +461,6 @@ class HomeViewModelTest {
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
-        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
         testScheduler.advanceUntilIdle()
 
@@ -495,7 +488,6 @@ class HomeViewModelTest {
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
-        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
         testScheduler.advanceUntilIdle()
 
