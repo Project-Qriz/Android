@@ -54,7 +54,7 @@ class DailyStudyRepositoryImpl @Inject constructor(
                         questionId = activity.first,
                         category = TestCategory.DAILY_STUDY.id,
                     ),
-                    optionId = activity.second.id,
+                    optionId = if (activity.second.id > 0) activity.second.id else null,
                     questionNum = index + 1,
                     timeSpent = activity.third
                 )

@@ -12,7 +12,7 @@ data class DailyTestSubmitRequest(
 data class DailyTestSubmitActivity(
     @SerialName("question") val question: DailyTestSubmitQuestion,
     @SerialName("questionNum") val questionNum: Int,
-    @SerialName("optionId") val optionId: Long,
+    @SerialName("optionId") val optionId: Long?,
     @SerialName("timeSpent") val timeSpent: Int,
 )
 
