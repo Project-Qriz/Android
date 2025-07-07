@@ -93,6 +93,7 @@ fun TestScreen(
             currentIndex = currentIndex,
             lastIndex = questions.lastIndex,
             canTurnNextPage = questions[currentIndex].isOptionSelected,
+            canTurnPreviousPage = testTimeType == TestTimeType.TOTAL,
             onClickNextPage = onClickNextPage,
             onClickSubmit = onClickSubmit,
             onClickPreviousPage = onClickPreviousPage

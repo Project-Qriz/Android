@@ -1,6 +1,7 @@
 package com.qriz.app.feature.daily_study.status.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizCard
-import com.qriz.app.core.designsystem.theme.Blue200
 import com.qriz.app.core.designsystem.theme.Blue500
 import com.qriz.app.core.designsystem.theme.Gray100
 import com.qriz.app.core.designsystem.theme.Gray200
@@ -47,6 +47,7 @@ internal fun TestStatusCard(
 ) {
     Row (
         modifier = Modifier
+            .clickable { onClick?.invoke() }
             .background(
                 color = backgroundColor,
                 shape = RoundedCornerShape(8.dp)

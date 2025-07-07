@@ -25,7 +25,7 @@ data class DailyStudyPlanStatusUiState(
     val canRetry: Boolean,
     val score: Double,
     val passed: Boolean,
-    val showRetryConfirmDialog: Boolean,
+    val showRetryConfirmationDialog: Boolean,
     val skills: ImmutableList<SimplePlannedSkill>
 ) : UiState {
 
@@ -56,6 +56,8 @@ data class DailyStudyPlanStatusUiState(
 
     val testCardIconColor = if (available) Gray800 else Gray200
 
+    val canTest = available && (attemptCount == 0 || canRetry)
+
     companion object {
         val DEFAULT = DailyStudyPlanStatusUiState(
             isLoading = true,
@@ -67,14 +69,14 @@ data class DailyStudyPlanStatusUiState(
             canRetry = false,
             score = 0.0,
             passed = false,
-            showRetryConfirmDialog = false,
+            showRetryConfirmationDialog = false,
             skills = persistentListOf()
         )
     }
 }
 
 sealed interface DailyStudyPlanStatusUiEffect : UiEffect {
-    data object MoveToTest : DailyStudyPlanStatusUiEffect
+    data class MoveToTest(val day: Int) : DailyStudyPlanStatusUiEffect
 }
 
 sealed interface DailyStudyPlanStatusUiAction : UiAction {
@@ -82,4 +84,5 @@ sealed interface DailyStudyPlanStatusUiAction : UiAction {
     data object ShowRetryConfirmDialog : DailyStudyPlanStatusUiAction
     data object DismissRetryConfirmDialog : DailyStudyPlanStatusUiAction
     data object MoveToTest : DailyStudyPlanStatusUiAction
+    data object ClickTestCard : DailyStudyPlanStatusUiAction
 }

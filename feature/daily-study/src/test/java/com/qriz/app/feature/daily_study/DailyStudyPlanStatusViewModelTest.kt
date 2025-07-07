@@ -1,7 +1,6 @@
 package com.qriz.app.feature.daily_study
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.toRoute
 import app.cash.turbine.test
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlanDetail
 import com.qriz.app.core.data.daily_study.daily_study_api.model.SimplePlannedSkill
@@ -13,11 +12,10 @@ import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
 import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.featrue.daily_study.R
 import com.qriz.app.feature.daily_study.status.DailyStudyPlanStatusUiAction
+import com.qriz.app.feature.daily_study.status.DailyStudyPlanStatusUiEffect
 import com.qriz.app.feature.daily_study.status.DailyStudyPlanStatusViewModel
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -27,11 +25,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-
-inline fun <reified T : Any> SavedStateHandle.mockkToRoute(page: T) {
-    mockkStatic("androidx.navigation.SavedStateHandleKt")
-    every { toRoute<T>() } returns page
-}
 
 class DailyStudyPlanStatusViewModelTest {
     @get:Rule
@@ -365,5 +358,101 @@ class DailyStudyPlanStatusViewModelTest {
         val state = viewModel.uiState.value
         assertTrue(state.isComplete) // attemptCount = 2이므로 완료
         assertTrue(state.available)
+    }
+
+    @Test
+    fun `ClickTestCard process - 시험이 불가능할 경우 작동 안함`() = runTest {
+        //given
+        val mockDetail = DailyStudyPlanDetail(
+            dayNumber = "Day1",
+            skills = mockSkills,
+            attemptCount = 0,
+            passed = false,
+            retestEligible = false,
+            totalScore = 0.0,
+            available = false
+        )
+        coEvery { mockDailyStudyRepository.getDailyStudyPlanDetail(1) } returns ApiResult.Success(mockDetail)
+
+        with(viewModel()) {
+            //when
+            process(DailyStudyPlanStatusUiAction.LoadData)
+            process(DailyStudyPlanStatusUiAction.ClickTestCard)
+
+            //then
+            uiState.test {
+                val state = awaitItem()
+                assertFalse(state.available)
+                assertFalse(state.showRetryConfirmationDialog)
+            }
+        }
+    }
+
+    @Test
+    fun `ClickTestCard process - 시험이 가능할 경우 작동`() = runTest {
+        //given
+        val mockDetail = DailyStudyPlanDetail(
+            dayNumber = "Day1",
+            skills = mockSkills,
+            attemptCount = 0,
+            passed = false,
+            retestEligible = false,
+            totalScore = 0.0,
+            available = true
+        )
+        coEvery { mockDailyStudyRepository.getDailyStudyPlanDetail(1) } returns ApiResult.Success(mockDetail)
+
+        with(viewModel()) {
+            process(DailyStudyPlanStatusUiAction.LoadData)
+            
+            //when
+            process(DailyStudyPlanStatusUiAction.ClickTestCard)
+
+            //then
+            uiState.test {
+                val state = awaitItem()
+                assertTrue(state.available)
+                assertFalse(state.canRetry)
+                assertFalse(state.showRetryConfirmationDialog)
+            }
+            
+            effect.test {
+                val effect = awaitItem()
+                assertEquals(
+                    DailyStudyPlanStatusUiEffect.MoveToTest(1),
+                    effect
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `ClickTestCard process - 재시험인 경우 showRetryConfirmationDialog true 상태 변경`() = runTest {
+        //given
+        val mockDetail = DailyStudyPlanDetail(
+            dayNumber = "Day1",
+            skills = mockSkills,
+            attemptCount = 1,
+            passed = false,
+            retestEligible = true,
+            totalScore = 45.0,
+            available = true
+        )
+        coEvery { mockDailyStudyRepository.getDailyStudyPlanDetail(1) } returns ApiResult.Success(mockDetail)
+
+        with(viewModel()) {
+            process(DailyStudyPlanStatusUiAction.LoadData)
+            
+            //when
+            process(DailyStudyPlanStatusUiAction.ClickTestCard)
+
+            //then
+            uiState.test {
+                val state = awaitItem()
+                assertTrue(state.available)
+                assertTrue(state.canRetry)
+                assertTrue(state.showRetryConfirmationDialog)
+            }
+        }
     }
 }

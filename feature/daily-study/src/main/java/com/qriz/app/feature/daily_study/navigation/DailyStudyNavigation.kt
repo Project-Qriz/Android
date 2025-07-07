@@ -6,6 +6,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.qriz.app.core.navigation.route.DailyStudyRoute
 import com.qriz.app.feature.daily_study.status.DailyStudyPlanStatusScreen
+import com.qriz.app.feature.daily_study.study.DailyTestScreen
 
 fun NavController.navigateToDailyStudyPlanStatus(
     dayNumber: Int,
@@ -23,14 +24,35 @@ fun NavController.navigateToDailyStudyPlanStatus(
     )
 }
 
+fun NavController.navigateToDailyTest(
+    dayNumber: Int,
+    navOptions: NavOptions? = null,
+) {
+    navigate(
+        DailyStudyRoute.DailyTest(dayNumber = dayNumber),
+        navOptions = navOptions,
+    )
+}
+
 fun NavGraphBuilder.dailyStudyNavGraph(
     onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
+    moveToTest: (Int) -> Unit,
+    moveToDailyStudyResult: () -> Unit,
 ) {
     composable<DailyStudyRoute.DailyStudyPlanStatus> {
         DailyStudyPlanStatusScreen(
             moveToBack = onBack,
+            moveToTest = moveToTest,
             onShowSnackbar = onShowSnackbar
+        )
+    }
+
+    composable<DailyStudyRoute.DailyTest> {
+        DailyTestScreen(
+            moveToResult = moveToDailyStudyResult,
+            onShowSnackBar = onShowSnackbar,
+            moveToBack = onBack,
         )
     }
 }

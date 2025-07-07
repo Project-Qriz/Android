@@ -7,12 +7,16 @@ import com.qriz.app.core.data.daily_study.daily_study_api.model.ImportanceLevel
 import com.qriz.app.core.data.daily_study.daily_study_api.model.PlannedSkill
 import com.qriz.app.core.data.daily_study.daily_study_api.model.SimplePlannedSkill
 import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
+import com.qriz.app.core.data.test.test_api.model.Option
+import com.qriz.app.core.data.test.test_api.model.Question
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.model.requireValue
 import com.qriz.app.core.network.daily_study.DailyStudyApi
 import com.qriz.app.core.network.daily_study.model.response.DailyStudyDetailResponse
 import com.qriz.app.core.network.daily_study.model.response.DailyStudyPlanResponse
 import com.qriz.app.core.network.daily_study.model.response.DailyStudyStatusResponse
+import com.qriz.app.core.network.daily_study.model.response.DailyTestOptionResponse
+import com.qriz.app.core.network.daily_study.model.response.DailyTestQuestionResponse
 import com.qriz.app.core.network.daily_study.model.response.PlannedSkillResponse
 import com.qriz.app.core.network.daily_study.model.response.SimplePlannedSkillResponse
 import com.qriz.app.core.network.daily_study.model.response.WeeklyRecommendationResponse
@@ -23,8 +27,8 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
-import java.io.IOException
 import java.time.LocalDate
+import com.qriz.app.core.data.test.test_api.model.Test as TestModel
 
 class DailyStudyRepositoryTest {
     val mockApi = mockk<DailyStudyApi>()
@@ -163,7 +167,7 @@ class DailyStudyRepositoryTest {
             )
         )
         
-        coEvery { mockApi.getDailyStudyDetail("Day1") } returns ApiResult.Success(mockResponse)
+        coEvery { mockApi.getDailyStudyDetail("1") } returns ApiResult.Success(mockResponse)
 
         val expected = DailyStudyPlanDetail(
             dayNumber = "Day1",
@@ -190,7 +194,110 @@ class DailyStudyRepositoryTest {
         val result = repository.getDailyStudyPlanDetail(day)
 
         //then
-        coVerify { mockApi.getDailyStudyDetail("Day1") }
+        coVerify { mockApi.getDailyStudyDetail("1") }
         result shouldBe ApiResult.Success(expected)
+    }
+
+    @Test
+    fun `getDailyStudy - 문제를 불러와서 Test로 변환해서 반환한다`() = runTest {
+        //given
+        val dayNumber = 1
+        val mockResponse = listOf(
+            DailyTestQuestionResponse(
+                questionId = 1L,
+                skillId = 1,
+                category = 1,
+                question = "SQL에서 WHERE절의 역할은 무엇인가요?",
+                description = "WHERE절의 기본 개념을 묻는 문제입니다.",
+                options = listOf(
+                    DailyTestOptionResponse(id = 1L, content = "데이터를 조회한다"),
+                    DailyTestOptionResponse(id = 2L, content = "데이터를 필터링한다"),
+                    DailyTestOptionResponse(id = 3L, content = "데이터를 정렬한다")
+                ),
+                timeLimit = 60,
+                difficulty = 1
+            ),
+            DailyTestQuestionResponse(
+                questionId = 2L,
+                skillId = 2,
+                category = 1,
+                question = "JOIN의 종류에는 어떤 것이 있나요?",
+                description = "JOIN의 기본 개념을 묻는 문제입니다.",
+                options = listOf(
+                    DailyTestOptionResponse(id = 4L, content = "INNER JOIN"),
+                    DailyTestOptionResponse(id = 5L, content = "LEFT JOIN"),
+                    DailyTestOptionResponse(id = 6L, content = "모든 답이 맞다")
+                ),
+                timeLimit = 90,
+                difficulty = 2
+            )
+        )
+        
+        coEvery { mockApi.getDailyStudy("1") } returns ApiResult.Success(mockResponse)
+
+        val expectedTest = TestModel(
+            questions = listOf(
+                Question(
+                    id = 1L,
+                    question = "SQL에서 WHERE절의 역할은 무엇인가요?",
+                    options = listOf(
+                        Option(id = 1L, content = "데이터를 조회한다"),
+                        Option(id = 2L, content = "데이터를 필터링한다"),
+                        Option(id = 3L, content = "데이터를 정렬한다")
+                    ),
+                    timeLimit = 60,
+                    description = "WHERE절의 기본 개념을 묻는 문제입니다.",
+                    skillId = 1,
+                    category = 1,
+                    difficulty = 1
+                ),
+                Question(
+                    id = 2L,
+                    question = "JOIN의 종류에는 어떤 것이 있나요?",
+                    options = listOf(
+                        Option(id = 4L, content = "INNER JOIN"),
+                        Option(id = 5L, content = "LEFT JOIN"),
+                        Option(id = 6L, content = "모든 답이 맞다")
+                    ),
+                    timeLimit = 90,
+                    description = "JOIN의 기본 개념을 묻는 문제입니다.",
+                    skillId = 2,
+                    category = 1,
+                    difficulty = 2
+                )
+            ),
+            totalTimeLimit = 150
+        )
+
+        //when
+        val result = repository.getDailyStudy(dayNumber)
+
+        //then
+        coVerify { mockApi.getDailyStudy("1") }
+        result shouldBe ApiResult.Success(expectedTest)
+    }
+
+    @Test
+    fun `submitTest - 풀이를 제출할 수 있다`() = runTest {
+        //given
+        val day = 1
+        val activities = listOf(
+            Triple(1L, Option(id = 1L, content = "데이터를 조회한다"), 30),
+            Triple(2L, Option(id = 4L, content = "INNER JOIN"), 45)
+        )
+        
+        coEvery { mockApi.submitDailyTest(any(), any()) } returns ApiResult.Success(Unit)
+
+        //when
+        val result = repository.submitTest(day, activities)
+
+        //then
+        coVerify { 
+            mockApi.submitDailyTest(
+                dayNumber = 1,
+                request = any()
+            )
+        }
+        result shouldBe ApiResult.Success(Unit)
     }
 }

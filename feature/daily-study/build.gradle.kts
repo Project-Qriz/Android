@@ -10,4 +10,5 @@ android {
 
 dependencies {
     implementation(projects.core.data.dailyStudy.dailyStudyApi)
+    implementation(projects.core.ui.test)
 }
