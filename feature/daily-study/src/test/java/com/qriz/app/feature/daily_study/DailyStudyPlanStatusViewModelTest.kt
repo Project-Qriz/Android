@@ -26,7 +26,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class DailyTestPlanStatusViewModelTest {
+class DailyStudyPlanStatusViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
