@@ -59,6 +59,8 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         val viewModel = homeViewModel()
 
         //when
@@ -67,6 +69,7 @@ class HomeViewModelTest {
         //then
         with(viewModel) {
             uiState.test {
+                val state = awaitItem()
                 assertEquals(
                     UserExamUiState.Scheduled(
                         examName = USER_EXAM_NAME,
@@ -75,7 +78,7 @@ class HomeViewModelTest {
                         dday = 10,
                         ddayType = DdayType.BEFORE
                     ),
-                    awaitItem().userExamState
+                    state.userExamState
                 )
             }
         }
@@ -86,6 +89,8 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamFailure()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         val viewModel = homeViewModel()
 
         //when
@@ -141,8 +146,8 @@ class HomeViewModelTest {
         with(viewModel) {
             uiState.test {
                 with(awaitItem()) {
-                    dailyStudyPlans shouldBe dailyStudyPlans
-                    weeklyRecommendations shouldBe weeklyRecommendations
+                    dailyStudyPlans shouldBe Companion.dailyStudyPlans
+                    weeklyRecommendations shouldBe Companion.weeklyRecommendations
                 }
             }
         }
@@ -153,11 +158,14 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         mockExamSchedulesSuccess()
         val viewModel = homeViewModel()
 
         //when
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
 
         //then
         with(viewModel) {
@@ -186,11 +194,14 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         mockExamSchedulesFailure()
         val viewModel = homeViewModel()
 
         //when
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.ClickApply)
 
         //then
@@ -212,11 +223,14 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         mockExamSchedulesNetworkError()
         val viewModel = homeViewModel()
 
         //when
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.ClickApply)
 
         //then
@@ -238,11 +252,14 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         mockExamSchedulesUnknownError()
         val viewModel = homeViewModel()
 
         //when
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.ClickApply)
 
         //then
@@ -264,12 +281,16 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         mockExamSchedulesSuccess(isApplied = false)
         mockApplyExamSuccess()
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
+        testScheduler.advanceUntilIdle()
 
         //when
         viewModel.process(HomeUiAction.ClickExamSchedule(examId = 1))
@@ -294,13 +315,15 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         mockExamSchedulesSuccess()
         mockApplyEditExamSuccess()
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
-
         testScheduler.advanceUntilIdle()
 
         //when
@@ -330,7 +353,9 @@ class HomeViewModelTest {
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
+        testScheduler.advanceUntilIdle()
 
         //when
         viewModel.process(HomeUiAction.ClickExamSchedule(examId = 1))
@@ -354,7 +379,9 @@ class HomeViewModelTest {
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
+        testScheduler.advanceUntilIdle()
 
         //when
         viewModel.process(HomeUiAction.ClickExamSchedule(examId = 1))
@@ -378,7 +405,9 @@ class HomeViewModelTest {
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
+        testScheduler.advanceUntilIdle()
 
         //when
         viewModel.process(HomeUiAction.ClickExamSchedule(examId = 1))
@@ -397,13 +426,15 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         mockExamSchedulesSuccess()
         mockEditExamFailure()
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
-
         testScheduler.advanceUntilIdle()
 
         //when
@@ -423,13 +454,15 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         mockExamSchedulesSuccess()
         mockEditExamNetworkError()
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
-
         testScheduler.advanceUntilIdle()
 
         //when
@@ -449,13 +482,15 @@ class HomeViewModelTest {
         //given
         mockUserFlow()
         mockUserExamSuccess()
+        mockDailyStudyPlanSuccess()
+        mockWeeklyRecommendation()
         mockExamSchedulesSuccess()
         mockEditExamUnknownError()
 
         val viewModel = homeViewModel()
         viewModel.process(HomeUiAction.ObserveClient)
+        testScheduler.advanceUntilIdle()
         viewModel.process(HomeUiAction.LoadToExamSchedules)
-
         testScheduler.advanceUntilIdle()
 
         //when
