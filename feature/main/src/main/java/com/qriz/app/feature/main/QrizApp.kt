@@ -26,6 +26,7 @@ import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookDetail
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookList
 import com.qriz.app.feature.daily_study.navigation.dailyStudyNavGraph
 import com.qriz.app.feature.daily_study.navigation.navigateToDailyStudyPlanStatus
+import com.qriz.app.feature.daily_study.navigation.navigateToDailyTest
 import com.qriz.app.feature.home.navigation.homeNavGraph
 import com.qriz.app.feature.incorrect_answers_note.navigation.incorrectAnswersNoteNavGraph
 import com.qriz.app.feature.main.component.MainBottomBar
@@ -153,6 +154,8 @@ private fun QrizNavHost(
 
         dailyStudyNavGraph(
             onBack = navController::popBackStack,
+            moveToTest = navController::navigateToDailyTest,
+            moveToDailyStudyResult = {},
             onShowSnackbar = onShowSnackbar,
         )
     }

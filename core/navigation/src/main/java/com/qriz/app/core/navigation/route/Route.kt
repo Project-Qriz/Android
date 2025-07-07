@@ -79,4 +79,7 @@ sealed interface DailyStudyRoute : Route {
         val isReview: Boolean,
         val isComprehensiveReview: Boolean,
     ) : DailyStudyRoute
+
+    @Serializable
+    data class DailyTest(val dayNumber: Int)
 }
