@@ -2,10 +2,12 @@ package com.qriz.app.core.data.daily_study.daily_study
 
 import com.qriz.app.core.data.daily_study.daily_study.mapper.toDailyStudyDetail
 import com.qriz.app.core.data.daily_study.daily_study.mapper.toDailyStudyPlan
+import com.qriz.app.core.data.daily_study.daily_study.mapper.toDailyTestResult
 import com.qriz.app.core.data.daily_study.daily_study.mapper.toTest
 import com.qriz.app.core.data.daily_study.daily_study.mapper.toWeeklyRecommendation
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlanDetail
+import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyTestResult
 import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
 import com.qriz.app.core.data.daily_study.daily_study_api.repository.DailyStudyRepository
 import com.qriz.app.core.data.test.test_api.model.Option
@@ -65,5 +67,10 @@ class DailyStudyRepositoryImpl @Inject constructor(
             dayNumber = day,
             request = request
         )
+    }
+
+    override suspend fun getDailyTestResult(day: Int): ApiResult<DailyTestResult> {
+        return dailyStudyApi.getDailyStudyResult(dayNumber = day)
+            .map { it.toDailyTestResult() }
     }
 }
