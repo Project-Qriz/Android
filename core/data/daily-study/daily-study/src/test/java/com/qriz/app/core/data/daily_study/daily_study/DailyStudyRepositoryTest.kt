@@ -3,8 +3,11 @@ package com.qriz.app.core.data.daily_study.daily_study
 import app.cash.turbine.test
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlanDetail
+import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyTestResult
 import com.qriz.app.core.data.daily_study.daily_study_api.model.ImportanceLevel
 import com.qriz.app.core.data.daily_study.daily_study_api.model.PlannedSkill
+import com.qriz.app.core.data.daily_study.daily_study_api.model.QuestionResult
+import com.qriz.app.core.data.daily_study.daily_study_api.model.SkillItem
 import com.qriz.app.core.data.daily_study.daily_study_api.model.SimplePlannedSkill
 import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
 import com.qriz.app.core.data.test.test_api.model.Option
@@ -17,8 +20,11 @@ import com.qriz.app.core.network.daily_study.model.response.DailyStudyPlanRespon
 import com.qriz.app.core.network.daily_study.model.response.DailyStudyStatusResponse
 import com.qriz.app.core.network.daily_study.model.response.DailyTestOptionResponse
 import com.qriz.app.core.network.daily_study.model.response.DailyTestQuestionResponse
+import com.qriz.app.core.network.daily_study.model.response.DailyTestResultResponse
 import com.qriz.app.core.network.daily_study.model.response.PlannedSkillResponse
 import com.qriz.app.core.network.daily_study.model.response.SimplePlannedSkillResponse
+import com.qriz.app.core.network.daily_study.model.response.SkillScore
+import com.qriz.app.core.network.daily_study.model.response.SubjectResultResponse
 import com.qriz.app.core.network.daily_study.model.response.WeeklyRecommendationResponse
 import com.qriz.app.core.network.daily_study.model.response.WeeklyRecommendationResponseContainer
 import io.kotest.matchers.shouldBe
@@ -299,5 +305,82 @@ class DailyStudyRepositoryTest {
             )
         }
         result shouldBe ApiResult.Success(Unit)
+    }
+
+    @Test
+    fun `getDailyTestResult - 결과가 존재할 때 가져올 수 있다`() = runTest {
+        //given
+        val day = 1
+        val mockResponse = DailyTestResultResponse(
+            dayNumber = "Day1",
+            passed = true,
+            reviewDay = false,
+            comprehensiveReviewDay = false,
+            items = listOf(
+                SkillScore(
+                    skillId = 1,
+                    score = 85.0
+                ),
+                SkillScore(
+                    skillId = 2,
+                    score = 75.0
+                )
+            ),
+            subjectResultsList = listOf(
+                SubjectResultResponse(
+                    questionId = 1,
+                    detailType = "SQL기본",
+                    question = "SQL에서 WHERE절의 역할은 무엇인가요?",
+                    correction = true
+                ),
+                SubjectResultResponse(
+                    questionId = 2,
+                    detailType = "JOIN",
+                    question = "JOIN의 종류에는 어떤 것이 있나요?",
+                    correction = false
+                )
+            ),
+            totalScore = 80.0
+        )
+
+        coEvery { mockApi.getDailyStudyResult(dayNumber = 1) } returns ApiResult.Success(mockResponse)
+
+        val expected = DailyTestResult(
+            passed = true,
+            isReview = false,
+            isComprehensiveReview = false,
+            totalScore = 80,
+            skillItems = listOf(
+                SkillItem(
+                    skillId = 1L,
+                    score = 85.0
+                ),
+                SkillItem(
+                    skillId = 2L,
+                    score = 75.0
+                )
+            ),
+            questionResults = listOf(
+                QuestionResult(
+                    questionId = 1L,
+                    detailType = "SQL기본",
+                    question = "SQL에서 WHERE절의 역할은 무엇인가요?",
+                    correct = true
+                ),
+                QuestionResult(
+                    questionId = 2L,
+                    detailType = "JOIN",
+                    question = "JOIN의 종류에는 어떤 것이 있나요?",
+                    correct = false
+                )
+            )
+        )
+
+        //when
+        val result = repository.getDailyTestResult(day)
+
+        //then
+        coVerify { mockApi.getDailyStudyResult(dayNumber = 1) }
+        result shouldBe ApiResult.Success(expected)
     }
 }
