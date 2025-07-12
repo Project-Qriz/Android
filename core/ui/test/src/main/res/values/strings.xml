@@ -15,4 +15,9 @@
     <string name="expected_score">예측 점수: %1$s점</string>
     <string name="test_result_score">%1$s점</string>
     <string name="low_score">점수 미달</string>
+    <string name="question_number">문제%1$d</string>
+    <string name="user_name">%1$s님이&#160;</string>
+    <string name="recommend_concept_book">보완하면 좋은 개념을</string>
+    <string name="go_to_concept_book">\n보러갈까요?</string>
+    <string name="go_to_concept_book_button">개념서 보러가기</string>
 </resources>
