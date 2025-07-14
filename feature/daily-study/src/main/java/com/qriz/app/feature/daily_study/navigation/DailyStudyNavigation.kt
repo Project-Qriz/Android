@@ -4,7 +4,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import com.qriz.app.core.navigation.route.DailyStudyRoute
+import com.qriz.app.core.navigation.route.MainTabRoute
+import com.qriz.app.feature.daily_study.result.DailyTestResultScreen
 import com.qriz.app.feature.daily_study.status.DailyStudyPlanStatusScreen
 import com.qriz.app.feature.daily_study.study.DailyTestScreen
 
@@ -34,6 +37,18 @@ fun NavController.navigateToDailyTest(
     )
 }
 
+fun NavController.navigateToDailyTestResult(
+    dayNumber: Int,
+    navOptions: NavOptions = navOptions {
+        popUpTo<MainTabRoute.Home>()
+    },
+) {
+    navigate(
+        DailyStudyRoute.DailyTestResult(dayNumber = dayNumber),
+        navOptions = navOptions,
+    )
+}
+
 fun NavGraphBuilder.dailyStudyNavGraph(
     onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
@@ -54,5 +69,9 @@ fun NavGraphBuilder.dailyStudyNavGraph(
             onShowSnackBar = onShowSnackbar,
             moveToBack = onBack,
         )
+    }
+
+    composable<DailyStudyRoute.DailyTestResult> {
+        DailyTestResultScreen(onClose = onBack)
     }
 }

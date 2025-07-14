@@ -20,4 +20,7 @@
     <string name="recommend_concept_book">보완하면 좋은 개념을</string>
     <string name="go_to_concept_book">\n보러갈까요?</string>
     <string name="go_to_concept_book_button">개념서 보러가기</string>
+    <string name="concept_score_analysis">개념별 점수 분석</string>
+    <string name="total">전체</string>
+    <string name="show_score_detail">상세 보기</string>
 </resources>
