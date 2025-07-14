@@ -7,6 +7,7 @@ import com.qriz.app.core.network.daily_study.model.response.DailyStudyPlanRespon
 import com.qriz.app.core.network.daily_study.model.response.WeeklyRecommendationResponseContainer
 import com.qriz.app.core.network.daily_study.model.response.DailyTestQuestionResponse
 import com.qriz.app.core.network.daily_study.model.response.DailyTestResultResponse
+import com.qriz.app.core.network.daily_study.model.response.WeeklyReviewResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -36,4 +37,7 @@ interface DailyStudyApi {
 
     @GET("/api/v1/daily/subject-details/{dayNumber}")
     suspend fun getDailyStudyResult(@Path("dayNumber") dayNumber: Int): ApiResult<DailyTestResultResponse>
+
+    @GET("/api/v1/daily/weekly-reviews/{dayNumber}")
+    suspend fun getWeeklyReview(@Path("dayNumber") dayNumber: Int): ApiResult<WeeklyReviewResponse>
 }
