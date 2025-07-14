@@ -9,9 +9,14 @@ import com.qriz.app.core.data.daily_study.daily_study_api.model.PlannedSkill
 import com.qriz.app.core.data.daily_study.daily_study_api.model.QuestionResult
 import com.qriz.app.core.data.daily_study.daily_study_api.model.SkillItem
 import com.qriz.app.core.data.daily_study.daily_study_api.model.SimplePlannedSkill
+import com.qriz.app.core.data.daily_study.daily_study_api.model.SubjectResult
+import com.qriz.app.core.data.daily_study.daily_study_api.model.CategoryResult
+import com.qriz.app.core.data.daily_study.daily_study_api.model.ConceptResult
 import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
+import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyReviewResult
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Question
+import com.qriz.app.core.data.test.test_api.model.Test as TestModel
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.model.requireValue
 import com.qriz.app.core.network.daily_study.DailyStudyApi
@@ -21,12 +26,16 @@ import com.qriz.app.core.network.daily_study.model.response.DailyStudyStatusResp
 import com.qriz.app.core.network.daily_study.model.response.DailyTestOptionResponse
 import com.qriz.app.core.network.daily_study.model.response.DailyTestQuestionResponse
 import com.qriz.app.core.network.daily_study.model.response.DailyTestResultResponse
+import com.qriz.app.core.network.daily_study.model.response.MajorItem
 import com.qriz.app.core.network.daily_study.model.response.PlannedSkillResponse
 import com.qriz.app.core.network.daily_study.model.response.SimplePlannedSkillResponse
 import com.qriz.app.core.network.daily_study.model.response.SkillScore
+import com.qriz.app.core.network.daily_study.model.response.Subject
+import com.qriz.app.core.network.daily_study.model.response.SubItemScore
 import com.qriz.app.core.network.daily_study.model.response.SubjectResultResponse
 import com.qriz.app.core.network.daily_study.model.response.WeeklyRecommendationResponse
 import com.qriz.app.core.network.daily_study.model.response.WeeklyRecommendationResponseContainer
+import com.qriz.app.core.network.daily_study.model.response.WeeklyReviewResponse
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -34,12 +43,11 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import java.time.LocalDate
-import com.qriz.app.core.data.test.test_api.model.Test as TestModel
 
 class DailyStudyRepositoryTest {
     val mockApi = mockk<DailyStudyApi>()
 
-    val repository = DailyStudyRepositoryImpl(mockApi)
+    private val repository = DailyStudyRepositoryImpl(mockApi)
 
     @Test
     fun `오늘의 공부 플랜을 불러와 flow형태로 반환한다`() = runTest {
@@ -381,6 +389,112 @@ class DailyStudyRepositoryTest {
 
         //then
         coVerify { mockApi.getDailyStudyResult(dayNumber = 1) }
+        result shouldBe ApiResult.Success(expected)
+    }
+
+    @Test
+    fun `getWeeklyReviewResult - 주간 리뷰 결과를 성공적으로 가져온다`() = runTest {
+        //given
+        val day = 7
+        val mockResponse = WeeklyReviewResponse(
+            subjects = listOf(
+                Subject(
+                    title = "1과목",
+                    totalScore = 35.0,
+                    majorItems = listOf(
+                        MajorItem(
+                            majorItem = "데이터 모델링의 이해",
+                            score = 35.0,
+                            subItemScores = listOf(
+                                SubItemScore(
+                                    subItem = "엔터티",
+                                    score = 15.0
+                                ),
+                                SubItemScore(
+                                    subItem = "관계",
+                                    score = 20.0
+                                )
+                            )
+                        )
+                    )
+                ),
+                Subject(
+                    title = "2과목",
+                    totalScore = 60.0,
+                    majorItems = listOf(
+                        MajorItem(
+                            majorItem = "SQL 기본",
+                            score = 60.0,
+                            subItemScores = listOf(
+                                SubItemScore(
+                                    subItem = "SELECT 문",
+                                    score = 25.0
+                                ),
+                                SubItemScore(
+                                    subItem = "조인",
+                                    score = 35.0
+                                )
+                            )
+                        )
+                    )
+                )
+            ),
+            totalScore = 95.0
+        )
+
+        coEvery { mockApi.getWeeklyReview(dayNumber = 7) } returns ApiResult.Success(mockResponse)
+
+        val expected = WeeklyReviewResult(
+            totalScore = 95.0f,
+            subjectItems = listOf(
+                SubjectResult(
+                    subjectName = "1과목",
+                    score = 35.0f,
+                    categoryItems = listOf(
+                        CategoryResult(
+                            categoryName = "데이터 모델링의 이해",
+                            score = 35.0f,
+                            conceptItems = listOf(
+                                ConceptResult(
+                                    conceptName = "엔터티",
+                                    score = 15.0f
+                                ),
+                                ConceptResult(
+                                    conceptName = "관계",
+                                    score = 20.0f
+                                )
+                            )
+                        )
+                    )
+                ),
+                SubjectResult(
+                    subjectName = "2과목",
+                    score = 60.0f,
+                    categoryItems = listOf(
+                        CategoryResult(
+                            categoryName = "SQL 기본",
+                            score = 60.0f,
+                            conceptItems = listOf(
+                                ConceptResult(
+                                    conceptName = "SELECT 문",
+                                    score = 25.0f
+                                ),
+                                ConceptResult(
+                                    conceptName = "조인",
+                                    score = 35.0f
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        //when
+        val result = repository.getWeeklyReviewResult(day)
+
+        //then
+        coVerify { mockApi.getWeeklyReview(dayNumber = 7) }
         result shouldBe ApiResult.Success(expected)
     }
 }
