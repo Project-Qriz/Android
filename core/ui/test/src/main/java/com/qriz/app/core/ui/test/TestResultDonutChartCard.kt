@@ -1,11 +1,12 @@
 package com.qriz.app.core.ui.test
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.QrizCard
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Gray100
+import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.Gray300
 import com.qriz.app.core.designsystem.theme.Gray600
 import com.qriz.app.core.designsystem.theme.Gray700
@@ -56,18 +59,18 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
 
 @Composable
 fun TestResultDonutChartCard(
     modifier: Modifier = Modifier,
+    totalScore: Int,
+    testResultItems: ImmutableList<TestResultItem>,
+    getTestResultColor: (index: Int) -> Color,
     title: @Composable () -> Unit,
     chartTitle: String? = null,
     isLessScore: Boolean = false,
     estimatedScore: Float? = null,
-    totalScore: Int,
-    testResultItems: ImmutableList<TestResultItem>,
-    getTestResultColor: (index: Int) -> Color,
+    onClickDetail: (() -> Unit)? = null,
 ) {
     TestResultBaseCard(
         modifier = modifier,
@@ -153,6 +156,28 @@ fun TestResultDonutChartCard(
                 getTestResultColor = getTestResultColor
             )
 
+            if (onClickDetail != null) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 24.dp)
+                        .fillMaxWidth()
+                        .clickable(onClick = onClickDetail)
+                        .border(
+                            width = 1.dp,
+                            color = Gray200,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(
+                            vertical = 13.dp
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = stringResource(R.string.show_score_detail),
+                        style = QrizTheme.typography.body2.copy(Gray800),
+                    )
+                }
+            }
         }
     }
 }
@@ -312,11 +337,13 @@ fun BottomScoreRow(
 
 @Composable
 fun BottomScoreRowItem(
+    modifier: Modifier = Modifier,
     scoreName: String,
     scoreColor: Color,
     score: Int,
 ) {
     Row(
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
