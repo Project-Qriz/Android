@@ -5,10 +5,12 @@ import com.qriz.app.core.data.daily_study.daily_study.mapper.toDailyStudyPlan
 import com.qriz.app.core.data.daily_study.daily_study.mapper.toDailyTestResult
 import com.qriz.app.core.data.daily_study.daily_study.mapper.toTest
 import com.qriz.app.core.data.daily_study.daily_study.mapper.toWeeklyRecommendation
+import com.qriz.app.core.data.daily_study.daily_study.mapper.toWeeklyResult
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlanDetail
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyTestResult
 import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
+import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyReviewResult
 import com.qriz.app.core.data.daily_study.daily_study_api.repository.DailyStudyRepository
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Test
@@ -23,7 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class DailyStudyRepositoryImpl @Inject constructor(
+internal class DailyStudyRepositoryImpl @Inject constructor(
     private val dailyStudyApi: DailyStudyApi
 ): DailyStudyRepository {
     override fun getDailyStudyPlanFlow(): Flow<ApiResult<List<DailyStudyPlan>>> = flow {
@@ -72,5 +74,9 @@ class DailyStudyRepositoryImpl @Inject constructor(
     override suspend fun getDailyTestResult(day: Int): ApiResult<DailyTestResult> {
         return dailyStudyApi.getDailyStudyResult(dayNumber = day)
             .map { it.toDailyTestResult() }
+    }
+
+    override suspend fun getWeeklyReviewResult(day: Int): ApiResult<WeeklyReviewResult> {
+        return dailyStudyApi.getWeeklyReview(dayNumber = day).map { it.toWeeklyResult() }
     }
 }
