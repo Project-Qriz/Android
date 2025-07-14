@@ -80,7 +80,7 @@ data class DailyTestResultUiState(
             day = 0,
             state = LoadState.Loading,
             weeklyReviewState = WeeklyReviewState.Loading,
-            viewType = ViewType.DETAIL,
+            viewType = ViewType.TOTAL,
             userName = "",
             isReview = false,
             isComprehensiveReview = false,
