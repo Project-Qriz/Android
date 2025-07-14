@@ -91,7 +91,6 @@ data class DailyTestResultUiState(
 }
 
 sealed interface DailyTestResultUiAction : UiAction {
-    data object ClickCloseNavigation : DailyTestResultUiAction
     data object LoadData : DailyTestResultUiAction
     data object ClickFilter : DailyTestResultUiAction
     data object ShowDetail : DailyTestResultUiAction

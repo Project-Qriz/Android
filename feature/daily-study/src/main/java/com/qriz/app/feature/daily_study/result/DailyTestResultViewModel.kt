@@ -1,6 +1,5 @@
 package com.qriz.app.feature.daily_study.result
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
@@ -24,7 +23,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DailyStudyResultViewModel @Inject constructor(
+class DailyTestResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
     private val dailyStudyRepository: DailyStudyRepository,
@@ -34,7 +33,6 @@ class DailyStudyResultViewModel @Inject constructor(
 ) {
     override fun process(action: DailyTestResultUiAction): Job = viewModelScope.launch {
         when (action) {
-            is DailyTestResultUiAction.ClickCloseNavigation -> sendEffect(DailyTestResultUiEffect.Close)
             is DailyTestResultUiAction.LoadData -> loadData()
             is DailyTestResultUiAction.ClickFilter -> updateState { copy(showFilterDropDown = showFilterDropDown.not()) }
             is DailyTestResultUiAction.ShowDetail -> showDetail()

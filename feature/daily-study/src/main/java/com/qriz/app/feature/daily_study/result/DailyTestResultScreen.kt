@@ -49,7 +49,7 @@ private fun getTestResultColor(index: Int): Color =
 
 @Composable
 fun DailyTestResultScreen(
-    viewModel: DailyStudyResultViewModel = hiltViewModel(),
+    viewModel: DailyTestResultViewModel = hiltViewModel(),
     onClose: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
