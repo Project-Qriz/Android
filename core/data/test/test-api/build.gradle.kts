@@ -1,12 +1,20 @@
-import com.qriz.app.setNamespace
-
 plugins {
-    id("qriz.android.library")
+    id("kotlin")
+    alias(libs.plugins.jetbrains.kotlin.jvm)
+    alias(libs.plugins.kotlinx.serialization)
 }
-
-android {
-    setNamespace("core.data.test.test_api")
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
 }
 
 dependencies {
+    api(projects.core.model)
+    api(projects.core.data.test.testApi)
+    implementation(libs.kotlinx.serialization.json)
 }
