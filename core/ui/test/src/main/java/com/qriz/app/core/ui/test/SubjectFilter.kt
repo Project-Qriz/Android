@@ -154,11 +154,6 @@ private fun SubjectFilterDropDownMenuItem(
     )
 }
 
-data class DropDownMenuState(
-    val offset: Offset,
-    val size: IntSize,
-)
-
 @Preview(showBackground = true)
 @Composable
 private fun SubjectFilterPreview() {

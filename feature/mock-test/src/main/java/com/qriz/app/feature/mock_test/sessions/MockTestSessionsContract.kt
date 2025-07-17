@@ -22,6 +22,7 @@ data class MockTestSessionsUiState(
 
 sealed interface MockTestSessionsUiAction : UiAction {
     data object LoadData : MockTestSessionsUiAction
+    data class ClickMockTest(val id: Long) : MockTestSessionsUiAction
 }
 
 sealed interface MockTestSessionsUiEffect : UiEffect {

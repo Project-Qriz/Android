@@ -24,6 +24,7 @@ class MockTestSessionsViewModel @Inject constructor(
     override fun process(action: MockTestSessionsUiAction): Job = viewModelScope.launch {
         when (action) {
             is MockTestSessionsUiAction.LoadData -> loadData()
+            is MockTestSessionsUiAction.ClickMockTest -> {}
         }
     }
 

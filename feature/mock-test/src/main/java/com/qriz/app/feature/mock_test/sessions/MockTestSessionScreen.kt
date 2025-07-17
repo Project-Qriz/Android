@@ -2,6 +2,8 @@ package com.qriz.app.feature.mock_test.sessions
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,7 +13,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSession
 import com.qriz.app.core.designsystem.component.NavigationType
+import com.qriz.app.core.designsystem.component.QrizLoading
 import com.qriz.app.core.designsystem.component.QrizTopBar
+import com.qriz.app.core.ui.common.const.ErrorScreen
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.mock_test.R
 import com.qriz.app.feature.mock_test.sessions.model.Filter
@@ -37,15 +41,17 @@ fun MockTestSessionsScreen(
     }
 
     MockTestSessionsContent(
-        uiState = uiState.sessionState,
+        sessionState = uiState.sessionState,
         onBack = onBack,
+        filter = uiState.filter,
         onShowSnackbar = onShowSnackbar,
     )
 }
 
 @Composable
 private fun MockTestSessionsContent(
-    uiState: SessionState,
+    sessionState: SessionState,
+    filter: Filter,
     onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
 ) {
@@ -58,16 +64,19 @@ private fun MockTestSessionsContent(
             onNavigationClick = onBack,
         )
 
-        when(uiState) {
-            is SessionState.Success -> {
+        when(sessionState) {
+            is SessionState.Success -> SessionContent(
+                filter = filter,
+                data = sessionState.data,
+            )
 
-            }
-            is SessionState.Failure -> {
+            is SessionState.Failure -> ErrorScreen(
+                title = stringResource(com.qriz.app.core.ui.common.R.string.error_occurs),
+                description = sessionState.message,
+                onClickRetry = {}
+            )
 
-            }
-            is SessionState.Loading -> {
-
-            }
+            is SessionState.Loading -> QrizLoading()
         }
     }
 }
@@ -80,6 +89,16 @@ private fun SessionContent(
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
-
+        //TODO: Filter
+        LazyColumn(
+            modifier = Modifier.weight(1f)
+        ) {
+            items(
+                items = data,
+                key = { it.session }
+            ) {
+                //TODO: Items
+            }
+        }
     }
 }
