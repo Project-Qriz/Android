@@ -81,5 +81,8 @@ sealed interface DailyStudyRoute : Route {
     ) : DailyStudyRoute
 
     @Serializable
-    data class DailyTest(val dayNumber: Int)
+    data class DailyTest(val dayNumber: Int) : DailyStudyRoute
+
+    @Serializable
+    data class DailyTestResult(val dayNumber: Int) : DailyStudyRoute
 }
