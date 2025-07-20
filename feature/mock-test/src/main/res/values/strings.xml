@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="mock_test">모의고사</string>
+    <string name="filter_total">전체</string>
+    <string name="filter_completed">학습 후</string>
+    <string name="filter_not_completed">학습 전</string>
+    <string name="filter_past_order">과거순</string>
+    <string name="total_score">총점수: %1$d점</string>
+    <string name="session_not_completed">학습 전</string>
+    <string name="session_completed">학습 완료</string>
 </resources>
