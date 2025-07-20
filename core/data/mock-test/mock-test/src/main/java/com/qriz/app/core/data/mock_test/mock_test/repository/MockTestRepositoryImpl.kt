@@ -20,36 +20,45 @@ import javax.inject.Inject
 
 internal class MockTestRepositoryImpl @Inject constructor(
     private val mockTestApi: MockTestApi,
-): MockTestRepository {
+) : MockTestRepository {
 
     private val sessionFilter = MutableStateFlow(SessionFilter.ALL)
-    
-    private val _mockTestSessions = MutableStateFlow<ApiResult<List<MockTestSession>>>(ApiResult.Success(emptyList()))
+
+    private val _mockTestSessions =
+        MutableStateFlow<ApiResult<List<MockTestSession>>>(ApiResult.Success(emptyList()))
+
     @OptIn(ExperimentalCoroutinesApi::class)
-    override val mockTestSessions: Flow<ApiResult<List<MockTestSession>>> = _mockTestSessions
-        .onStart { fetchMockTestSessions() }
-        .flatMapLatest { result ->
-            sessionFilter.map { filter -> 
-                result.map { sessions ->
-                    when(filter) {
-                        SessionFilter.ALL -> sessions
-                        SessionFilter.COMPLETED -> sessions.filter { session -> session.completed }
-                        SessionFilter.NOT_COMPLETED -> sessions.filter { session -> session.completed.not() }
-                        SessionFilter.OLDEST_FIRST -> sessions.sortedBy { session ->
-                            session.session.firstOrNull()?.digitToIntOrNull() ?: 0
+    override val mockTestSessions: Flow<ApiResult<List<MockTestSession>>> =
+        _mockTestSessions.onStart {
+                if (_mockTestSessions.value is ApiResult.Success && (_mockTestSessions.value as ApiResult.Success).data.isNotEmpty()) {
+                    return@onStart
+                }
+                fetchMockTestSessions()
+            }.flatMapLatest { result ->
+                sessionFilter.map { filter ->
+                    result.map { sessions ->
+                        when (filter) {
+                            SessionFilter.ALL -> sessions
+                            SessionFilter.COMPLETED -> sessions.filter { session -> session.completed }
+                            SessionFilter.NOT_COMPLETED -> sessions.filter { session -> session.completed.not() }
+                            SessionFilter.OLDEST_FIRST -> sessions.sortedBy { session ->
+                                //TODO: examId로 정렬
+                                session.session.replace(
+                                    "회차",
+                                    ""
+                                ).toInt()
+                            }
                         }
                     }
                 }
-            }   
-        }
+            }
 
     override fun setSessionFilter(filter: SessionFilter) {
         sessionFilter.value = filter
     }
 
     private suspend fun fetchMockTestSessions() {
-        val result = mockTestApi.getMockTestSessions(null)
-            .map { it.toMockTestSession() }
+        val result = mockTestApi.getMockTestSessions(null).map { it.toMockTestSession().reversed() }
         _mockTestSessions.value = result
     }
 
