@@ -1,7 +1,9 @@
 package com.qriz.app.core.data.mock_test.mock_test
 
+import app.cash.turbine.test
 import com.qriz.app.core.data.mock_test.mock_test.repository.MockTestRepositoryImpl
 import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSession
+import com.qriz.app.core.data.mock_test.mock_test_api.model.SessionFilter
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Question
 import com.qriz.app.core.data.test.test_api.model.Test as TestModel
@@ -22,106 +24,182 @@ class MockTestRepositoryTest {
     private val mockApi = mockk<MockTestApi>()
     private val repository = MockTestRepositoryImpl(mockApi)
 
+    private val mockSessionResponses = listOf(
+        MockTestSessionResponse(
+            completed = true,
+            session = "1회차",
+            totalScore = 85
+        ),
+        MockTestSessionResponse(
+            completed = false,
+            session = "2회차",
+            totalScore = null
+        ),
+        MockTestSessionResponse(
+            completed = true,
+            session = "3회차",
+            totalScore = 92
+        )
+    )
+
+    private val mockSessions = listOf(
+        MockTestSession(
+            completed = true,
+            session = "3회차",
+            totalScore = 92
+        ),
+        MockTestSession(
+            completed = false,
+            session = "2회차",
+            totalScore = 0
+        ),
+        MockTestSession(
+            completed = true,
+            session = "1회차",
+            totalScore = 85
+        )
+    )
+
     @Test
-    fun `모의고사 세션 목록을 성공적으로 불러온다`() = runTest {
-        //given
-        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(
-            listOf(
-                MockTestSessionResponse(
-                    completed = true,
-                    session = "session1",
-                    totalScore = 85
-                ),
-                MockTestSessionResponse(
-                    completed = false,
-                    session = "session2",
-                    totalScore = null
-                )
-            )
-        )
+    fun `mockTestSessions flow - 초기 데이터 로딩 및 ALL 필터 적용`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
 
-        val expected = listOf(
-            MockTestSession(
-                completed = true,
-                session = "session1",
-                totalScore = 85
-            ),
-            MockTestSession(
-                completed = false,
-                session = "session2",
-                totalScore = 0
-            )
-        )
-
-        //when
-        val result = repository.getMockTestSessions()
-
-        //then
-        coVerify { mockApi.getMockTestSessions(null) }
-        result shouldBe ApiResult.Success(expected)
+        // when & then
+        repository.mockTestSessions.test {
+            val result = awaitItem()
+            result shouldBe ApiResult.Success(mockSessions)
+            coVerify { mockApi.getMockTestSessions(null) }
+        }
     }
 
     @Test
-    fun `완료된 모의고사 세션만 필터링해서 불러온다`() = runTest {
-        //given
-        coEvery { mockApi.getMockTestSessions(true) } returns ApiResult.Success(
-            listOf(
-                MockTestSessionResponse(
-                    completed = true,
-                    session = "session1",
-                    totalScore = 85
-                )
-            )
+    fun `mockTestSessions flow - API 실패 시 실패 결과 반환`() = runTest {
+        // given
+        val errorResult = ApiResult.Failure(
+            -1,
+            "API 오류"
         )
+        coEvery { mockApi.getMockTestSessions(null) } returns errorResult
 
-        val expected = listOf(
-            MockTestSession(
-                completed = true,
-                session = "session1",
-                totalScore = 85
-            )
-        )
-
-        //when
-        val result = repository.getMockTestSessions(completed = true)
-
-        //then
-        coVerify { mockApi.getMockTestSessions(true) }
-        result shouldBe ApiResult.Success(expected)
+        // when & then
+        repository.mockTestSessions.test {
+            val result = awaitItem()
+            result shouldBe errorResult
+            coVerify { mockApi.getMockTestSessions(null) }
+        }
     }
 
     @Test
-    fun `미완료된 모의고사 세션만 필터링해서 불러온다`() = runTest {
-        //given
-        coEvery { mockApi.getMockTestSessions(false) } returns ApiResult.Success(
-            listOf(
-                MockTestSessionResponse(
-                    completed = false,
-                    session = "session2",
-                    totalScore = null
-                )
-            )
-        )
+    fun `setSessionFilter - COMPLETED 필터 적용`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
 
-        val expected = listOf(
-            MockTestSession(
-                completed = false,
-                session = "session2",
-                totalScore = 0
-            )
-        )
+        // when & then
+        repository.mockTestSessions.test {
+            // 초기 데이터 (ALL 필터)
+            val initialResult = awaitItem()
+            initialResult shouldBe ApiResult.Success(mockSessions)
 
-        //when
-        val result = repository.getMockTestSessions(completed = false)
+            // COMPLETED 필터 적용
+            repository.setSessionFilter(SessionFilter.COMPLETED)
+            val filteredResult = awaitItem()
 
-        //then
-        coVerify { mockApi.getMockTestSessions(false) }
-        result shouldBe ApiResult.Success(expected)
+            val expectedCompleted = mockSessions.filter { it.completed }
+            filteredResult shouldBe ApiResult.Success(expectedCompleted)
+        }
     }
 
     @Test
-    fun `모의고사 문제를 성공적으로 불러와서 Test로 변환한다`() = runTest {
-        //given
+    fun `setSessionFilter - NOT_COMPLETED 필터 적용`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
+
+        // when & then
+        repository.mockTestSessions.test {
+            // 초기 데이터 (ALL 필터)
+            awaitItem()
+
+            // NOT_COMPLETED 필터 적용
+            repository.setSessionFilter(SessionFilter.NOT_COMPLETED)
+            val filteredResult = awaitItem()
+
+            val expectedNotCompleted = mockSessions.filter { !it.completed }
+            filteredResult shouldBe ApiResult.Success(expectedNotCompleted)
+        }
+    }
+
+    @Test
+    fun `setSessionFilter - OLDEST_FIRST 필터 적용`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
+
+        // when & then
+        repository.mockTestSessions.test {
+            // 초기 데이터 (ALL 필터)
+            awaitItem()
+
+            // OLDEST_FIRST 필터 적용
+            repository.setSessionFilter(SessionFilter.OLDEST_FIRST)
+            val filteredResult = awaitItem()
+
+            val expectedSorted = mockSessions.sortedBy {
+                it.session.replace(
+                    "회차",
+                    ""
+                ).toInt()
+            }
+            filteredResult shouldBe ApiResult.Success(expectedSorted)
+        }
+    }
+
+    @Test
+    fun `setSessionFilter - 여러 필터 순차 적용`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
+
+        // when & then
+        repository.mockTestSessions.test {
+            // 초기 데이터 (ALL 필터)
+            val allResult = awaitItem()
+            allResult shouldBe ApiResult.Success(mockSessions)
+
+            // COMPLETED 필터 적용
+            repository.setSessionFilter(SessionFilter.COMPLETED)
+            val completedResult = awaitItem()
+            val expectedCompleted = mockSessions.filter { it.completed }
+            completedResult shouldBe ApiResult.Success(expectedCompleted)
+
+            // 다시 ALL 필터로 변경
+            repository.setSessionFilter(SessionFilter.ALL)
+            val backToAllResult = awaitItem()
+            backToAllResult shouldBe ApiResult.Success(mockSessions)
+        }
+    }
+
+    @Test
+    fun `mockTestSessions flow - 이미 데이터가 있으면 API 재호출 안함`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
+
+        // when - 첫 번째 구독
+        repository.mockTestSessions.test {
+            awaitItem()
+        }
+
+        // when - 두 번째 구독 (데이터가 이미 있음)
+        repository.mockTestSessions.test {
+            val result = awaitItem()
+            result shouldBe ApiResult.Success(mockSessions)
+        }
+
+        // then - API는 한 번만 호출되어야 함
+        coVerify(exactly = 1) { mockApi.getMockTestSessions(null) }
+    }
+
+    @Test
+    fun `getMockTest - 모의고사 문제를 성공적으로 불러와서 Test로 변환한다`() = runTest {
+        // given
         val mockTestId = 1L
         val mockResponse = MockTestQuestionsResponse(
             questions = listOf(
@@ -245,11 +323,29 @@ class MockTestRepositoryTest {
             totalTimeLimit = 210
         )
 
-        //when
+        // when
         val result = repository.getMockTest(mockTestId)
 
-        //then
+        // then
         coVerify { mockApi.getMockTestQuestions(mockTestId) }
         result shouldBe ApiResult.Success(expected)
+    }
+
+    @Test
+    fun `getMockTest - API 실패 시 실패 결과 반환`() = runTest {
+        // given
+        val mockTestId = 1L
+        val errorResult = ApiResult.Failure(
+            -1,
+            "문제 조회 실패"
+        )
+        coEvery { mockApi.getMockTestQuestions(mockTestId) } returns errorResult
+
+        // when
+        val result = repository.getMockTest(mockTestId)
+
+        // then
+        coVerify { mockApi.getMockTestQuestions(mockTestId) }
+        result shouldBe errorResult
     }
 }
