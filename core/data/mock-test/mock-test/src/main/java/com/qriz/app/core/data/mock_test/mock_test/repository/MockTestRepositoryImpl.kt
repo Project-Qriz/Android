@@ -1,15 +1,20 @@
 package com.qriz.app.core.data.mock_test.mock_test.repository
 
 import com.qriz.app.core.data.mock_test.mock_test.mapper.toMockTestSession
+import com.qriz.app.core.data.mock_test.mock_test.mapper.toRequest
 import com.qriz.app.core.data.mock_test.mock_test.mapper.toTest
 import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSession
 import com.qriz.app.core.data.mock_test.mock_test_api.model.SessionFilter
 import com.qriz.app.core.data.mock_test.mock_test_api.repository.MockTestRepository
+import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Test
+import com.qriz.app.core.data.test.test_api.model.TestCategory
 import com.qriz.app.core.model.ApiResult
-import com.qriz.app.core.model.flatMapSuspend
 import com.qriz.app.core.model.map
-import com.qriz.app.core.network.mock_test.model.api.MockTestApi
+import com.qriz.app.core.network.mock_test.api.MockTestApi
+import com.qriz.app.core.network.mock_test.model.request.MockTestSubmitActivity
+import com.qriz.app.core.network.mock_test.model.request.MockTestSubmitQuestion
+import com.qriz.app.core.network.mock_test.model.request.MockTestSubmitRequest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,5 +69,10 @@ internal class MockTestRepositoryImpl @Inject constructor(
 
     override suspend fun getMockTest(id: Long): ApiResult<Test> {
         return mockTestApi.getMockTestQuestions(id).map { it.toTest() }
+    }
+
+    override suspend fun submitMockTest(id: Long, activities: Map<Long, Option>): ApiResult<Unit> {
+        val request = activities.toRequest()
+        return mockTestApi.submitMockTest(id =  id, request = request)
     }
 }
