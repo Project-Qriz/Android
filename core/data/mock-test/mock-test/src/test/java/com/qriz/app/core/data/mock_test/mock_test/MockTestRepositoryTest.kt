@@ -1,14 +1,15 @@
 package com.qriz.app.core.data.mock_test.mock_test
 
 import app.cash.turbine.test
+import com.qriz.app.core.data.mock_test.mock_test.mapper.toRequest
 import com.qriz.app.core.data.mock_test.mock_test.repository.MockTestRepositoryImpl
 import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSession
 import com.qriz.app.core.data.mock_test.mock_test_api.model.SessionFilter
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Question
-import com.qriz.app.core.data.test.test_api.model.Test as TestModel
 import com.qriz.app.core.model.ApiResult
-import com.qriz.app.core.network.mock_test.model.api.MockTestApi
+import com.qriz.app.core.network.mock_test.api.MockTestApi
+import com.qriz.app.core.network.mock_test.model.request.MockTestSubmitRequest
 import com.qriz.app.core.network.mock_test.model.response.MockTestOptionResponse
 import com.qriz.app.core.network.mock_test.model.response.MockTestQuestionResponse
 import com.qriz.app.core.network.mock_test.model.response.MockTestQuestionsResponse
@@ -19,6 +20,7 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import com.qriz.app.core.data.test.test_api.model.Test as TestModel
 
 class MockTestRepositoryTest {
     private val mockApi = mockk<MockTestApi>()
@@ -347,5 +349,110 @@ class MockTestRepositoryTest {
         // then
         coVerify { mockApi.getMockTestQuestions(mockTestId) }
         result shouldBe errorResult
+    }
+
+    @Test
+    fun `submitMockTest - 모의고사 제출을 성공적으로 처리한다`() = runTest {
+        // given
+        val mockTestId = 1L
+        val activities = mapOf(
+            1L to Option(
+                id = 1L,
+                content = "SELECT는 데이터를 조회한다"
+            ),
+            2L to Option(
+                id = 5L,
+                content = "INNER JOIN"
+            )
+        )
+        val request = activities.toRequest()
+        coEvery { mockApi.submitMockTest(id = 1, request = activities.toRequest()) } returns ApiResult.Success(Unit)
+
+
+        // when
+        val result = repository.submitMockTest(
+            mockTestId,
+            activities
+        )
+
+        // then
+        coVerify {
+            mockApi.submitMockTest(
+                mockTestId,
+                request
+            )
+        }
+        result shouldBe ApiResult.Success(Unit)
+    }
+
+    @Test
+    fun `submitMockTest - API 실패 시 실패 결과 반환`() = runTest {
+        // given
+        val mockTestId = 1L
+        val activities = mapOf(
+            1L to Option(
+                id = 1L,
+                content = "SELECT는 데이터를 조회한다"
+            ),
+            2L to Option(
+                id = 5L,
+                content = "INNER JOIN"
+            )
+        )
+        val request = activities.toRequest()
+        val errorResult = ApiResult.Failure(
+            -1,
+            "제출 실패"
+        )
+        coEvery { mockApi.submitMockTest(id = 1, request = activities.toRequest()) } returns errorResult
+
+
+        // when
+        val result = repository.submitMockTest(
+            mockTestId,
+            activities
+        )
+
+        // then
+        coVerify {
+            mockApi.submitMockTest(
+                mockTestId,
+                request,
+            )
+        }
+        result shouldBe errorResult
+    }
+
+    @Test
+    fun `submitMockTest - 빈 답안으로 제출 시 빈 activities 리스트로 요청`() = runTest {
+        // given
+        val mockTestId = 1L
+        val activities = emptyMap<Long, Option>()
+
+        val expectedRequest = MockTestSubmitRequest(
+            activities = emptyList()
+        )
+
+        coEvery {
+            mockApi.submitMockTest(
+                mockTestId,
+                expectedRequest
+            )
+        } returns ApiResult.Success(Unit)
+
+        // when
+        val result = repository.submitMockTest(
+            mockTestId,
+            activities
+        )
+
+        // then
+        coVerify {
+            mockApi.submitMockTest(
+                mockTestId,
+                expectedRequest
+            )
+        }
+        result shouldBe ApiResult.Success(Unit)
     }
 }
