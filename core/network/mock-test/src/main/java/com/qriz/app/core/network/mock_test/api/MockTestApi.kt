@@ -1,9 +1,12 @@
-package com.qriz.app.core.network.mock_test.model.api
+package com.qriz.app.core.network.mock_test.api
 
 import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.network.mock_test.model.request.MockTestSubmitRequest
 import com.qriz.app.core.network.mock_test.model.response.MockTestQuestionsResponse
 import com.qriz.app.core.network.mock_test.model.response.MockTestSessionResponse
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -17,4 +20,10 @@ interface MockTestApi {
     suspend fun getMockTestSessions(
         @Query("status") completed: Boolean?
     ): ApiResult<List<MockTestSessionResponse>>
+
+    @POST("/api/v1/exam/submit/{examId}")
+    suspend fun submitMockTest(
+        @Path("examId") id: Long,
+        @Body request: MockTestSubmitRequest
+    ): ApiResult<Unit>
 }

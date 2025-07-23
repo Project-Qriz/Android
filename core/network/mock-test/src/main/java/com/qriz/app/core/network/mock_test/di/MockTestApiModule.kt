@@ -1,6 +1,6 @@
-package com.qriz.app.core.network.mock_test.model.di
+package com.qriz.app.core.network.mock_test.di
 
-import com.qriz.app.core.network.mock_test.model.api.MockTestApi
+import com.qriz.app.core.network.mock_test.api.MockTestApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
