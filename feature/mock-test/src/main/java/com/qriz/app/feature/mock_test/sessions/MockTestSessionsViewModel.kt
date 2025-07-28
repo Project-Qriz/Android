@@ -30,7 +30,7 @@ class MockTestSessionsViewModel @Inject constructor(
 
     override fun process(action: MockTestSessionsUiAction): Job = viewModelScope.launch {
         when (action) {
-            is MockTestSessionsUiAction.ClickMockTest -> {}
+            is MockTestSessionsUiAction.ClickMockTest -> sendEffect(MockTestSessionsUiEffect.MoveToMockTest(action.id))
             is MockTestSessionsUiAction.ClickSessionFilter -> {
                 updateState { copy(expandFilter = expandFilter.not()) }
             }

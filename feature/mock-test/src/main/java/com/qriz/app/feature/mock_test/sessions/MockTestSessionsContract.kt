@@ -30,4 +30,5 @@ sealed interface MockTestSessionsUiAction : UiAction {
 
 sealed interface MockTestSessionsUiEffect : UiEffect {
     data class ShowSnackBar(val message: String) : MockTestSessionsUiEffect
+    data class MoveToMockTest(val id: Long) : MockTestSessionsUiEffect
 }

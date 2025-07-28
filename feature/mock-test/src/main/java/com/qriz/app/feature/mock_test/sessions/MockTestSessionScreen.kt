@@ -1,6 +1,5 @@
 package com.qriz.app.feature.mock_test.sessions
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,6 +36,7 @@ import kotlinx.collections.immutable.persistentListOf
 fun MockTestSessionsScreen(
     viewModel: MockTestSessionsViewModel = hiltViewModel(),
     onShowSnackbar: (String) -> Unit,
+    moveToMockTest: (Long) -> Unit,
     onBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -44,6 +44,7 @@ fun MockTestSessionsScreen(
     viewModel.collectSideEffect { effect ->
         when (effect) {
             is MockTestSessionsUiEffect.ShowSnackBar -> onShowSnackbar(effect.message)
+            is MockTestSessionsUiEffect.MoveToMockTest -> moveToMockTest(effect.id)
         }
     }
 
@@ -53,9 +54,8 @@ fun MockTestSessionsScreen(
         filter = uiState.filter,
         expandFilter = uiState.expandFilter,
         onClickFilter = { viewModel.process(MockTestSessionsUiAction.ClickSessionFilter) },
-        onFilterSelected = {
-            viewModel.process(MockTestSessionsUiAction.SelectSessionFilter(it))
-        },
+        onFilterSelected = { viewModel.process(MockTestSessionsUiAction.SelectSessionFilter(it)) },
+        onClickCard = { viewModel.process(MockTestSessionsUiAction.ClickMockTest(it)) }
     )
 }
 
@@ -67,6 +67,7 @@ private fun MockTestSessionsContent(
     onBack: () -> Unit,
     onClickFilter: () -> Unit,
     onFilterSelected: (SessionFilter) -> Unit,
+    onClickCard: (Long) -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -84,6 +85,7 @@ private fun MockTestSessionsContent(
                 data = sessionState.data,
                 onClickFilter = onClickFilter,
                 onFilterSelected = onFilterSelected,
+                onClickCard = onClickCard,
             )
 
             is SessionState.Failure -> ErrorScreen(
@@ -104,13 +106,8 @@ private fun SessionContent(
     data: ImmutableList<MockTestSession>,
     onClickFilter: () -> Unit,
     onFilterSelected: (SessionFilter) -> Unit,
+    onClickCard: (Long) -> Unit,
 ) {
-    val listState = rememberLazyListState()
-
-    LaunchedEffect(data) {
-        listState.scrollToItem(0)
-    }
-
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -124,7 +121,6 @@ private fun SessionContent(
 
         LazyColumn(
             modifier = Modifier.weight(1f),
-            state = listState,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(
                 start = 18.dp,
@@ -137,6 +133,7 @@ private fun SessionContent(
                     totalScore = it.totalScore,
                     title = it.session,
                     completed = it.completed,
+                    onCardClick = { onClickCard(it.id) }
                 )
             }
         }
@@ -153,17 +150,20 @@ private fun MockTestSessionsContentPreview() {
                     MockTestSession(
                         session = "12회차",
                         totalScore = 87,
-                        completed = true
+                        completed = true,
+                        id = 1,
                     ),
                     MockTestSession(
                         session = "11회차",
                         totalScore = 65,
-                        completed = false
+                        completed = false,
+                        id = 2,
                     ),
                     MockTestSession(
                         session = "10회차",
                         totalScore = 97,
-                        completed = true
+                        completed = true,
+                        id = 3,
                     ),
                 )
             ),
@@ -172,6 +172,7 @@ private fun MockTestSessionsContentPreview() {
             onBack = {},
             onClickFilter = {},
             onFilterSelected = {},
+            onClickCard = {},
         )
     }
 }
