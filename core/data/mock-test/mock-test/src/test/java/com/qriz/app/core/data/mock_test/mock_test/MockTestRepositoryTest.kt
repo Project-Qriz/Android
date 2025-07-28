@@ -30,17 +30,20 @@ class MockTestRepositoryTest {
         MockTestSessionResponse(
             completed = true,
             session = "1회차",
-            totalScore = 85
+            totalScore = 85,
+            id = 1,
         ),
         MockTestSessionResponse(
             completed = false,
             session = "2회차",
-            totalScore = null
+            totalScore = null,
+            id = 2
         ),
         MockTestSessionResponse(
             completed = true,
             session = "3회차",
-            totalScore = 92
+            totalScore = 92,
+            id = 3,
         )
     )
 
@@ -48,17 +51,20 @@ class MockTestRepositoryTest {
         MockTestSession(
             completed = true,
             session = "3회차",
-            totalScore = 92
+            totalScore = 92,
+            id = 3
         ),
         MockTestSession(
             completed = false,
             session = "2회차",
-            totalScore = 0
+            totalScore = 0,
+            id = 2
         ),
         MockTestSession(
             completed = true,
             session = "1회차",
-            totalScore = 85
+            totalScore = 85,
+            id = 1,
         )
     )
 
