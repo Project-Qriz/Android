@@ -90,4 +90,7 @@ sealed interface DailyStudyRoute : Route {
 sealed interface MockTestRoute : Route {
     @Serializable
     data object MockTestSessions : MockTestRoute
+
+    @Serializable
+    data class MockTest(val id: Long) : MockTestRoute
 }
