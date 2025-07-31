@@ -55,6 +55,7 @@ import com.qriz.app.core.designsystem.theme.Gray600
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
+import com.qriz.app.core.ui.common.const.DashedDivider
 import com.qriz.app.feature.home.R
 import com.qriz.app.core.designsystem.R as DSR
 import kotlinx.collections.immutable.ImmutableList
@@ -281,7 +282,9 @@ private fun TodayStudyCard(
             DashedDivider(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 17.5.dp)
+                    .padding(vertical = 17.5.dp),
+                color = Blue100,
+                interval = floatArrayOf(20f, 10f)
             )
 
             if (plan.comprehensiveReviewDay) {
@@ -348,37 +351,6 @@ private fun ConceptCard(
                 style = QrizTheme.typography.headline2.copy(color = Gray800)
             )
         }
-    }
-}
-
-@Composable
-private fun DashedDivider(modifier: Modifier = Modifier) {
-    Canvas(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(1.dp)
-    ) {
-        val pathEffect = PathEffect.dashPathEffect(
-            intervals = floatArrayOf(
-                20f,
-                10f
-            ),
-            phase = 0f
-        )
-
-        drawLine(
-            color = Blue100,
-            start = Offset(
-                0f,
-                size.height / 2
-            ),
-            end = Offset(
-                size.width,
-                size.height / 2
-            ),
-            strokeWidth = 1.dp.toPx(),
-            pathEffect = pathEffect,
-        )
     }
 }
 
