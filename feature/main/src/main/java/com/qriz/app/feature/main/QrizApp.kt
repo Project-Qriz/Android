@@ -35,6 +35,7 @@ import com.qriz.app.feature.main.navigation.MainNavigator
 import com.qriz.app.feature.main.navigation.rememberMainNavigator
 import com.qriz.app.feature.mock_test.navigation.mockTestNavGraph
 import com.qriz.app.feature.mock_test.navigation.navigateToMockTest
+import com.qriz.app.feature.mock_test.navigation.navigateToMockTestGuide
 import com.qriz.app.feature.mock_test.navigation.navigateToMockTestSessions
 import com.qriz.app.feature.mypage.navigation.myPageNavGraph
 import com.qriz.app.feature.onboard.navigation.navigateConceptCheckGuide
@@ -167,6 +168,7 @@ private fun QrizNavHost(
         mockTestNavGraph(
             onBack = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
+            moveToMockTestGuide = navController::navigateToMockTestGuide,
             moveToMockTest = navController::navigateToMockTest
         )
     }

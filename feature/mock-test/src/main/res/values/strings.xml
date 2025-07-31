@@ -8,4 +8,12 @@
     <string name="total_score">총점수: %1$d점</string>
     <string name="session_not_completed">학습 전</string>
     <string name="session_completed">학습 완료</string>
+    <string name="mock_test_guide_title">배운 내용을 기반으로\n실제같은 모의고사를 풀어봐요</string>
+    <string name="mock_test_limit_time_guide">모의고사는 전체 문제를 기준으로 제한시간이 측정됩니다.</string>
+    <string name="data_modeling_understanding">데이터 모델링의 이해</string>
+    <string name="sql_basic_and_application">SQL 기본 및 활용</string>
+    <string name="question_total">계</string>
+    <string name="subject_question_count">%1$d 문항</string>
+    <string name="total_question_count">총 %1$d 문항</string>
+    <string name="test_start">테스트 시작하기</string>
 </resources>
