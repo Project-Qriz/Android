@@ -1,5 +1,6 @@
 package com.qriz.app.core.network.mock_test.model.response
 
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -20,7 +21,7 @@ data class ProblemResultResponse(
 
 @Serializable
 data class HistoricalScoreResponse(
-    @SerialName("completionDateTime") val completionDateTime: String,
+    @SerialName("completionDateTime") val completionDateTime: LocalDateTime,
     @SerialName("itemScores") val itemScores: List<ItemScoreResponse>,
     @SerialName("attemptCount") val attemptCount: Int,
     @SerialName("displayDate") val displayDate: String
@@ -28,5 +29,6 @@ data class HistoricalScoreResponse(
 
 @Serializable
 data class ItemScoreResponse(
-    @SerialName("type") val type: String, @SerialName("score") val score: Double
+    @SerialName("type") val type: String,
+    @SerialName("score") val score: Int,
 )

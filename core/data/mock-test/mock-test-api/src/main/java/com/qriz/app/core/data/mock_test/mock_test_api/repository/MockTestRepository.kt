@@ -1,5 +1,6 @@
 package com.qriz.app.core.data.mock_test.mock_test_api.repository
 
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestResult
 import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSession
 import com.qriz.app.core.data.mock_test.mock_test_api.model.SessionFilter
 import com.qriz.app.core.data.test.test_api.model.Option
@@ -15,4 +16,6 @@ interface MockTestRepository {
     suspend fun getMockTest(id: Long): ApiResult<Test>
 
     suspend fun submitMockTest(id: Long, activities: Map<Long, Option>): ApiResult<Unit>
+
+    suspend fun getMockTestResult(id: Long): ApiResult<MockTestResult>
 }

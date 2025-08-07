@@ -10,7 +10,8 @@ android {
 }
 
 dependencies {
-    api(projects.core.model)
+    implementation(projects.core.model)
+    implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.retrofit)
 }
