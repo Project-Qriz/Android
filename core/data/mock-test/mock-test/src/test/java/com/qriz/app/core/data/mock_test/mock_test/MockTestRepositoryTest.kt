@@ -5,20 +5,34 @@ import com.qriz.app.core.data.mock_test.mock_test.mapper.toRequest
 import com.qriz.app.core.data.mock_test.mock_test.repository.MockTestRepositoryImpl
 import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSession
 import com.qriz.app.core.data.mock_test.mock_test_api.model.SessionFilter
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestResult
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestScoreHistory
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestScoreHistoryItem
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSubjectScore
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestCategoryScore
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSkillScore
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Question
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.network.mock_test.api.MockTestApi
 import com.qriz.app.core.network.mock_test.model.request.MockTestSubmitRequest
+import com.qriz.app.core.network.mock_test.model.response.HistoricalScoreResponse
+import com.qriz.app.core.network.mock_test.model.response.ItemScoreResponse
+import com.qriz.app.core.network.mock_test.model.response.MajorItemScore
 import com.qriz.app.core.network.mock_test.model.response.MockTestOptionResponse
 import com.qriz.app.core.network.mock_test.model.response.MockTestQuestionResponse
 import com.qriz.app.core.network.mock_test.model.response.MockTestQuestionsResponse
+import com.qriz.app.core.network.mock_test.model.response.MockTestResultResponse
+import com.qriz.app.core.network.mock_test.model.response.MockTestScoreResponse
 import com.qriz.app.core.network.mock_test.model.response.MockTestSessionResponse
+import com.qriz.app.core.network.mock_test.model.response.ProblemResultResponse
+import com.qriz.app.core.network.mock_test.model.response.SubItemScore
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.LocalDateTime
 import org.junit.Test
 import com.qriz.app.core.data.test.test_api.model.Test as TestModel
 
@@ -372,7 +386,12 @@ class MockTestRepositoryTest {
             )
         )
         val request = activities.toRequest()
-        coEvery { mockApi.submitMockTest(id = 1, request = activities.toRequest()) } returns ApiResult.Success(Unit)
+        coEvery {
+            mockApi.submitMockTest(
+                id = 1,
+                request = activities.toRequest()
+            )
+        } returns ApiResult.Success(Unit)
 
 
         // when
@@ -410,7 +429,12 @@ class MockTestRepositoryTest {
             -1,
             "제출 실패"
         )
-        coEvery { mockApi.submitMockTest(id = 1, request = activities.toRequest()) } returns errorResult
+        coEvery {
+            mockApi.submitMockTest(
+                id = 1,
+                request = activities.toRequest()
+            )
+        } returns errorResult
 
 
         // when
@@ -460,5 +484,237 @@ class MockTestRepositoryTest {
             )
         }
         result shouldBe ApiResult.Success(Unit)
+    }
+
+    @Test
+    fun `getMockTestResult - 전체 결과, 점수 상세 결과 값을 불러와 합친다`() = runTest {
+        //given
+        val mockTestId = 1L
+        coEvery { mockApi.getMockTestResult(mockTestId) } returns ApiResult.Success(mockTestResultResponse)
+        coEvery { mockApi.getMockTestSubjectDetails(mockTestId) } returns ApiResult.Success(mockTestSubjectDetailsResponse)
+
+        //when
+        val result = repository.getMockTestResult(mockTestId)
+
+        //then
+        coVerify {
+            mockApi.getMockTestResult(mockTestId)
+            mockApi.getMockTestSubjectDetails(mockTestId)
+        }
+        result shouldBe ApiResult.Success(expectedMockTestResult)
+    }
+
+    companion object {
+        private val mockTestResultResponse = MockTestResultResponse(
+            problemResults = listOf(
+                ProblemResultResponse(
+                    questionId = 1L,
+                    questionNum = 1,
+                    skillName = "SQL 기본 문법",
+                    question = "SQL의 기본 문법에 대한 설명으로 옳은 것은?",
+                    correction = true
+                ),
+                ProblemResultResponse(
+                    questionId = 2L,
+                    questionNum = 2,
+                    skillName = "JOIN",
+                    question = "다음 중 올바른 JOIN 문법은?",
+                    correction = false
+                )
+            ),
+            historicalScores = listOf(
+                HistoricalScoreResponse(
+                    completionDateTime = LocalDateTime(
+                        year = 2024,
+                        monthNumber = 12,
+                        dayOfMonth = 11,
+                        hour = 20,
+                        minute = 12,
+                        second = 25,
+                        nanosecond = 112364000,
+                    ),
+                    itemScores = listOf(
+                        ItemScoreResponse(
+                            type = "SQL 기본",
+                            score = 85
+                        ),
+                        ItemScoreResponse(
+                            type = "데이터 모델링",
+                            score = 90
+                        )
+                    ),
+                    attemptCount = 3,
+                    displayDate = "2024-01-15"
+                ),
+                HistoricalScoreResponse(
+                    completionDateTime = LocalDateTime(
+                        year = 2024,
+                        monthNumber = 12,
+                        dayOfMonth = 10,
+                        hour = 20,
+                        minute = 12,
+                        second = 25,
+                        nanosecond = 112364000,
+                    ),
+                    itemScores = listOf(
+                        ItemScoreResponse(
+                            type = "SQL 기본",
+                            score = 92
+                        ),
+                        ItemScoreResponse(
+                            type = "데이터 모델링",
+                            score = 88
+                        )
+                    ),
+                    attemptCount = 2,
+                    displayDate = "2024-01-20"
+                )
+            )
+        )
+
+        private val mockTestSubjectDetailsResponse = listOf(
+            MockTestScoreResponse(
+                title = "SQLD 모의고사 1회",
+                totalScore = 85,
+                majorItems = listOf(
+                    MajorItemScore(
+                        majorItem = "데이터 모델링의 이해",
+                        score = 88,
+                        subItemScores = listOf(
+                            SubItemScore(
+                                subItem = "데이터 모델링의 개념",
+                                score = 90
+                            ),
+                            SubItemScore(
+                                subItem = "엔터티",
+                                score = 85
+                            ),
+                            SubItemScore(
+                                subItem = "속성",
+                                score = 88
+                            )
+                        )
+                    ),
+                    MajorItemScore(
+                        majorItem = "SQL 기본 및 활용",
+                        score = 82,
+                        subItemScores = listOf(
+                            SubItemScore(
+                                subItem = "SQL 기본",
+                                score = 85
+                            ),
+                            SubItemScore(
+                                subItem = "SQL 활용",
+                                score = 80
+                            ),
+                            SubItemScore(
+                                subItem = "관리 구문",
+                                score = 78
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        private val expectedMockTestResult = MockTestResult(
+            totalScore = 85,
+            historicalScores = listOf(
+                MockTestScoreHistory(
+//                    completionDateTime = LocalDateTime.parse("2024-12-11T20:12:25.112364"),
+                    completionDateTime = LocalDateTime(
+                        year = 2024,
+                        monthNumber = 12,
+                        dayOfMonth = 11,
+                        hour = 20,
+                        minute = 12,
+                        second = 25,
+                        nanosecond = 112364000,
+                    ),
+                    itemScores = listOf(
+                        MockTestScoreHistoryItem(
+                            type = "SQL 기본",
+                            score = 85
+                        ),
+                        MockTestScoreHistoryItem(
+                            type = "데이터 모델링",
+                            score = 90
+                        )
+                    ),
+                    attemptCount = 3,
+                    displayDate = "2024-01-15",
+                    totalScore = 175
+                ),
+                MockTestScoreHistory(
+//                    completionDateTime = LocalDateTime.parse("2024-12-10T20:12:25.112364"),
+                    completionDateTime = LocalDateTime(
+                        year = 2024,
+                        monthNumber = 12,
+                        dayOfMonth = 10,
+                        hour = 20,
+                        minute = 12,
+                        second = 25,
+                        nanosecond = 112364000,
+                    ),
+                    itemScores = listOf(
+                        MockTestScoreHistoryItem(
+                            type = "SQL 기본",
+                            score = 92
+                        ),
+                        MockTestScoreHistoryItem(
+                            type = "데이터 모델링",
+                            score = 88
+                        )
+                    ),
+                    attemptCount = 2,
+                    displayDate = "2024-01-20",
+                    totalScore = 180
+                )
+            ),
+            subjectScores = listOf(
+                MockTestSubjectScore(
+                    title = "SQLD 모의고사 1회",
+                    score = 85,
+                    categoryScores = listOf(
+                        MockTestCategoryScore(
+                            title = "데이터 모델링의 이해",
+                            score = 88,
+                            skillScores = listOf(
+                                MockTestSkillScore(
+                                    title = "데이터 모델링의 개념",
+                                    score = 90
+                                ),
+                                MockTestSkillScore(
+                                    title = "엔터티",
+                                    score = 85
+                                ),
+                                MockTestSkillScore(
+                                    title = "속성",
+                                    score = 88
+                                )
+                            )
+                        ),
+                        MockTestCategoryScore(
+                            title = "SQL 기본 및 활용",
+                            score = 82,
+                            skillScores = listOf(
+                                MockTestSkillScore(
+                                    title = "SQL 기본",
+                                    score = 85
+                                ),
+                                MockTestSkillScore(
+                                    title = "SQL 활용",
+                                    score = 80
+                                ),
+                                MockTestSkillScore(
+                                    title = "관리 구문",
+                                    score = 78
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
     }
 }
