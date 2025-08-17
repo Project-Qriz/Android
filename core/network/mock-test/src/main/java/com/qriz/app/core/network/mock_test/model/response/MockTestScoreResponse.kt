@@ -7,26 +7,26 @@ import kotlinx.serialization.SerialName
 data class MockTestScoreResponse(
     @SerialName("title")
     val title: String,
-    @SerialName("total_score")
-    val totalScore: Int,
-    @SerialName("major_items")
+    @SerialName("totalScore")
+    val totalScore: Double,
+    @SerialName("majorItems")
     val majorItems: List<MajorItemScore>,
 )
 
 @Serializable
 data class MajorItemScore(
-    @SerialName("major_item")
+    @SerialName("majorItem")
     val majorItem: String,
     @SerialName("score")
-    val score: Int,
-    @SerialName("sub_item_scores")
+    val score: Double,
+    @SerialName("subItemScores")
     val subItemScores: List<SubItemScore>,
 )
 
 @Serializable
 data class SubItemScore(
-    @SerialName("sub_item")
+    @SerialName("subItem")
     val subItem: String,
     @SerialName("score")
-    val score: Int,
+    val score: Double,
 )

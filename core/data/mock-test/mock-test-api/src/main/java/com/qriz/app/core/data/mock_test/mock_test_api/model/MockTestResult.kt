@@ -4,14 +4,16 @@ import kotlinx.datetime.LocalDateTime
 
 data class MockTestResult(
     val totalScore: Int,
+    val questionResults: List<MockTestQuestionResult>,
     val historicalScores: List<MockTestScoreHistory>,
     val subjectScores: List<MockTestSubjectScore>,
 )
 
 data class MockTestQuestionResult(
     val id: Long,
+    val correct: Boolean,
     val question: String,
-    val tags: List<String>
+    val tag: String
 )
 
 data class MockTestScoreHistory(

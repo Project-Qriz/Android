@@ -23,12 +23,12 @@ data class ProblemResultResponse(
 data class HistoricalScoreResponse(
     @SerialName("completionDateTime") val completionDateTime: LocalDateTime,
     @SerialName("itemScores") val itemScores: List<ItemScoreResponse>,
-    @SerialName("attemptCount") val attemptCount: Int,
+    @SerialName("attemptCount") val attemptCount: Double,
     @SerialName("displayDate") val displayDate: String
 )
 
 @Serializable
 data class ItemScoreResponse(
     @SerialName("type") val type: String,
-    @SerialName("score") val score: Int,
+    @SerialName("score") val score: Double,
 )

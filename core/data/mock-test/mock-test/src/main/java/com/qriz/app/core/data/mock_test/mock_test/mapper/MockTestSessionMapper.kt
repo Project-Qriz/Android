@@ -8,7 +8,7 @@ fun List<MockTestSessionResponse>.toMockTestSession(): List<MockTestSession> {
         MockTestSession(
             completed = it.completed,
             session = it.session,
-            totalScore = if (it.totalScore != null) it.totalScore!! else 0,
+            totalScore = if (it.totalScore != null) it.totalScore!!.toInt() else 0,
             id = it.id
         )
     }
