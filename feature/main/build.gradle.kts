@@ -17,4 +17,5 @@ dependencies {
     implementation(projects.feature.incorrectAnswersNote)
     implementation(projects.feature.mypage)
     implementation(projects.feature.dailyStudy)
+    implementation(projects.feature.mockTest)
 }

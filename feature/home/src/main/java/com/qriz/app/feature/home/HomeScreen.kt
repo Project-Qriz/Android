@@ -54,6 +54,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     moveToPreviewTest: () -> Unit,
     moveToDailyStudy: (Int, Boolean, Boolean) -> Unit,
+    moveToMockTestSessions: () -> Unit,
     onShowSnackBar: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -70,6 +71,8 @@ fun HomeScreen(
             is HomeUiEffect.ShowSnackBar -> onShowSnackBar(
                 it.message ?: context.getString(it.defaultResId)
             )
+
+            is HomeUiEffect.MoveToMockTestSessions -> moveToMockTestSessions()
         }
     }
 
@@ -154,7 +157,7 @@ fun HomeScreen(
         weeklyRecommendation = uiState.weeklyRecommendation,
         onInit = { viewModel.process(HomeUiAction.ObserveClient) },
         onClickExamApply = { viewModel.process(HomeUiAction.ClickApply) },
-        onClickMockTest = {},
+        onClickMockTest = { viewModel.process(HomeUiAction.ClickMockTestCard) },
         onClickPreviewTest = { viewModel.process(HomeUiAction.MoveToPreviewTest) },
         onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeStudyPlanDate(it)) },
         onClickWeeklyCustomConcept = {},

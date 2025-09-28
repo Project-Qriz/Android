@@ -10,4 +10,5 @@ android {
 
 dependencies {
     implementation(libs.bundles.unit.test)
+    implementation(libs.androidx.compose.navigation)
 }

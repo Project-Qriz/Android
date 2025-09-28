@@ -166,6 +166,7 @@ fabric.properties
 
 ### Firebender ###
 firebender.json
+/docs/*
 
 ### MAC ###
 *.DS_Store

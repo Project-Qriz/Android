@@ -1,0 +1,720 @@
+package com.qriz.app.core.data.mock_test.mock_test
+
+import app.cash.turbine.test
+import com.qriz.app.core.data.mock_test.mock_test.mapper.toRequest
+import com.qriz.app.core.data.mock_test.mock_test.repository.MockTestRepositoryImpl
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSession
+import com.qriz.app.core.data.mock_test.mock_test_api.model.SessionFilter
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestResult
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestScoreHistory
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestScoreHistoryItem
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSubjectScore
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestCategoryScore
+import com.qriz.app.core.data.mock_test.mock_test_api.model.MockTestSkillScore
+import com.qriz.app.core.data.test.test_api.model.Option
+import com.qriz.app.core.data.test.test_api.model.Question
+import com.qriz.app.core.model.ApiResult
+import com.qriz.app.core.network.mock_test.api.MockTestApi
+import com.qriz.app.core.network.mock_test.model.request.MockTestSubmitRequest
+import com.qriz.app.core.network.mock_test.model.response.HistoricalScoreResponse
+import com.qriz.app.core.network.mock_test.model.response.ItemScoreResponse
+import com.qriz.app.core.network.mock_test.model.response.MajorItemScore
+import com.qriz.app.core.network.mock_test.model.response.MockTestOptionResponse
+import com.qriz.app.core.network.mock_test.model.response.MockTestQuestionResponse
+import com.qriz.app.core.network.mock_test.model.response.MockTestQuestionsResponse
+import com.qriz.app.core.network.mock_test.model.response.MockTestResultResponse
+import com.qriz.app.core.network.mock_test.model.response.MockTestScoreResponse
+import com.qriz.app.core.network.mock_test.model.response.MockTestSessionResponse
+import com.qriz.app.core.network.mock_test.model.response.ProblemResultResponse
+import com.qriz.app.core.network.mock_test.model.response.SubItemScore
+import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.LocalDateTime
+import org.junit.Test
+import com.qriz.app.core.data.test.test_api.model.Test as TestModel
+
+class MockTestRepositoryTest {
+    private val mockApi = mockk<MockTestApi>()
+    private val repository = MockTestRepositoryImpl(mockApi)
+
+    private val mockSessionResponses = listOf(
+        MockTestSessionResponse(
+            completed = true,
+            session = "1회차",
+            totalScore = 85,
+            id = 1,
+        ),
+        MockTestSessionResponse(
+            completed = false,
+            session = "2회차",
+            totalScore = null,
+            id = 2
+        ),
+        MockTestSessionResponse(
+            completed = true,
+            session = "3회차",
+            totalScore = 92,
+            id = 3,
+        )
+    )
+
+    private val mockSessions = listOf(
+        MockTestSession(
+            completed = true,
+            session = "3회차",
+            totalScore = 92,
+            id = 3
+        ),
+        MockTestSession(
+            completed = false,
+            session = "2회차",
+            totalScore = 0,
+            id = 2
+        ),
+        MockTestSession(
+            completed = true,
+            session = "1회차",
+            totalScore = 85,
+            id = 1,
+        )
+    )
+
+    @Test
+    fun `mockTestSessions flow - 초기 데이터 로딩 및 ALL 필터 적용`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
+
+        // when & then
+        repository.mockTestSessions.test {
+            val result = awaitItem()
+            result shouldBe ApiResult.Success(mockSessions)
+            coVerify { mockApi.getMockTestSessions(null) }
+        }
+    }
+
+    @Test
+    fun `mockTestSessions flow - API 실패 시 실패 결과 반환`() = runTest {
+        // given
+        val errorResult = ApiResult.Failure(
+            -1,
+            "API 오류"
+        )
+        coEvery { mockApi.getMockTestSessions(null) } returns errorResult
+
+        // when & then
+        repository.mockTestSessions.test {
+            val result = awaitItem()
+            result shouldBe errorResult
+            coVerify { mockApi.getMockTestSessions(null) }
+        }
+    }
+
+    @Test
+    fun `setSessionFilter - COMPLETED 필터 적용`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
+
+        // when & then
+        repository.mockTestSessions.test {
+            // 초기 데이터 (ALL 필터)
+            val initialResult = awaitItem()
+            initialResult shouldBe ApiResult.Success(mockSessions)
+
+            // COMPLETED 필터 적용
+            repository.setSessionFilter(SessionFilter.COMPLETED)
+            val filteredResult = awaitItem()
+
+            val expectedCompleted = mockSessions.filter { it.completed }
+            filteredResult shouldBe ApiResult.Success(expectedCompleted)
+        }
+    }
+
+    @Test
+    fun `setSessionFilter - NOT_COMPLETED 필터 적용`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
+
+        // when & then
+        repository.mockTestSessions.test {
+            // 초기 데이터 (ALL 필터)
+            awaitItem()
+
+            // NOT_COMPLETED 필터 적용
+            repository.setSessionFilter(SessionFilter.NOT_COMPLETED)
+            val filteredResult = awaitItem()
+
+            val expectedNotCompleted = mockSessions.filter { !it.completed }
+            filteredResult shouldBe ApiResult.Success(expectedNotCompleted)
+        }
+    }
+
+    @Test
+    fun `setSessionFilter - OLDEST_FIRST 필터 적용`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
+
+        // when & then
+        repository.mockTestSessions.test {
+            // 초기 데이터 (ALL 필터)
+            awaitItem()
+
+            // OLDEST_FIRST 필터 적용
+            repository.setSessionFilter(SessionFilter.OLDEST_FIRST)
+            val filteredResult = awaitItem()
+
+            val expectedSorted = mockSessions.sortedBy {
+                it.session.replace(
+                    "회차",
+                    ""
+                ).toInt()
+            }
+            filteredResult shouldBe ApiResult.Success(expectedSorted)
+        }
+    }
+
+    @Test
+    fun `setSessionFilter - 여러 필터 순차 적용`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
+
+        // when & then
+        repository.mockTestSessions.test {
+            // 초기 데이터 (ALL 필터)
+            val allResult = awaitItem()
+            allResult shouldBe ApiResult.Success(mockSessions)
+
+            // COMPLETED 필터 적용
+            repository.setSessionFilter(SessionFilter.COMPLETED)
+            val completedResult = awaitItem()
+            val expectedCompleted = mockSessions.filter { it.completed }
+            completedResult shouldBe ApiResult.Success(expectedCompleted)
+
+            // 다시 ALL 필터로 변경
+            repository.setSessionFilter(SessionFilter.ALL)
+            val backToAllResult = awaitItem()
+            backToAllResult shouldBe ApiResult.Success(mockSessions)
+        }
+    }
+
+    @Test
+    fun `mockTestSessions flow - 이미 데이터가 있으면 API 재호출 안함`() = runTest {
+        // given
+        coEvery { mockApi.getMockTestSessions(null) } returns ApiResult.Success(mockSessionResponses)
+
+        // when - 첫 번째 구독
+        repository.mockTestSessions.test {
+            awaitItem()
+        }
+
+        // when - 두 번째 구독 (데이터가 이미 있음)
+        repository.mockTestSessions.test {
+            val result = awaitItem()
+            result shouldBe ApiResult.Success(mockSessions)
+        }
+
+        // then - API는 한 번만 호출되어야 함
+        coVerify(exactly = 1) { mockApi.getMockTestSessions(null) }
+    }
+
+    @Test
+    fun `getMockTest - 모의고사 문제를 성공적으로 불러와서 Test로 변환한다`() = runTest {
+        // given
+        val mockTestId = 1L
+        val mockResponse = MockTestQuestionsResponse(
+            questions = listOf(
+                MockTestQuestionResponse(
+                    questionId = 1L,
+                    skillId = 1L,
+                    category = 1,
+                    question = "SQL의 기본 문법에 대한 설명으로 옳은 것은?",
+                    description = "SQL 기본 문법을 묻는 문제입니다.",
+                    options = listOf(
+                        MockTestOptionResponse(
+                            id = 1L,
+                            content = "SELECT는 데이터를 조회한다"
+                        ),
+                        MockTestOptionResponse(
+                            id = 2L,
+                            content = "INSERT는 데이터를 삽입한다"
+                        ),
+                        MockTestOptionResponse(
+                            id = 3L,
+                            content = "UPDATE는 데이터를 수정한다"
+                        ),
+                        MockTestOptionResponse(
+                            id = 4L,
+                            content = "모든 답이 맞다"
+                        )
+                    ),
+                    timeLimit = 120,
+                    difficulty = 2
+                ),
+                MockTestQuestionResponse(
+                    questionId = 2L,
+                    skillId = 2L,
+                    category = 2,
+                    question = "다음 중 올바른 JOIN 문법은?",
+                    description = "JOIN 문법을 묻는 문제입니다.",
+                    options = listOf(
+                        MockTestOptionResponse(
+                            id = 5L,
+                            content = "INNER JOIN"
+                        ),
+                        MockTestOptionResponse(
+                            id = 6L,
+                            content = "LEFT JOIN"
+                        ),
+                        MockTestOptionResponse(
+                            id = 7L,
+                            content = "RIGHT JOIN"
+                        ),
+                        MockTestOptionResponse(
+                            id = 8L,
+                            content = "모든 답이 맞다"
+                        )
+                    ),
+                    timeLimit = 90,
+                    difficulty = 1
+                )
+            ),
+            totalTimeLimit = 210
+        )
+
+        coEvery { mockApi.getMockTestQuestions(mockTestId) } returns ApiResult.Success(mockResponse)
+
+        val expected = TestModel(
+            questions = listOf(
+                Question(
+                    id = 1L,
+                    question = "SQL의 기본 문법에 대한 설명으로 옳은 것은?",
+                    options = listOf(
+                        Option(
+                            id = 1L,
+                            content = "SELECT는 데이터를 조회한다"
+                        ),
+                        Option(
+                            id = 2L,
+                            content = "INSERT는 데이터를 삽입한다"
+                        ),
+                        Option(
+                            id = 3L,
+                            content = "UPDATE는 데이터를 수정한다"
+                        ),
+                        Option(
+                            id = 4L,
+                            content = "모든 답이 맞다"
+                        )
+                    ),
+                    timeLimit = 120,
+                    description = "SQL 기본 문법을 묻는 문제입니다.",
+                    skillId = 1,
+                    category = 1,
+                    difficulty = 2
+                ),
+                Question(
+                    id = 2L,
+                    question = "다음 중 올바른 JOIN 문법은?",
+                    options = listOf(
+                        Option(
+                            id = 5L,
+                            content = "INNER JOIN"
+                        ),
+                        Option(
+                            id = 6L,
+                            content = "LEFT JOIN"
+                        ),
+                        Option(
+                            id = 7L,
+                            content = "RIGHT JOIN"
+                        ),
+                        Option(
+                            id = 8L,
+                            content = "모든 답이 맞다"
+                        )
+                    ),
+                    timeLimit = 90,
+                    description = "JOIN 문법을 묻는 문제입니다.",
+                    skillId = 2,
+                    category = 2,
+                    difficulty = 1
+                )
+            ),
+            totalTimeLimit = 210
+        )
+
+        // when
+        val result = repository.getMockTest(mockTestId)
+
+        // then
+        coVerify { mockApi.getMockTestQuestions(mockTestId) }
+        result shouldBe ApiResult.Success(expected)
+    }
+
+    @Test
+    fun `getMockTest - API 실패 시 실패 결과 반환`() = runTest {
+        // given
+        val mockTestId = 1L
+        val errorResult = ApiResult.Failure(
+            -1,
+            "문제 조회 실패"
+        )
+        coEvery { mockApi.getMockTestQuestions(mockTestId) } returns errorResult
+
+        // when
+        val result = repository.getMockTest(mockTestId)
+
+        // then
+        coVerify { mockApi.getMockTestQuestions(mockTestId) }
+        result shouldBe errorResult
+    }
+
+    @Test
+    fun `submitMockTest - 모의고사 제출을 성공적으로 처리한다`() = runTest {
+        // given
+        val mockTestId = 1L
+        val activities = mapOf(
+            1L to Option(
+                id = 1L,
+                content = "SELECT는 데이터를 조회한다"
+            ),
+            2L to Option(
+                id = 5L,
+                content = "INNER JOIN"
+            )
+        )
+        val request = activities.toRequest()
+        coEvery {
+            mockApi.submitMockTest(
+                id = 1,
+                request = activities.toRequest()
+            )
+        } returns ApiResult.Success(Unit)
+
+
+        // when
+        val result = repository.submitMockTest(
+            mockTestId,
+            activities
+        )
+
+        // then
+        coVerify {
+            mockApi.submitMockTest(
+                mockTestId,
+                request
+            )
+        }
+        result shouldBe ApiResult.Success(Unit)
+    }
+
+    @Test
+    fun `submitMockTest - API 실패 시 실패 결과 반환`() = runTest {
+        // given
+        val mockTestId = 1L
+        val activities = mapOf(
+            1L to Option(
+                id = 1L,
+                content = "SELECT는 데이터를 조회한다"
+            ),
+            2L to Option(
+                id = 5L,
+                content = "INNER JOIN"
+            )
+        )
+        val request = activities.toRequest()
+        val errorResult = ApiResult.Failure(
+            -1,
+            "제출 실패"
+        )
+        coEvery {
+            mockApi.submitMockTest(
+                id = 1,
+                request = activities.toRequest()
+            )
+        } returns errorResult
+
+
+        // when
+        val result = repository.submitMockTest(
+            mockTestId,
+            activities
+        )
+
+        // then
+        coVerify {
+            mockApi.submitMockTest(
+                mockTestId,
+                request,
+            )
+        }
+        result shouldBe errorResult
+    }
+
+    @Test
+    fun `submitMockTest - 빈 답안으로 제출 시 빈 activities 리스트로 요청`() = runTest {
+        // given
+        val mockTestId = 1L
+        val activities = emptyMap<Long, Option>()
+
+        val expectedRequest = MockTestSubmitRequest(
+            activities = emptyList()
+        )
+
+        coEvery {
+            mockApi.submitMockTest(
+                mockTestId,
+                expectedRequest
+            )
+        } returns ApiResult.Success(Unit)
+
+        // when
+        val result = repository.submitMockTest(
+            mockTestId,
+            activities
+        )
+
+        // then
+        coVerify {
+            mockApi.submitMockTest(
+                mockTestId,
+                expectedRequest
+            )
+        }
+        result shouldBe ApiResult.Success(Unit)
+    }
+
+    @Test
+    fun `getMockTestResult - 전체 결과, 점수 상세 결과 값을 불러와 합친다`() = runTest {
+        //given
+        val mockTestId = 1L
+        coEvery { mockApi.getMockTestResult(mockTestId) } returns ApiResult.Success(mockTestResultResponse)
+        coEvery { mockApi.getMockTestSubjectDetails(mockTestId) } returns ApiResult.Success(mockTestSubjectDetailsResponse)
+
+        //when
+        val result = repository.getMockTestResult(mockTestId)
+
+        //then
+        coVerify {
+            mockApi.getMockTestResult(mockTestId)
+            mockApi.getMockTestSubjectDetails(mockTestId)
+        }
+        result shouldBe ApiResult.Success(expectedMockTestResult)
+    }
+
+    companion object {
+        private val mockTestResultResponse = MockTestResultResponse(
+            problemResults = listOf(
+                ProblemResultResponse(
+                    questionId = 1L,
+                    questionNum = 1,
+                    skillName = "SQL 기본 문법",
+                    question = "SQL의 기본 문법에 대한 설명으로 옳은 것은?",
+                    correction = true
+                ),
+                ProblemResultResponse(
+                    questionId = 2L,
+                    questionNum = 2,
+                    skillName = "JOIN",
+                    question = "다음 중 올바른 JOIN 문법은?",
+                    correction = false
+                )
+            ),
+            historicalScores = listOf(
+                HistoricalScoreResponse(
+                    completionDateTime = LocalDateTime(
+                        year = 2024,
+                        monthNumber = 12,
+                        dayOfMonth = 11,
+                        hour = 20,
+                        minute = 12,
+                        second = 25,
+                        nanosecond = 112364000,
+                    ),
+                    itemScores = listOf(
+                        ItemScoreResponse(
+                            type = "SQL 기본",
+                            score = 85
+                        ),
+                        ItemScoreResponse(
+                            type = "데이터 모델링",
+                            score = 90
+                        )
+                    ),
+                    attemptCount = 3,
+                    displayDate = "2024-01-15"
+                ),
+                HistoricalScoreResponse(
+                    completionDateTime = LocalDateTime(
+                        year = 2024,
+                        monthNumber = 12,
+                        dayOfMonth = 10,
+                        hour = 20,
+                        minute = 12,
+                        second = 25,
+                        nanosecond = 112364000,
+                    ),
+                    itemScores = listOf(
+                        ItemScoreResponse(
+                            type = "SQL 기본",
+                            score = 92
+                        ),
+                        ItemScoreResponse(
+                            type = "데이터 모델링",
+                            score = 88
+                        )
+                    ),
+                    attemptCount = 2,
+                    displayDate = "2024-01-20"
+                )
+            )
+        )
+
+        private val mockTestSubjectDetailsResponse = listOf(
+            MockTestScoreResponse(
+                title = "SQLD 모의고사 1회",
+                totalScore = 85,
+                majorItems = listOf(
+                    MajorItemScore(
+                        majorItem = "데이터 모델링의 이해",
+                        score = 88,
+                        subItemScores = listOf(
+                            SubItemScore(
+                                subItem = "데이터 모델링의 개념",
+                                score = 90
+                            ),
+                            SubItemScore(
+                                subItem = "엔터티",
+                                score = 85
+                            ),
+                            SubItemScore(
+                                subItem = "속성",
+                                score = 88
+                            )
+                        )
+                    ),
+                    MajorItemScore(
+                        majorItem = "SQL 기본 및 활용",
+                        score = 82,
+                        subItemScores = listOf(
+                            SubItemScore(
+                                subItem = "SQL 기본",
+                                score = 85
+                            ),
+                            SubItemScore(
+                                subItem = "SQL 활용",
+                                score = 80
+                            ),
+                            SubItemScore(
+                                subItem = "관리 구문",
+                                score = 78
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        private val expectedMockTestResult = MockTestResult(
+            totalScore = 85,
+            historicalScores = listOf(
+                MockTestScoreHistory(
+//                    completionDateTime = LocalDateTime.parse("2024-12-11T20:12:25.112364"),
+                    completionDateTime = LocalDateTime(
+                        year = 2024,
+                        monthNumber = 12,
+                        dayOfMonth = 11,
+                        hour = 20,
+                        minute = 12,
+                        second = 25,
+                        nanosecond = 112364000,
+                    ),
+                    itemScores = listOf(
+                        MockTestScoreHistoryItem(
+                            type = "SQL 기본",
+                            score = 85
+                        ),
+                        MockTestScoreHistoryItem(
+                            type = "데이터 모델링",
+                            score = 90
+                        )
+                    ),
+                    attemptCount = 3,
+                    displayDate = "2024-01-15",
+                    totalScore = 175
+                ),
+                MockTestScoreHistory(
+//                    completionDateTime = LocalDateTime.parse("2024-12-10T20:12:25.112364"),
+                    completionDateTime = LocalDateTime(
+                        year = 2024,
+                        monthNumber = 12,
+                        dayOfMonth = 10,
+                        hour = 20,
+                        minute = 12,
+                        second = 25,
+                        nanosecond = 112364000,
+                    ),
+                    itemScores = listOf(
+                        MockTestScoreHistoryItem(
+                            type = "SQL 기본",
+                            score = 92
+                        ),
+                        MockTestScoreHistoryItem(
+                            type = "데이터 모델링",
+                            score = 88
+                        )
+                    ),
+                    attemptCount = 2,
+                    displayDate = "2024-01-20",
+                    totalScore = 180
+                )
+            ),
+            subjectScores = listOf(
+                MockTestSubjectScore(
+                    title = "SQLD 모의고사 1회",
+                    score = 85,
+                    categoryScores = listOf(
+                        MockTestCategoryScore(
+                            title = "데이터 모델링의 이해",
+                            score = 88,
+                            skillScores = listOf(
+                                MockTestSkillScore(
+                                    title = "데이터 모델링의 개념",
+                                    score = 90
+                                ),
+                                MockTestSkillScore(
+                                    title = "엔터티",
+                                    score = 85
+                                ),
+                                MockTestSkillScore(
+                                    title = "속성",
+                                    score = 88
+                                )
+                            )
+                        ),
+                        MockTestCategoryScore(
+                            title = "SQL 기본 및 활용",
+                            score = 82,
+                            skillScores = listOf(
+                                MockTestSkillScore(
+                                    title = "SQL 기본",
+                                    score = 85
+                                ),
+                                MockTestSkillScore(
+                                    title = "SQL 활용",
+                                    score = 80
+                                ),
+                                MockTestSkillScore(
+                                    title = "관리 구문",
+                                    score = 78
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    }
+}

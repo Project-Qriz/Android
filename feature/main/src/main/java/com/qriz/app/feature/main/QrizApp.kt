@@ -27,11 +27,17 @@ import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookList
 import com.qriz.app.feature.daily_study.navigation.dailyStudyNavGraph
 import com.qriz.app.feature.daily_study.navigation.navigateToDailyStudyPlanStatus
 import com.qriz.app.feature.daily_study.navigation.navigateToDailyTest
+import com.qriz.app.feature.daily_study.navigation.navigateToDailyTestResult
 import com.qriz.app.feature.home.navigation.homeNavGraph
 import com.qriz.app.feature.incorrect_answers_note.navigation.incorrectAnswersNoteNavGraph
 import com.qriz.app.feature.main.component.MainBottomBar
 import com.qriz.app.feature.main.navigation.MainNavigator
 import com.qriz.app.feature.main.navigation.rememberMainNavigator
+import com.qriz.app.feature.mock_test.navigation.mockTestNavGraph
+import com.qriz.app.feature.mock_test.navigation.navigateToMockTest
+import com.qriz.app.feature.mock_test.navigation.navigateToMockTestGuide
+import com.qriz.app.feature.mock_test.navigation.navigateToMockTestResult
+import com.qriz.app.feature.mock_test.navigation.navigateToMockTestSessions
 import com.qriz.app.feature.mypage.navigation.myPageNavGraph
 import com.qriz.app.feature.onboard.navigation.navigateConceptCheckGuide
 import com.qriz.app.feature.onboard.navigation.navigatePreviewGuide
@@ -134,6 +140,7 @@ private fun QrizNavHost(
         homeNavGraph(
             moveToPreviewTest = navController::navigatePreviewGuide,
             moveToDailyStudy = navController::navigateToDailyStudyPlanStatus,
+            moveToMockTestSessions = navController::navigateToMockTestSessions,
             onShowSnackbar = onShowSnackbar,
         )
 
@@ -154,9 +161,17 @@ private fun QrizNavHost(
 
         dailyStudyNavGraph(
             onBack = navController::popBackStack,
-            moveToTest = navController::navigateToDailyTest,
+            moveToTest = { navController.navigateToDailyTestResult(dayNumber = 1) },
             moveToDailyStudyResult = {},
             onShowSnackbar = onShowSnackbar,
+        )
+
+        mockTestNavGraph(
+            onBack = navController::popBackStack,
+            onShowSnackbar = onShowSnackbar,
+            moveToMockTestGuide = navController::navigateToMockTestGuide,
+            moveToMockTest = navController::navigateToMockTest,
+            moveToMockTestResult = navController::navigateToMockTestResult
         )
     }
 }

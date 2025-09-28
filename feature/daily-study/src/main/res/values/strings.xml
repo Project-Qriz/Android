@@ -24,4 +24,10 @@
     <string name="cancel">취소하기</string>
     <string name="confirm_submit">제출하시겠습니까?</string>
     <string name="submit_warning">확인 버튼을 누르면 다시 돌아올 수 없어요.</string>
+    <string name="test_result">시험 결과</string>
+    <string name="daily_test_result">데일리 테스트 결과</string>
+    <string name="daily_test_result_title_user_name">%1$s님의\n</string>
+    <string name="daily_test_result_title_tail">예요!</string>
+    <string name="day_number">Day%1$d</string>
+    <string name="question_results">문제 풀이 결과</string>
 </resources>
