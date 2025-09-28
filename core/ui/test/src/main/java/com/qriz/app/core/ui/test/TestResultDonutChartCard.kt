@@ -201,7 +201,7 @@ fun AnimatedDonutChart(
     var animation by rememberSaveable { mutableStateOf(true) }
 
     val totalAnimationAngle = (totalScore / 100F) * 360
-    val total = totalScore.div(totalAnimationAngle)
+    val total = if (totalAnimationAngle <= 0) 0f else totalScore.div(totalAnimationAngle)
 
     var currentSum = 0
     val arcs = remember(testResultItems) {
@@ -221,6 +221,8 @@ fun AnimatedDonutChart(
     }
 
     LaunchedEffect(key1 = arcs) {
+        if (total == 0f) return@LaunchedEffect
+
         val animationJobs = mutableListOf<Deferred<*>>()
         if (animation) {
             arcs.map {
