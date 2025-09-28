@@ -78,7 +78,7 @@ sealed interface MockTestUiAction : UiAction {
 }
 
 sealed interface MockTestUiEffect : UiEffect {
-    data object MoveToResult : MockTestUiEffect
+    data class MoveToResult(val id: Long) : MockTestUiEffect
     data class ShowSnackBar(
         @StringRes val defaultResId: Int, val message: String? = null
     ) : MockTestUiEffect

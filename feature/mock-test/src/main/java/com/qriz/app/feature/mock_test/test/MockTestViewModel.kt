@@ -95,7 +95,7 @@ open class MockTestViewModel @Inject constructor(
 
         when(val result = mockTestRepository.submitMockTest(id = mockTestId, activities = selectedOptions)) {
             is ApiResult.Success<Unit> -> {
-                sendEffect(MockTestUiEffect.MoveToResult)
+                sendEffect(MockTestUiEffect.MoveToResult(id = mockTestId))
             }
 
             is ApiResult.Failure -> {

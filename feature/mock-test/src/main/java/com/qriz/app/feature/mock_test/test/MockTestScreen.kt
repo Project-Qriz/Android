@@ -19,7 +19,7 @@ import com.qriz.app.core.ui.common.R as UCR
 @Composable
 fun MockTestScreen(
     viewModel: MockTestViewModel = hiltViewModel(),
-    moveToResult: () -> Unit,
+    moveToResult: (Long) -> Unit,
     onShowSnackBar: (String) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -28,7 +28,7 @@ fun MockTestScreen(
 
     viewModel.collectSideEffect {
         when (it) {
-            is MockTestUiEffect.MoveToResult -> moveToResult()
+            is MockTestUiEffect.MoveToResult -> moveToResult(it.id)
             is MockTestUiEffect.ShowSnackBar -> onShowSnackBar(
                 it.message ?: context.getString(it.defaultResId)
             )

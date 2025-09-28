@@ -96,4 +96,7 @@ sealed interface MockTestRoute : Route {
 
     @Serializable
     data class MockTestGuide(val id: Long) : MockTestRoute
+
+    @Serializable
+    data class MockTestResult(val id: Long) : MockTestRoute
 }

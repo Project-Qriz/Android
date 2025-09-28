@@ -40,14 +40,15 @@ fun TestResultDetailPage(
     resultDetailItems: ImmutableList<TestResultDetailItem>,
     getTestResultColor: (Int) -> Color,
     onClickFilter: () -> Unit,
+    onSelectFilter: ((ScoreDetailSubjectFilter) -> Unit)? = null,
 ) {
     LazyColumn(
         modifier = modifier
-            .fillMaxSize()
             .padding(
                 horizontal = 18.dp,
                 vertical = 24.dp,
             )
+            .fillMaxSize()
     ) {
         item {
             ScoreDetailChartHeader(
@@ -57,6 +58,7 @@ fun TestResultDetailPage(
                 enableFilter = enableFilter,
                 testResultItem = testResultItem,
                 getTestResultColor = getTestResultColor,
+                onSelectFilter = onSelectFilter,
                 onClickFilter = onClickFilter,
             )
         }
@@ -84,6 +86,7 @@ private fun ScoreDetailChartHeader(
     showFilterDropDown: Boolean,
     testResultItem: ImmutableList<TestResultItem>,
     getTestResultColor: (Int) -> Color,
+    onSelectFilter: ((ScoreDetailSubjectFilter) -> Unit)? = null,
     onClickFilter: () -> Unit,
 ) {
     Column(
@@ -101,7 +104,7 @@ private fun ScoreDetailChartHeader(
                 subject = subject,
                 showDropDown = showFilterDropDown,
                 onClickFilter = onClickFilter,
-                onSelectSubjectFilter = {},
+                onSelectSubjectFilter = { onSelectFilter?.invoke(it) },
             )
         } else {
             Text(
@@ -181,6 +184,7 @@ private fun TestResultDetailPagePreview() {
                     )
                 )
             ),
+            onSelectFilter = {},
             onClickFilter = {},
         )
     }

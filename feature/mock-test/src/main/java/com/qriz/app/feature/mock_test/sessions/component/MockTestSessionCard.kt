@@ -72,7 +72,7 @@ fun MockTestSessionCard(
                     color = Gray700
                 )
                 Text(
-                    text = stringResource(R.string.total_score, totalScore),
+                    text = stringResource(R.string.mock_test_session_total_score, totalScore),
                     style = QrizTheme.typography.body2,
                     color = Gray500
                 )

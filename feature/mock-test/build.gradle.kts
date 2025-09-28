@@ -9,6 +9,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.data.user.userApi)
     implementation(projects.core.data.mockTest.mockTestApi)
     implementation(projects.core.ui.test)
+    implementation(libs.vico.compose)
 }
