@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="my_plan_reset">플랜 초기화</string>
+    <string name="my_exam_register">시험 등록</string>
+    <string name="my_customer_service">고객 센터</string>
+    <string name="my_service_terms">서비스 이용약관</string>
+    <string name="my_privacy_terms">개인정보 처리방침</string>
+    <string name="my_app_version">버전정보</string>
+    <string name="my_app_version_format">%s(%s)</string>
+</resources>
