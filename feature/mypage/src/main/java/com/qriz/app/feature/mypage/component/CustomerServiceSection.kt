@@ -65,8 +65,8 @@ internal fun CustomerServiceSection(
                 title = stringResource(R.string.my_app_version),
                 subTitle = stringResource(
                     R.string.my_app_version_format,
-                    "1",
-                    "1.0.0",
+                    BuildConfig.VERSION_NAME,
+                    BuildConfig.VERSION_CODE.toString(),
                 ),
                 onClick = onClickVersion,
             )

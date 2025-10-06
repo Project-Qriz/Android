@@ -1,4 +1,7 @@
 [versions]
+version_code = "1"
+version_name = "1.0.0"
+
 agp = "8.6.0"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
