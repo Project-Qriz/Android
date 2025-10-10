@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +26,7 @@ import com.qriz.app.feature.mypage.R
 @Composable
 internal fun FeatureSection(
     modifier: Modifier = Modifier,
-    onClickReset: () -> Unit,
+    onClickResetPlan: () -> Unit,
     onClickRegisterExam: () -> Unit,
 ) {
     Row(
@@ -38,13 +37,13 @@ internal fun FeatureSection(
             modifier = Modifier.weight(1f),
             title = stringResource(R.string.my_plan_reset),
             iconRes = R.drawable.ic_reset,
-            onClick = onClickReset,
+            onClick = onClickResetPlan,
         )
         FeatureItem(
             modifier = Modifier.weight(1f),
             title = stringResource(R.string.my_exam_register),
             iconRes = R.drawable.ic_exam_register,
-            onClick = onClickReset,
+            onClick = onClickRegisterExam,
         )
     }
 }
@@ -85,7 +84,7 @@ private fun FeatureItem(
 private fun FeatureSectionPreview() {
     QrizTheme {
         FeatureSection(
-            onClickReset = {},
+            onClickResetPlan = {},
             onClickRegisterExam = {},
         )
     }

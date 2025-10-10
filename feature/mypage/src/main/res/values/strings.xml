@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="my_title">마이페이지</string>
     <string name="my_plan_reset">플랜 초기화</string>
     <string name="my_exam_register">시험 등록</string>
     <string name="my_customer_service">고객 센터</string>
@@ -7,4 +8,6 @@
     <string name="my_privacy_terms">개인정보 처리방침</string>
     <string name="my_app_version">버전정보</string>
     <string name="my_app_version_format">%s(%s)</string>
+    <string name="my_reset_plan_dialog_title">플랜을 초기화 할까요?</string>
+    <string name="my_reset_plan_dialog_message">지금까지의 플랜이 초기화되며,\nDay1부터 다시 시작됩니다.</string>
 </resources>
