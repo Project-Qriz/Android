@@ -1,4 +1,4 @@
-package com.qriz.app.feature.home.component
+package com.qriz.app.core.ui.common.const
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

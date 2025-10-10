@@ -15,7 +15,7 @@ import com.qriz.app.core.model.requireValue
 import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
 import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.feature.base.BaseViewModel
-import com.qriz.app.feature.home.HomeUiState.SchedulesLoadState
+import com.qriz.app.core.ui.common.const.ExamScheduleState
 import com.qriz.app.feature.home.component.UserExamUiState
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
@@ -205,7 +205,7 @@ class HomeViewModel @Inject constructor(
     private fun loadToExamSchedules() = viewModelScope.launch {
         updateState {
             copy(
-                schedulesState = SchedulesLoadState.Loading,
+                schedulesState = ExamScheduleState.Loading,
                 isShowExamScheduleBottomSheet = true,
                 examSchedulesErrorMessage = null,
             )
@@ -214,7 +214,7 @@ class HomeViewModel @Inject constructor(
         when (val result = examRepository.getExamSchedules()) {
             is ApiResult.Failure -> updateState {
                 copy(
-                    schedulesState = SchedulesLoadState.Failure(result.message),
+                    schedulesState = ExamScheduleState.Error(result.message),
                     isShowExamScheduleBottomSheet = false,
                     examSchedulesErrorMessage = result.message
                 )
@@ -222,7 +222,7 @@ class HomeViewModel @Inject constructor(
 
             is ApiResult.NetworkError -> updateState {
                 copy(
-                    schedulesState = SchedulesLoadState.Failure(NETWORK_IS_UNSTABLE),
+                    schedulesState = ExamScheduleState.Error(NETWORK_IS_UNSTABLE),
                     isShowExamScheduleBottomSheet = false,
                     examSchedulesErrorMessage = NETWORK_IS_UNSTABLE,
                 )
@@ -230,7 +230,7 @@ class HomeViewModel @Inject constructor(
 
             is ApiResult.UnknownError -> updateState {
                 copy(
-                    schedulesState = SchedulesLoadState.Failure(UNKNOWN_ERROR),
+                    schedulesState = ExamScheduleState.Error(UNKNOWN_ERROR),
                     isShowExamScheduleBottomSheet = false,
                     examSchedulesErrorMessage = UNKNOWN_ERROR,
                 )
@@ -239,7 +239,7 @@ class HomeViewModel @Inject constructor(
             is ApiResult.Success -> {
                 updateState {
                     copy(
-                        schedulesState = SchedulesLoadState.Success(result.data.toImmutableList()),
+                        schedulesState = ExamScheduleState.Success(result.data.toImmutableList()),
                         userApplicationId = result.data.findUaid(),
                     )
                 }

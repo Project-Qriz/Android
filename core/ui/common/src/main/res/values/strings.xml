@@ -16,4 +16,9 @@
     <string name="retry">재시도</string>
     <string name="confirm">확인</string>
 
+    <string name="exam_date">시험일: %s</string>
+    <string name="exam_application_period">접수기간: %s</string>
+    <string name="schedule_is_empty">시험 일정이 아직 나오지 않았어요</string>
+    <string name="schedule_is_not_registered">공식 홈페이지에 등록된 시험일정이 없습니다.</string>
+
 </resources>

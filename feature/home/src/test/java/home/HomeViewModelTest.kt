@@ -19,6 +19,7 @@ import com.qriz.app.feature.home.HomeUiState
 import com.qriz.app.feature.home.HomeViewModel
 import com.qriz.app.feature.home.R
 import com.qriz.app.feature.home.component.UserExamUiState
+import com.qriz.app.core.ui.common.const.ExamScheduleState
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
@@ -177,7 +178,7 @@ class HomeViewModelTest {
                 //Success
                 val success = awaitItem()
                 assertEquals(
-                    HomeUiState.SchedulesLoadState.Success(examSchedulesApplied),
+                    ExamScheduleState.Success(examSchedulesApplied),
                     success.schedulesState,
                 )
                 assertEquals(
@@ -208,7 +209,7 @@ class HomeViewModelTest {
             uiState.test {
                 val state = expectMostRecentItem()
                 assertEquals(
-                    HomeUiState.SchedulesLoadState.Failure("Error"),
+                    ExamScheduleState.Error("Error"),
                     state.schedulesState
                 )
                 assertEquals("Error", state.examSchedulesErrorMessage)
@@ -237,7 +238,7 @@ class HomeViewModelTest {
             uiState.test {
                 val state = expectMostRecentItem()
                 assertEquals(
-                    HomeUiState.SchedulesLoadState.Failure(NETWORK_IS_UNSTABLE),
+                    ExamScheduleState.Error(NETWORK_IS_UNSTABLE),
                     state.schedulesState
                 )
                 assertEquals(NETWORK_IS_UNSTABLE, state.examSchedulesErrorMessage)
@@ -266,7 +267,7 @@ class HomeViewModelTest {
             uiState.test {
                 val state = expectMostRecentItem()
                 assertEquals(
-                    HomeUiState.SchedulesLoadState.Failure("알 수 없는 오류가 발생했습니다."),
+                    ExamScheduleState.Error("알 수 없는 오류가 발생했습니다."),
                     state.schedulesState
                 )
                 assertEquals("알 수 없는 오류가 발생했습니다.", state.examSchedulesErrorMessage)
@@ -636,7 +637,7 @@ class HomeViewModelTest {
     private fun assertExamSchedulesLoadingState(state: HomeUiState) {
         print("${state.schedulesState} // ${state.isShowExamScheduleBottomSheet} // ${state.examSchedulesErrorMessage}")
         assertEquals(
-            HomeUiState.SchedulesLoadState.Loading,
+            ExamScheduleState.Loading,
             state.schedulesState
         )
         assertTrue(state.isShowExamScheduleBottomSheet)
