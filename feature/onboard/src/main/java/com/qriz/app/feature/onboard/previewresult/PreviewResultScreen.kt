@@ -27,7 +27,6 @@ import com.qriz.app.core.designsystem.theme.Blue50
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
 import com.qriz.app.core.ui.common.const.ErrorScreen
-import com.qriz.app.core.ui.common.const.NetworkErrorScreen
 import com.qriz.app.core.ui.test.model.TestResultItem
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.onboard.R

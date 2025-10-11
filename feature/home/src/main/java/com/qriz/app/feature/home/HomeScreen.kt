@@ -36,7 +36,8 @@ import com.qriz.app.core.ui.common.const.ErrorScreen
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.home.HomeUiState.HomeDataLoadState
 import com.qriz.app.feature.home.component.DailyStudyPlanDayFilterBottomSheet
-import com.qriz.app.feature.home.component.ExamScheduleBottomSheet
+import com.qriz.app.core.ui.common.const.ExamScheduleBottomSheet
+import com.qriz.app.core.ui.common.const.ExamScheduleState
 import com.qriz.app.feature.home.component.ExamScheduleCard
 import com.qriz.app.feature.home.component.TestStartCard
 import com.qriz.app.feature.home.component.TodayStudyCardPager

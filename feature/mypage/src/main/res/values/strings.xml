@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="my_title">마이페이지</string>
+    <string name="my_plan_reset">플랜 초기화</string>
+    <string name="my_exam_register">시험 등록</string>
+    <string name="my_customer_service">고객 센터</string>
+    <string name="my_service_terms">서비스 이용약관</string>
+    <string name="my_privacy_terms">개인정보 처리방침</string>
+    <string name="my_app_version">버전정보</string>
+    <string name="my_app_version_format">%s(%s)</string>
+    <string name="my_reset_plan_dialog_title">플랜을 초기화 할까요?</string>
+    <string name="my_reset_plan_dialog_message">지금까지의 플랜이 초기화되며,\nDay1부터 다시 시작됩니다.</string>
+
+    <string name="setting_title">설정</string>
+    <string name="setting_reset_password">비밀번호 재설정</string>
+    <string name="setting_logout">로그아웃</string>
+    <string name="setting_withdraw">회원탈퇴</string>
+    <string name="setting_logout_message">로그아웃 하시겠습니까?</string>
+
+    <string name="withdraw_title">회원 탈퇴 시 아래 내용을 확인해주세요</string>
+    <string name="withdraw_description_1">회원 탈퇴 시 계정 정보는 모두 삭제됩니다.</string>
+    <string name="withdraw_description_2">진행 중인 ‘오늘의 공부’를 포함해, 모든 데이터가 삭제되며 복구할 수 없습니다.</string>
+    <string name="withdraw_confirm_message">QRIZ 회원 탈퇴를 하시겠습니까?</string>
+    <string name="withdraw_confirm_dialog_message">탈퇴 시 사용자와 관련된 모든 데이터는 즉시 삭제되며, 복구가 불가능합니다.\n\n정말로 탈퇴하시겠어요?</string>
+    <string name="withdraw_confirm_dialog_confirm_text">탈퇴하기</string>
+    <string name="withdraw_confirm_dialog_cancel_text">더 써볼래요</string>
+</resources>

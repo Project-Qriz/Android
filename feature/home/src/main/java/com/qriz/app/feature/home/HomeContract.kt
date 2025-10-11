@@ -10,6 +10,7 @@ import com.qriz.app.feature.base.UiAction
 import com.qriz.app.feature.base.UiEffect
 import com.qriz.app.feature.base.UiState
 import com.qriz.app.feature.home.component.UserExamUiState
+import com.qriz.app.core.ui.common.const.ExamScheduleState
 import com.quiz.app.core.data.user.user_api.model.User
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -25,7 +26,7 @@ data class HomeUiState(
     val userExamState: UserExamUiState,
     val selectedPlanDay: Int,
     val todayPlanIsReview: Boolean,
-    val schedulesState: SchedulesLoadState,
+    val schedulesState: ExamScheduleState,
     val dailyStudyPlans: ImmutableList<DailyStudyPlan>,
     val weeklyRecommendation: ImmutableList<WeeklyRecommendation>,
     val examSchedulesErrorMessage: String?,
@@ -40,7 +41,7 @@ data class HomeUiState(
             isShowExamScheduleBottomSheet = false,
             user = User.Default,
             dataLoadState = HomeDataLoadState.Loading,
-            schedulesState = SchedulesLoadState.Loading,
+            schedulesState = ExamScheduleState.Loading,
             userExamState = UserExamUiState.NoSchedule,
             dailyStudyPlans = persistentListOf(),
             weeklyRecommendation = persistentListOf(),
@@ -67,17 +68,6 @@ data class HomeUiState(
         data object Loading: HomeDataLoadState
     }
 
-    @Stable
-    sealed interface SchedulesLoadState {
-        @Immutable
-        data object Loading : SchedulesLoadState
-
-        @Immutable
-        data class Failure(val message: String) : SchedulesLoadState
-
-        @Immutable
-        data class Success(val data: ImmutableList<Schedule>) : SchedulesLoadState
-    }
 }
 
 sealed interface HomeUiAction : UiAction {

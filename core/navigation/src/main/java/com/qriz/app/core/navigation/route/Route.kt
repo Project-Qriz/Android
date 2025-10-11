@@ -100,3 +100,11 @@ sealed interface MockTestRoute : Route {
     @Serializable
     data class MockTestResult(val id: Long) : MockTestRoute
 }
+
+sealed interface MyPageRoute : Route {
+    @Serializable
+    data object Setting : MyPageRoute
+
+    @Serializable
+    data object Withdraw : MyPageRoute
+}

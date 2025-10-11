@@ -68,4 +68,7 @@ interface UserApi {
     suspend fun resetPwd(
         @Body request: ResetPwdRequest
     ): ApiResult<Unit>
+
+    @POST("/api/v1/withdraw")
+    suspend fun withdraw(): ApiResult<Unit>
 }

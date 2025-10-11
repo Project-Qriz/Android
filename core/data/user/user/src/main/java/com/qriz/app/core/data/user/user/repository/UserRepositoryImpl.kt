@@ -1,6 +1,7 @@
 package com.qriz.app.core.data.user.user.repository
 
 import com.qriz.app.core.data.user.user.mapper.toDataModel
+import com.qriz.app.core.datastore.TokenDataStore
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.model.flatMapSuspend
 import com.qriz.app.core.model.map
@@ -25,6 +26,7 @@ import javax.inject.Inject
 
 internal class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi,
+    private val tokenDataStore: TokenDataStore,
 ) : UserRepository {
     private val user = MutableStateFlow<User?>(null)
 
@@ -95,7 +97,10 @@ internal class UserRepositoryImpl @Inject constructor(
                 nickname = nickname,
             )
         ).flatMapSuspend {
-            login(loginId, password)
+            login(
+                loginId,
+                password
+            )
         }
     }
 
@@ -115,7 +120,10 @@ internal class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun verifyPasswordAuthNumber(email: String, authNumber: String): ApiResult<String> {
+    override suspend fun verifyPasswordAuthNumber(
+        email: String,
+        authNumber: String
+    ): ApiResult<String> {
         return userApi.verifyPwdReset(
             request = VerifyPwdResetRequest(
                 email = email,
@@ -131,5 +139,17 @@ internal class UserRepositoryImpl @Inject constructor(
                 resetToken = resetToken,
             )
         )
+    }
+
+    override suspend fun logout() {
+        tokenDataStore.clearToken()
+    }
+
+    override suspend fun withdraw(): ApiResult<Unit> {
+        val result = userApi.withdraw()
+        if (result is ApiResult.Success) {
+            tokenDataStore.clearToken()
+        }
+        return result
     }
 }

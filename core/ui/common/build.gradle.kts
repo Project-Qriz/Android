@@ -11,6 +11,6 @@ android {
 
 dependencies {
     implementation(projects.core.designsystem)
-
+    implementation(projects.core.data.application.applicationApi)
     implementation(libs.coil.core)
 }

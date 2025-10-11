@@ -1,4 +1,4 @@
-package com.qriz.app.feature.home.component
+package com.qriz.app.core.ui.common.const
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,7 +18,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,21 +39,33 @@ import com.qriz.app.core.designsystem.theme.Gray500
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.White
-import com.qriz.app.core.ui.common.const.ErrorScreen
-import com.qriz.app.feature.home.HomeUiState
+import com.qriz.app.core.ui.common.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDateTime
 
+@Stable
+sealed interface ExamScheduleState {
+    @Immutable
+    data object Loading : ExamScheduleState
+
+    @Immutable
+    data class Success(val data: ImmutableList<Schedule>) : ExamScheduleState
+
+    @Immutable
+    data class Error(val message: String) : ExamScheduleState
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExamScheduleBottomSheet(
-    schedulesLoadState: HomeUiState.SchedulesLoadState,
+    schedulesLoadState: ExamScheduleState,
     onSelectExamDate: (Long) -> Unit,
     onDismissRequest: () -> Unit,
     onClickRetry: () -> Unit = {},
 ) {
     ModalBottomSheet(
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = White,
         onDismissRequest = onDismissRequest,
         tonalElevation = 0.dp,
@@ -66,7 +81,7 @@ fun ExamScheduleBottomSheet(
 
 @Composable
 private fun ExamScheduleBottomSheetContent(
-    schedulesLoadState: HomeUiState.SchedulesLoadState,
+    schedulesLoadState: ExamScheduleState,
     onSelectExamDate: (Long) -> Unit,
     onClickRetry: () -> Unit,
 ) {
@@ -111,23 +126,25 @@ private fun ExamScheduleBottomSheetContent(
                 )
         )
         when (schedulesLoadState) {
-            is HomeUiState.SchedulesLoadState.Failure -> {
-                ErrorScreen(
-                    title = schedulesLoadState.message,
-                    description = stringResource(com.qriz.app.core.ui.common.R.string.try_again),
-                    onClickRetry = onClickRetry,
-                )
+            ExamScheduleState.Loading -> Loading()
+
+            is ExamScheduleState.Success -> {
+                if (schedulesLoadState.data.isNotEmpty()) {
+                    ScheduleContent(
+                        data = schedulesLoadState.data,
+                        onSelect = onSelectExamDate,
+                    )
+                } else {
+                    EmptyContent()
+                }
             }
 
-            is HomeUiState.SchedulesLoadState.Loading -> Loading()
-
-            is HomeUiState.SchedulesLoadState.Success -> if (schedulesLoadState.data.isNotEmpty()) {
-                ScheduleContent(
-                    data = schedulesLoadState.data,
-                    onSelect = onSelectExamDate,
+            is ExamScheduleState.Error -> {
+                ErrorScreen(
+                    title = schedulesLoadState.message,
+                    description = stringResource(R.string.try_again),
+                    onClickRetry = onClickRetry,
                 )
-            } else {
-                EmptyContent()
             }
         }
     }
@@ -180,16 +197,16 @@ private fun EmptyContent() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                imageVector = ImageVector.vectorResource(com.qriz.app.feature.home.R.drawable.ic_timer),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_timer),
                 contentDescription = null
             )
             Text(
-                text = stringResource(com.qriz.app.feature.home.R.string.schedule_is_empty),
+                text = stringResource(R.string.schedule_is_empty),
                 style = QrizTheme.typography.heading2,
                 color = Black,
             )
             Text(
-                text = stringResource(com.qriz.app.feature.home.R.string.schedule_is_not_registered),
+                text = stringResource(R.string.schedule_is_not_registered),
                 style = QrizTheme.typography.body2,
                 color = Gray500,
             )
@@ -220,7 +237,8 @@ private fun TestDateItem(
 ) {
     val textColor = if (isPeriodExpired) Gray300 else Gray800
     Box(
-        modifier = Modifier.background(if (isPeriodExpired) Gray100 else White)
+        modifier = Modifier
+            .background(if (isPeriodExpired) Gray100 else White)
             .clickable(onClick = onClick)
     ) {
         Row(
@@ -251,7 +269,7 @@ private fun TestDateItem(
                 )
                 Text(
                     text = stringResource(
-                        com.qriz.app.feature.home.R.string.exam_application_period,
+                        R.string.exam_application_period,
                         period
                     ),
                     style = QrizTheme.typography.body2Long,
@@ -260,7 +278,7 @@ private fun TestDateItem(
                 )
                 Text(
                     text = stringResource(
-                        com.qriz.app.feature.home.R.string.exam_date,
+                        R.string.exam_date,
                         date
                     ),
                     style = QrizTheme.typography.body2Long,
@@ -318,7 +336,7 @@ private fun TestDateItemPreview3() {
 private fun TestDateBottomSheetContentPreview() {
     QrizTheme {
         ExamScheduleBottomSheetContent(
-            schedulesLoadState = HomeUiState.SchedulesLoadState.Success(
+            schedulesLoadState = ExamScheduleState.Success(
                 persistentListOf(
                     Schedule(
                         applicationId = 1,
@@ -343,7 +361,7 @@ private fun TestDateBottomSheetContentPreview() {
 private fun TestDateBottomSheetEmptyContentPreview() {
     QrizTheme {
         ExamScheduleBottomSheetContent(
-            schedulesLoadState = HomeUiState.SchedulesLoadState.Success(persistentListOf()),
+            schedulesLoadState = ExamScheduleState.Success(persistentListOf()),
             onSelectExamDate = {},
             onClickRetry = {},
         )

@@ -1,4 +1,7 @@
 [versions]
+version_code = "1"
+version_name = "1.0.0"
+
 agp = "8.6.0"
 kotlin = "2.0.0"
 coreKtx = "1.13.1"
@@ -7,7 +10,7 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
-composeBom = "2024.08.00"
+composeBom = "2025.10.00"
 appcompat = "1.7.0"
 material = "1.12.0"
 kotlinxSerializationJson = "1.7.2"
