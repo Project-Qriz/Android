@@ -34,4 +34,8 @@ interface UserRepository {
     suspend fun verifyPasswordAuthNumber(email: String, authNumber: String): ApiResult<String>
 
     suspend fun resetPassword(password: String, resetToken: String): ApiResult<Unit>
+
+    suspend fun logout()
+
+    suspend fun withdraw(): ApiResult<Unit>
 }

@@ -31,16 +31,18 @@ import com.qriz.app.feature.mypage.component.UserSection
 fun MyPageScreen(
     viewModel: MyPageViewModel = hiltViewModel(),
     onShowSnackBar: (String) -> Unit,
+    moveToSetting: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     viewModel.collectSideEffect {
-        Log.d("MyPageScreen", "collectSideEffect: $it")
         when (it) {
             is MyPageUiEffect.ShowSnackBar -> onShowSnackBar(
                 it.message ?: context.getString(it.defaultResId)
             )
+
+            is MyPageUiEffect.NavigateSetting -> moveToSetting()
         }
     }
 
@@ -53,6 +55,7 @@ fun MyPageScreen(
         examScheduleState = uiState.examScheduleState,
         showExamBottomSheet = uiState.showExamBottomSheet,
         showResetPlanDialog = uiState.showResetPlanDialog,
+        onClickProfile = { viewModel.process(MyPageUiAction.ClickProfile) },
         onConfirmResetPlan = { viewModel.process(MyPageUiAction.ResetPlan) },
         onClickResetPlan = { viewModel.process(MyPageUiAction.ShowResetPlanDialog) },
         onClickRegisterExamSchedule = { viewModel.process(MyPageUiAction.ShowExamBottomSheet) },
@@ -69,6 +72,7 @@ fun MyPageContent(
     examScheduleState: ExamScheduleState,
     showResetPlanDialog: Boolean,
     showExamBottomSheet: Boolean,
+    onClickProfile: () -> Unit,
     onClickRegisterExamSchedule: () -> Unit,
     onSelectExamSchedule: (Long) -> Unit,
     onClickResetPlan: () -> Unit,
@@ -112,7 +116,7 @@ fun MyPageContent(
                 horizontal = 18.dp,
             ),
             userName = userName,
-            onClick = {},
+            onClick = onClickProfile,
         )
 
         FeatureSection(
@@ -143,6 +147,7 @@ fun MyPageContentPreview() {
             examScheduleState = ExamScheduleState.Loading,
             showResetPlanDialog = false,
             showExamBottomSheet = false,
+            onClickProfile = {},
             onClickRegisterExamSchedule = {},
             onSelectExamSchedule = {},
             onClickResetPlan = {},

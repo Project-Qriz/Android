@@ -37,6 +37,7 @@ class MyPageViewModel @Inject constructor(
             is MyPageUiAction.ShowResetPlanDialog -> updateState { copy(showResetPlanDialog = true) }
             is MyPageUiAction.ResetPlan -> initializePlan()
             is MyPageUiAction.ClickExamSchedule -> applyExam(action.examId)
+            is MyPageUiAction.ClickProfile -> sendEffect(MyPageUiEffect.NavigateSetting)
         }
     }
 

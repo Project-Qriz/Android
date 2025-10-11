@@ -36,6 +36,7 @@ sealed interface MyPageUiAction : UiAction {
     data object DismissResetPlanDialog : MyPageUiAction
     data class ClickExamSchedule(val examId: Long) : MyPageUiAction
     data object ResetPlan : MyPageUiAction
+    data object ClickProfile : MyPageUiAction
 }
 
 sealed interface MyPageUiEffect : UiEffect {
@@ -43,4 +44,6 @@ sealed interface MyPageUiEffect : UiEffect {
         @StringRes val defaultResId: Int,
         val message: String? = null
     ) : MyPageUiEffect
+
+    data object NavigateSetting : MyPageUiEffect
 }
