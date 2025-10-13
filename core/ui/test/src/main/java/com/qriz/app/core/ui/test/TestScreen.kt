@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -49,7 +50,9 @@ fun TestScreen(
         onClickPreviousPage()
     }
 
-    Column {
+    Column(
+        modifier = Modifier.navigationBarsPadding()
+    ) {
         TestTopBar(
             remainTimeText = remainTimeText,
             progressPercent = progressPercent,
@@ -58,7 +61,8 @@ fun TestScreen(
         )
 
         Box(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f),
         ) {
             if (isLoading) QrizLoading()
 
@@ -110,10 +114,22 @@ private fun TestScreenPreview() {
             id = 1,
             question = "다음 중 트랜잭션 모델링에서 '긴 트랜잭션(Long Transaction)'을 처리하는 방법으로 가장 적절한 것은?",
             options = persistentListOf(
-                GeneralOptionItem(0, "트랜잭션을 더 작은 단위로 분할"),
-                SelectedOrCorrectOptionItem(0, "트랜잭션의 타임아웃 시간을 늘림"),
-                GeneralOptionItem(0, "모든 데이터를 메모리에 로드"),
-                GeneralOptionItem(0, "트랜잭션의 격리 수준을 낮춤"),
+                GeneralOptionItem(
+                    0,
+                    "트랜잭션을 더 작은 단위로 분할"
+                ),
+                SelectedOrCorrectOptionItem(
+                    0,
+                    "트랜잭션의 타임아웃 시간을 늘림"
+                ),
+                GeneralOptionItem(
+                    0,
+                    "모든 데이터를 메모리에 로드"
+                ),
+                GeneralOptionItem(
+                    0,
+                    "트랜잭션의 격리 수준을 낮춤"
+                ),
             ),
             timeLimit = 1.minutes.inWholeMilliseconds.toInt(),
             isOptionSelected = true,
@@ -122,10 +138,22 @@ private fun TestScreenPreview() {
             id = 2,
             question = "다음 중 트랜잭션 모델링에서 '긴 트랜잭션(Long Transaction)'을 처리하는 방법으로 가장 적절한 것은?@2",
             options = persistentListOf(
-                SelectedOrCorrectOptionItem(0, "트랜잭션을 더 작은 단위로 분할#2"),
-                GeneralOptionItem(0, "트랜잭션의 타임아웃 시간을 늘림#2"),
-                GeneralOptionItem(0, "모든 데이터를 메모리에 로드#2"),
-                GeneralOptionItem(0, "트랜잭션의 격리 수준을 낮춤#2"),
+                SelectedOrCorrectOptionItem(
+                    0,
+                    "트랜잭션을 더 작은 단위로 분할#2"
+                ),
+                GeneralOptionItem(
+                    0,
+                    "트랜잭션의 타임아웃 시간을 늘림#2"
+                ),
+                GeneralOptionItem(
+                    0,
+                    "모든 데이터를 메모리에 로드#2"
+                ),
+                GeneralOptionItem(
+                    0,
+                    "트랜잭션의 격리 수준을 낮춤#2"
+                ),
             ),
             timeLimit = 1.minutes.inWholeMilliseconds.toInt(),
             isOptionSelected = true,

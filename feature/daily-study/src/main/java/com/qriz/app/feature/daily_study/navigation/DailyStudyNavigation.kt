@@ -40,7 +40,7 @@ fun NavController.navigateToDailyTest(
 fun NavController.navigateToDailyTestResult(
     dayNumber: Int,
     navOptions: NavOptions = navOptions {
-        popUpTo<MainTabRoute.Home>()
+        popUpTo<DailyStudyRoute.DailyStudyPlanStatus>()
     },
 ) {
     navigate(
@@ -53,13 +53,13 @@ fun NavGraphBuilder.dailyStudyNavGraph(
     onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
     moveToTest: (Int) -> Unit,
-    moveToDailyStudyResult: () -> Unit,
+    moveToDailyStudyResult: (Int) -> Unit,
 ) {
     composable<DailyStudyRoute.DailyStudyPlanStatus> {
         DailyStudyPlanStatusScreen(
             moveToBack = onBack,
             moveToTest = moveToTest,
-            onShowSnackbar = onShowSnackbar
+            moveToResult = moveToDailyStudyResult,
         )
     }
 

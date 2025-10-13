@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.Icon
@@ -54,7 +55,10 @@ fun MainBottomBar(
         exit = fadeOut() + slideOut { IntOffset(0, it.height) }
     ) {
         Column(
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier
+                .background(White)
+                .fillMaxWidth()
+                .navigationBarsPadding(),
         ) {
             Spacer(
                 modifier = Modifier

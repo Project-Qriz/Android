@@ -3,6 +3,7 @@ package com.qriz.app.feature.mock_test.result
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,6 +43,7 @@ fun MockTestResultScreen(
 
     Column(
         modifier = Modifier.fillMaxSize()
+            .navigationBarsPadding()
     ) {
         QrizTopBar(
             title = if (state.viewType == MockTestResultUiState.ViewType.TOTAL) stringResource(R.string.mock_test_result) else null,

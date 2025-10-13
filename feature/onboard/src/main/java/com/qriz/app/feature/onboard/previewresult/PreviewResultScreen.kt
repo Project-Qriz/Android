@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -92,6 +93,7 @@ private fun PreviewResultContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .navigationBarsPadding()
     ) {
         QrizTopBar(
             navigationType = NavigationType.CLOSE,
@@ -150,7 +152,7 @@ private fun PreviewResultContent(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, heightDp = 1500)
 @Composable
 private fun PreviewResultContentPreview() {
     QrizTheme {

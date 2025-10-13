@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -118,6 +119,7 @@ private fun DailyTestResultContent(
         modifier = Modifier
             .background(White)
             .fillMaxSize()
+            .navigationBarsPadding()
     ) {
         QrizTopBar(
             title = if (viewType == ViewType.TOTAL) stringResource(R.string.test_result) else null,

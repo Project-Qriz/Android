@@ -6,7 +6,8 @@
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Qriz.TransparentSystemBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

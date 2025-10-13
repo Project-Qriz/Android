@@ -28,7 +28,7 @@ private val QrizColorScheme = lightColorScheme(
     surfaceVariant = Gray600,
     onSurfaceVariant = Gray500,
     outline = Blue600,
-    background = Blue50,
+    background = White,
     error = Red700,
 )
 
@@ -46,8 +46,6 @@ fun QrizTheme(
                 isAppearanceLightStatusBars = true
                 isAppearanceLightNavigationBars = true
             }
-            window.statusBarColor = Blue50.toArgb()
-            window.navigationBarColor = Blue50.toArgb()
         }
     }
 

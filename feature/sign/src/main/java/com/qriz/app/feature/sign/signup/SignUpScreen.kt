@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.LinearProgressIndicator
@@ -116,7 +117,9 @@ private fun SignUpContent(
         pagerState.animateScrollToPage(currentPage.index)
     }
 
-    Column {
+    Column(
+        modifier = Modifier.navigationBarsPadding()
+    ) {
         QrizTopBar(
             title = stringResource(R.string.screen_title_sign_up),
             navigationType = NavigationType.BACK,

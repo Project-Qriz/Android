@@ -22,7 +22,7 @@ import com.qriz.app.core.ui.common.R as UCR
 @Composable
 fun DailyTestScreen(
     viewModel: DailyTestViewModel = hiltViewModel(),
-    moveToResult: () -> Unit,
+    moveToResult: (Int) -> Unit,
     onShowSnackBar: (String) -> Unit,
     moveToBack: () -> Unit,
 ) {
@@ -30,7 +30,7 @@ fun DailyTestScreen(
 
     viewModel.collectSideEffect {
         when (it) {
-            is DailyStudyUiEffect.MoveToResult -> moveToResult()
+            is DailyStudyUiEffect.MoveToResult -> moveToResult(it.day)
             is DailyStudyUiEffect.Cancel -> moveToBack()
             is DailyStudyUiEffect.ShowSnackbar -> onShowSnackBar(it.message)
         }

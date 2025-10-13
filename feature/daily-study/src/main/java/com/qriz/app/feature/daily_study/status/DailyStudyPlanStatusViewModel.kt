@@ -72,6 +72,11 @@ class DailyStudyPlanStatusViewModel @Inject constructor(
 
     private fun onClickTestCard() {
         val state = uiState.value
+        if (state.isComplete) {
+            sendEffect(DailyStudyPlanStatusUiEffect.MoveToResult(day = dayNumber))
+            return
+        }
+
         if (state.available.not()) {
             return
         }
