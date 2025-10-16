@@ -1,9 +1,11 @@
 package com.qriz.app.feature.mock_test.sessions
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +22,7 @@ import com.qriz.app.core.data.mock_test.mock_test_api.model.SessionFilter
 import com.qriz.app.core.designsystem.component.NavigationType
 import com.qriz.app.core.designsystem.component.QrizLoading
 import com.qriz.app.core.designsystem.component.QrizTopBar
+import com.qriz.app.core.designsystem.theme.Blue50
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.ui.common.const.ErrorScreen
 import com.qriz.app.feature.base.extention.collectSideEffect
@@ -68,7 +71,10 @@ private fun MockTestSessionsContent(
     onClickCard: (Long) -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Blue50)
+            .navigationBarsPadding()
     ) {
         QrizTopBar(
             navigationType = NavigationType.CLOSE,

@@ -1,8 +1,11 @@
 package com.qriz.app.feature.concept_book
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
@@ -17,6 +20,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.qriz.app.core.data.conceptbook.conceptbook_api.model.Subject
 import com.qriz.app.core.designsystem.component.NavigationType
 import com.qriz.app.core.designsystem.component.QrizTopBar
+import com.qriz.app.core.designsystem.theme.Red700
+import com.qriz.app.core.ui.common.provider.LocalPadding
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.concept_book.component.CategoryCardStyle
 import com.qriz.app.feature.concept_book.component.SubjectItem
@@ -53,7 +58,11 @@ fun ConceptBookContent(
     subjects: List<Subject>,
     moveToConceptBookList: (String) -> Unit,
 ) {
-    Column {
+    val scaffoldPadding = LocalPadding.current
+
+    Column(
+        modifier = Modifier.padding(scaffoldPadding)
+    ) {
         QrizTopBar(
             title = stringResource(R.string.concept_book_title),
             navigationType = NavigationType.NONE,

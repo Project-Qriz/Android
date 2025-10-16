@@ -189,7 +189,7 @@ class DailyTestViewModel @Inject constructor(
         )) {
             is ApiResult.Success -> {
                 updateState { copy(showSubmitConfirmationDialog = false) }
-                sendEffect(DailyStudyUiEffect.MoveToResult)
+                sendEffect(DailyStudyUiEffect.MoveToResult(dayNumber))
             }
             is ApiResult.Failure -> updateState {
                 copy(

@@ -61,7 +61,6 @@ fun MockTestScreen(
             title = stringResource(UCR.string.error_occurs),
             description = state.errorMessage,
             onClickRetry = {
-
             },
         )
 

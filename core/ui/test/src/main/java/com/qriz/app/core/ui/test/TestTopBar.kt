@@ -1,5 +1,6 @@
 package com.qriz.app.core.ui.test
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.component.NavigationType
 import com.qriz.app.core.designsystem.component.QrizTopBar
+import com.qriz.app.core.designsystem.theme.Blue50
 import com.qriz.app.core.designsystem.theme.Blue600
 import com.qriz.app.core.designsystem.theme.Gray200
 import com.qriz.app.core.designsystem.theme.Gray800
@@ -66,8 +68,8 @@ fun TestTopBar(
             progress = { progressPercent },
             trackColor = Gray200,
             color = Blue600,
-            strokeCap = StrokeCap.Round,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
         )
     }
 }

@@ -1,7 +1,9 @@
 package com.qriz.app.feature.daily_study.status
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +22,7 @@ import com.qriz.app.core.designsystem.component.NavigationType
 import com.qriz.app.core.designsystem.component.QrizDialog
 import com.qriz.app.core.designsystem.component.QrizLoading
 import com.qriz.app.core.designsystem.component.QrizTopBar
+import com.qriz.app.core.designsystem.theme.Blue50
 import com.qriz.app.core.designsystem.theme.Blue500
 import com.qriz.app.core.designsystem.theme.Gray500
 import com.qriz.app.core.designsystem.theme.Gray800
@@ -38,15 +41,16 @@ import com.qriz.app.core.designsystem.R as DSR
 @Composable
 fun DailyStudyPlanStatusScreen(
     viewModel: DailyStudyPlanStatusViewModel = hiltViewModel(),
+    moveToResult: (Int) -> Unit,
     moveToTest: (Int) -> Unit,
     moveToBack: () -> Unit,
-    onShowSnackbar: (String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     viewModel.collectSideEffect {
         when (it) {
             is DailyStudyPlanStatusUiEffect.MoveToTest -> moveToTest(it.day)
+            is DailyStudyPlanStatusUiEffect.MoveToResult -> moveToResult(it.day)
         }
     }
 
@@ -78,7 +82,6 @@ fun DailyStudyPlanStatusScreen(
         testStatusIconColor = uiState.testCardIconColor,
         testStatusBackgroundColor = uiState.testCardBackgroundColor,
         complete = uiState.isComplete,
-        canTest = uiState.canTest,
         onClickRetry = { viewModel.process(DailyStudyPlanStatusUiAction.LoadData) },
         onClickStatusCard = { viewModel.process(DailyStudyPlanStatusUiAction.ClickTestCard) },
         moveToBack = moveToBack,
@@ -99,13 +102,14 @@ private fun DailyStudyPlanStatusContent(
     testScore: Double,
     canRetry: Boolean,
     complete: Boolean,
-    canTest: Boolean,
     onClickStatusCard: () -> Unit,
     onClickRetry: () -> Unit,
     moveToBack: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
+            .background(Blue50)
+            .navigationBarsPadding()
     ) {
         QrizTopBar(
             title = stringResource(R.string.daily_study),
@@ -170,7 +174,7 @@ private fun DailyStudyPlanStatusContent(
                     statusTextColor = testStatusTextColor,
                     iconColor = testStatusIconColor,
                     backgroundColor = testStatusBackgroundColor,
-                    onClick = if (canTest) onClickStatusCard else null,
+                    onClick = onClickStatusCard,
                 )
 
                 if (complete) {
@@ -215,7 +219,6 @@ private fun DailyStudyStudyPlanStatusContentPreview() {
             testStatusBackgroundColor = White,
             testStatusIconColor = Gray800,
             complete = true,
-            canTest = true,
             onClickStatusCard = {},
             moveToBack = {},
         )

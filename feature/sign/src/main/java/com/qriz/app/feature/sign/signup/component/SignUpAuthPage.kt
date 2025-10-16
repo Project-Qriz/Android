@@ -1,9 +1,12 @@
 package com.qriz.app.feature.sign.signup.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -95,7 +98,8 @@ fun SignUpAuthPage(
         onButtonClick = onClickNextPage,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
             QrizTextFiled(
                 value = email,
@@ -118,6 +122,7 @@ fun SignUpAuthPage(
                 hint = stringResource(R.string.email_sample_hint),
                 modifier = Modifier
                     .weight(1f)
+                    .height(48.dp)
                     .focusRequester(emailFocusRequester)
                     .onFocusChanged {
                         if (it.isFocused) onChangeFocus(SignUpUiState.FocusState.EMAIL)
@@ -150,6 +155,7 @@ fun SignUpAuthPage(
                 contentPadding = PaddingValues(vertical = 14.dp),
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
+                    .height(48.dp)
                     .padding(start = 10.dp)
                     .widthIn(80.dp)
             ) {
@@ -193,6 +199,7 @@ fun SignUpAuthPage(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .weight(1f)
+                        .height(48.dp)
                         .onFocusChanged {
                             if (it.isFocused) onChangeFocus(SignUpUiState.FocusState.AUTH_NUM)
                         },
@@ -246,6 +253,7 @@ fun SignUpAuthPage(
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = PaddingValues(vertical = 14.dp),
                     modifier = Modifier
+                        .height(48.dp)
                         .padding(start = 10.dp)
                         .widthIn(80.dp)
                 ) {

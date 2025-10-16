@@ -77,6 +77,7 @@ data class DailyStudyPlanStatusUiState(
 
 sealed interface DailyStudyPlanStatusUiEffect : UiEffect {
     data class MoveToTest(val day: Int) : DailyStudyPlanStatusUiEffect
+    data class MoveToResult(val day: Int) : DailyStudyPlanStatusUiEffect
 }
 
 sealed interface DailyStudyPlanStatusUiAction : UiAction {

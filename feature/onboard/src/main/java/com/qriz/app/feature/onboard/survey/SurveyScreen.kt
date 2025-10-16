@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.HorizontalDivider
@@ -125,7 +127,8 @@ private fun ConceptCheckContent(
     Column(
         modifier = Modifier
             .background(Blue50)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .systemBarsPadding(),
     ) {
         Text(
             text = stringResource(R.string.check_known_concepts_prompt),

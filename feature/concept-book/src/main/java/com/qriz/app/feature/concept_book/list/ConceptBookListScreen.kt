@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -41,7 +43,7 @@ fun ConceptBookListScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     viewModel.collectSideEffect {
-        when(it) {
+        when (it) {
             is ConceptBookListUiEffect.NavigateToConceptBook -> moveToConceptBookDetail(it.id)
         }
     }
@@ -86,11 +88,16 @@ private fun ConceptBookListContent(
         QrizLoading()
     } else {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            ConceptBookTopBar (
-                subTitle = stringResource(id = R.string.subject, subjectNumber),
+            ConceptBookTopBar(
+                subTitle = stringResource(
+                    id = R.string.subject,
+                    subjectNumber
+                ),
                 title = categoryName,
                 onNavigationClick = moveToBack,
             )
@@ -115,7 +122,8 @@ private fun ConceptBookListContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(all = 16.dp)
             ) {
-                items(items = conceptBook,
+                items(
+                    items = conceptBook,
                     key = { it.hashCode() }) { item ->
                     ConceptBookItem(
                         name = item.name,

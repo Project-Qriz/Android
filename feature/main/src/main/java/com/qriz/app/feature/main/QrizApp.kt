@@ -1,6 +1,7 @@
 package com.qriz.app.feature.main
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -10,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -17,11 +19,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.core.navigation.route.SplashRoute
+import com.qriz.app.core.ui.common.provider.LocalPadding
 import com.qriz.app.feature.concept_book.navigation.conceptBookNavGraph
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookDetail
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookList
 import com.qriz.app.feature.daily_study.navigation.dailyStudyNavGraph
 import com.qriz.app.feature.daily_study.navigation.navigateToDailyStudyPlanStatus
+import com.qriz.app.feature.daily_study.navigation.navigateToDailyTest
 import com.qriz.app.feature.daily_study.navigation.navigateToDailyTestResult
 import com.qriz.app.feature.home.navigation.homeNavGraph
 import com.qriz.app.feature.incorrect_answers_note.navigation.incorrectAnswersNoteNavGraph
@@ -79,19 +83,13 @@ internal fun QrizApp(
             )
         },
         contentWindowInsets = WindowInsets(0.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding(),
+        modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding),
-        ) {
-            QrizNavHost(
-                mainNavigator = mainNavigator,
-                onShowSnackbar = onShowSnackbar,
-            )
-        }
+        QrizNavHost(
+            mainNavigator = mainNavigator,
+            padding = innerPadding,
+            onShowSnackbar = onShowSnackbar,
+        )
     }
 }
 
@@ -99,81 +97,86 @@ internal fun QrizApp(
 private fun QrizNavHost(
     startDestination: Route = SplashRoute,
     mainNavigator: MainNavigator,
+    padding: PaddingValues,
     onShowSnackbar: (String) -> Unit,
 ) {
     val navController = mainNavigator.navController
-    NavHost(
-        navController = navController,
-        startDestination = startDestination,
+    CompositionLocalProvider(
+        LocalPadding provides padding
     ) {
-        splashNavGraph(
-            moveToMain = { mainNavigator.navigateMainTabClearingStack(it) },
-            moveToSurvey = navController::navigateConceptCheckGuide,
-            moveToLogin = navController::navigateSignIn
-        )
+        NavHost(
+            navController = navController,
+            startDestination = startDestination,
+        ) {
+            splashNavGraph(
+                moveToMain = { mainNavigator.navigateMainTabClearingStack(it) },
+                moveToSurvey = navController::navigateConceptCheckGuide,
+                moveToLogin = navController::navigateSignIn
+            )
 
-        signNavGraph(
-            onBack = navController::popBackStack,
-            onShowSnackbar = onShowSnackbar,
-            moveToSignUp = navController::navigateSignUp,
-            moveToFindId = navController::navigateFindId,
-            moveToFindPw = navController::navigateFindPasswordAuth,
-            moveToHome = { mainNavigator.navigateMainTabClearingStack(MainTab.HOME) },
-            moveToConceptCheckGuide = navController::navigateConceptCheckGuide,
-            moveToResetPw = navController::navigateResetPassword,
-            moveToSignIn = navController::navigateSignIn
-        )
+            signNavGraph(
+                onBack = navController::popBackStack,
+                onShowSnackbar = onShowSnackbar,
+                moveToSignUp = navController::navigateSignUp,
+                moveToFindId = navController::navigateFindId,
+                moveToFindPw = navController::navigateFindPasswordAuth,
+                moveToHome = { mainNavigator.navigateMainTabClearingStack(MainTab.HOME) },
+                moveToConceptCheckGuide = navController::navigateConceptCheckGuide,
+                moveToResetPw = navController::navigateResetPassword,
+                moveToSignIn = navController::navigateSignIn
+            )
 
-        onboardNavGraph(
-            onBack = navController::popBackStack,
-            onNavigate = navController::navigate,
-            onShowSnackbar = onShowSnackbar,
-            moveToPreviewGuide = navController::navigatePreviewGuide,
-            moveToPreviewResult = navController::navigatePreviewResult,
-            moveToWelcomeGuide = navController::navigateWelcomeGuide,
-            moveToHome = { mainNavigator.navigateMainTabClearingStack(MainTab.HOME) },
-        )
+            onboardNavGraph(
+                onBack = navController::popBackStack,
+                onNavigate = navController::navigate,
+                onShowSnackbar = onShowSnackbar,
+                moveToPreviewGuide = navController::navigatePreviewGuide,
+                moveToPreviewResult = navController::navigatePreviewResult,
+                moveToWelcomeGuide = navController::navigateWelcomeGuide,
+                moveToHome = { mainNavigator.navigateMainTabClearingStack(MainTab.HOME) },
+            )
 
-        homeNavGraph(
-            moveToPreviewTest = navController::navigatePreviewGuide,
-            moveToDailyStudy = navController::navigateToDailyStudyPlanStatus,
-            moveToMockTestSessions = navController::navigateToMockTestSessions,
-            onShowSnackbar = onShowSnackbar,
-        )
+            homeNavGraph(
+                moveToPreviewTest = navController::navigatePreviewGuide,
+                moveToDailyStudy = navController::navigateToDailyStudyPlanStatus,
+                moveToMockTestSessions = navController::navigateToMockTestSessions,
+                onShowSnackbar = onShowSnackbar,
+            )
 
-        conceptBookNavGraph(
-            onShowSnackbar = onShowSnackbar,
-            onBack = navController::popBackStack,
-            moveToConceptBookList = navController::navigateToConceptBookList,
-            moveToConceptBookDetail = navController::navigateToConceptBookDetail,
-        )
+            conceptBookNavGraph(
+                onShowSnackbar = onShowSnackbar,
+                onBack = navController::popBackStack,
+                moveToConceptBookList = navController::navigateToConceptBookList,
+                moveToConceptBookDetail = navController::navigateToConceptBookDetail,
+            )
 
-        incorrectAnswersNoteNavGraph(
-            onShowSnackbar = onShowSnackbar,
-        )
+            incorrectAnswersNoteNavGraph(
+                onShowSnackbar = onShowSnackbar,
+            )
 
-        myPageNavGraph(
-            onShowSnackbar = onShowSnackbar,
-            onBack = navController::popBackStack,
-            moveToSetting = navController::navigateSetting,
-            moveToResetPassword = navController::navigateFindPasswordAuth,
-            moveToLogin = navController::navigateSignIn,
-            moveToWithDraw = navController::navigateWithdraw,
-        )
+            myPageNavGraph(
+                onShowSnackbar = onShowSnackbar,
+                onBack = navController::popBackStack,
+                moveToSetting = navController::navigateSetting,
+                moveToResetPassword = navController::navigateFindPasswordAuth,
+                moveToLogin = navController::navigateSignIn,
+                moveToWithDraw = navController::navigateWithdraw,
+            )
 
-        dailyStudyNavGraph(
-            onBack = navController::popBackStack,
-            moveToTest = { navController.navigateToDailyTestResult(dayNumber = 1) },
-            moveToDailyStudyResult = {},
-            onShowSnackbar = onShowSnackbar,
-        )
+            dailyStudyNavGraph(
+                onBack = navController::popBackStack,
+                moveToTest = navController::navigateToDailyTest,
+                moveToDailyStudyResult = navController::navigateToDailyTestResult,
+                onShowSnackbar = onShowSnackbar,
+            )
 
-        mockTestNavGraph(
-            onBack = navController::popBackStack,
-            onShowSnackbar = onShowSnackbar,
-            moveToMockTestGuide = navController::navigateToMockTestGuide,
-            moveToMockTest = navController::navigateToMockTest,
-            moveToMockTestResult = navController::navigateToMockTestResult
-        )
+            mockTestNavGraph(
+                onBack = navController::popBackStack,
+                onShowSnackbar = onShowSnackbar,
+                moveToMockTestGuide = navController::navigateToMockTestGuide,
+                moveToMockTest = navController::navigateToMockTest,
+                moveToMockTestResult = navController::navigateToMockTestResult
+            )
+        }
     }
 }

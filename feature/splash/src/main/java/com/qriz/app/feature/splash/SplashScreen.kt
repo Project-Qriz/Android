@@ -65,9 +65,8 @@ fun SplashContent(
 
     Box(
         modifier = Modifier
+            .background(color = Blue600)
             .fillMaxSize()
-            .navigationBarsPadding()
-            .background(color = Blue600),
     ) {
         Column(
             modifier = Modifier

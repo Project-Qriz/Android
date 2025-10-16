@@ -1,12 +1,14 @@
 package com.qriz.app.feature.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -31,13 +33,14 @@ import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommenda
 import com.qriz.app.core.designsystem.component.QrizDialog
 import com.qriz.app.core.designsystem.component.QrizLoading
 import com.qriz.app.core.designsystem.theme.Black
+import com.qriz.app.core.designsystem.theme.Blue50
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.ui.common.const.ErrorScreen
+import com.qriz.app.core.ui.common.const.ExamScheduleBottomSheet
+import com.qriz.app.core.ui.common.provider.LocalPadding
 import com.qriz.app.feature.base.extention.collectSideEffect
 import com.qriz.app.feature.home.HomeUiState.HomeDataLoadState
 import com.qriz.app.feature.home.component.DailyStudyPlanDayFilterBottomSheet
-import com.qriz.app.core.ui.common.const.ExamScheduleBottomSheet
-import com.qriz.app.core.ui.common.const.ExamScheduleState
 import com.qriz.app.feature.home.component.ExamScheduleCard
 import com.qriz.app.feature.home.component.TestStartCard
 import com.qriz.app.feature.home.component.TodayStudyCardPager
@@ -190,6 +193,7 @@ fun HomeContent(
     onClickGoToStudy: () -> Unit,
 ) {
     val isInitialized = rememberSaveable { mutableStateOf(false) }
+    val padding = LocalPadding.current
 
     LaunchedEffect(Unit) {
         if (isInitialized.value.not()) {
@@ -200,7 +204,11 @@ fun HomeContent(
 
     val horizontalPadding = remember { 18.dp }
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .background(Blue50)
+            .statusBarsPadding()
+            .fillMaxSize()
+            .padding(padding)
     ) {
         Row(
             modifier = Modifier

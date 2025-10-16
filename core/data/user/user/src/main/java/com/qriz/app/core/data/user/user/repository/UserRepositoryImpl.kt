@@ -36,8 +36,12 @@ internal class UserRepositoryImpl @Inject constructor(
                 username = id,
                 password = password
             )
-        ).flatMapSuspend { getUser() }
-
+        ).map {
+            it.user
+                .toDataModel()
+                .also { user -> this.user.value = user }
+        }
+        
         return response
     }
 

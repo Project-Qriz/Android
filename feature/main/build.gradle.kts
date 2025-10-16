@@ -9,6 +9,8 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.designsystem)
+
     implementation(projects.feature.splash)
     implementation(projects.feature.sign)
     implementation(projects.feature.onboard)

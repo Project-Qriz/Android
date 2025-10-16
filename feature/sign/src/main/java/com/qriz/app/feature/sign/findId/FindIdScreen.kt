@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -91,6 +92,7 @@ private fun FindIdContent(
         modifier = Modifier
             .fillMaxSize()
             .background(White)
+            .navigationBarsPadding()
     ) {
         QrizTopBar(
             title = stringResource(R.string.find_id),

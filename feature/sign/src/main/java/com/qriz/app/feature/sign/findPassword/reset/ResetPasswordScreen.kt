@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -91,11 +92,16 @@ private fun ResetPasswordContent(
     }
 
     if (uiState.showUnknownErrorDialog) {
-        ErrorDialog(description = UNKNOWN_ERROR, onConfirmClick = onConfirmUnknownErrorDialog)
+        ErrorDialog(
+            description = UNKNOWN_ERROR,
+            onConfirmClick = onConfirmUnknownErrorDialog
+        )
     }
 
     Column(
-        modifier = Modifier.background(color = White),
+        modifier = Modifier
+            .background(color = White)
+            .navigationBarsPadding(),
     ) {
         QrizTopBar(
             title = stringResource(R.string.find_password),

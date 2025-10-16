@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -29,9 +30,10 @@ internal fun ConceptBookTopBar(
 ) {
     Box(
         modifier = Modifier
-            .height(48.dp)
             .fillMaxWidth()
             .background(White)
+            .statusBarsPadding()
+            .height(48.dp)
     ) {
         IconButton(
             onClick = onNavigationClick,
