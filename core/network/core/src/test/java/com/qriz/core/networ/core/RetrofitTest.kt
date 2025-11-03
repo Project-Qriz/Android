@@ -1,8 +1,8 @@
 package com.qriz.core.networ.core
 
 import com.qriz.app.core.network.core.adapter.QrizCallAdapterFactory
+import com.qriz.app.core.network.core.auth.AuthManager
 import com.qriz.app.core.network.core.const.ACCESS_TOKEN_HEADER_KEY
-import com.qriz.app.core.network.core.const.REFRESH_TOKEN_HEADER_KEY
 import com.qriz.app.core.network.core.interceptor.AuthInterceptor
 import com.qriz.app.core.network.core.interceptor.AuthInterceptor.Companion.TOKEN_PREFIX
 import com.qriz.app.core.network.user.api.UserApi
@@ -12,7 +12,6 @@ import com.qriz.core.data.token.token_api.TokenRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -37,6 +36,10 @@ class RetrofitTest {
 
     private val mockTokenRepository = mockk<TokenRepository>(relaxed = true)
 
+    private val mockAuthManager = mockk<AuthManager>()
+
+    private val json = Json
+
     private val successResponseBody = """
                 {
                     "code": 1,
@@ -52,18 +55,19 @@ class RetrofitTest {
         mockWebServer = MockWebServer()
         mockWebServer.start()
 
-        val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(tokenRepository = mockTokenRepository))
-            .build()
+        val okHttpClient = OkHttpClient.Builder().addInterceptor(
+                AuthInterceptor(
+                    json = json,
+                    authManager = mockAuthManager
+                )
+            ).build()
 
         val json = Json { ignoreUnknownKeys = true }
         val converterFactory = json.asConverterFactory("application/json".toMediaType())
 
-        retrofit = Retrofit.Builder()
-            .baseUrl(mockWebServer.url("/"))
-            .client(okHttpClient)
-            .addCallAdapterFactory(QrizCallAdapterFactory())
-            .addConverterFactory(converterFactory).build()
+        retrofit = Retrofit.Builder().baseUrl(mockWebServer.url("/")).client(okHttpClient)
+            .addCallAdapterFactory(QrizCallAdapterFactory()).addConverterFactory(converterFactory)
+            .build()
 
         userApi = retrofit.create(UserApi::class.java)
     }
@@ -104,9 +108,9 @@ class RetrofitTest {
         coEvery { mockTokenRepository.getAccessToken() } returns null
         mockWebServer.enqueue(
             MockResponse().addHeader(
-                    ACCESS_TOKEN_HEADER_KEY,
-                    accessToken
-                ).setBody(successResponseBody)
+                ACCESS_TOKEN_HEADER_KEY,
+                accessToken
+            ).setBody(successResponseBody)
         )
 
         //when

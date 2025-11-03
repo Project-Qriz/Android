@@ -12,10 +12,10 @@ import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommenda
 import com.qriz.app.core.data.daily_study.daily_study_api.repository.DailyStudyRepository
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.model.requireValue
+import com.qriz.app.core.ui.common.const.ExamScheduleState
 import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
 import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.feature.base.BaseViewModel
-import com.qriz.app.core.ui.common.const.ExamScheduleState
 import com.qriz.app.feature.home.component.UserExamUiState
 import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
