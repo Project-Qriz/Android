@@ -1,5 +1,7 @@
 package com.qriz.app.feature.sign.signin
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
@@ -20,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -30,8 +34,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.kakao.sdk.user.UserApiClient
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.component.QrizLoading
 import com.qriz.app.core.designsystem.component.QrizTextFiled
@@ -42,7 +53,11 @@ import com.qriz.app.core.designsystem.theme.Gray500
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.feature.base.extention.collectSideEffect
+import com.qriz.app.feature.sign.BuildConfig
 import com.qriz.app.feature.sign.R
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 import com.qriz.app.core.designsystem.R as DSR
 
 @Composable
@@ -51,10 +66,12 @@ fun SignInScreen(
     moveToFindId: () -> Unit,
     moveToFindPw: () -> Unit,
     moveToHome: () -> Unit,
+    moveToConceptCheckGuide: () -> Unit,
     onShowSnackbar: (String) -> Unit,
     viewModel: SignInViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
     viewModel.collectSideEffect {
@@ -64,9 +81,48 @@ fun SignInScreen(
             )
 
             SignInUiEffect.MoveToSignUp -> moveToSignUp()
+
             SignInUiEffect.MoveToFindId -> moveToFindId()
+
             SignInUiEffect.MoveToFindPw -> moveToFindPw()
+
             SignInUiEffect.MoveToHome -> moveToHome()
+
+            SignInUiEffect.KakaoLogin -> {
+                coroutineScope.launch {
+                    when(val result = kakaoLogin(context)) {
+                        is SocialLoginResult.Failure -> viewModel.process(
+                            SignInUiAction.ShowSnackbar(
+                                result.message
+                            )
+                        )
+                        is SocialLoginResult.Success -> viewModel.process(
+                            SignInUiAction.ProcessKakaoLogin(
+                                result.token
+                            )
+                        )
+                    }
+                }
+            }
+
+            SignInUiEffect.GoogleLogin -> {
+                coroutineScope.launch {
+                    when(val result = googleLogin(context)) {
+                        is SocialLoginResult.Failure -> viewModel.process(
+                            SignInUiAction.ShowSnackbar(
+                                result.message
+                            )
+                        )
+                        is SocialLoginResult.Success -> viewModel.process(
+                            SignInUiAction.ProcessGoogleLogin(
+                                result.token
+                            )
+                        )
+                    }
+                }
+            }
+
+            SignInUiEffect.MoveToConceptCheckGuide -> moveToConceptCheckGuide()
         }
     }
 
@@ -84,6 +140,8 @@ fun SignInScreen(
         onClickSignUp = { viewModel.process(SignInUiAction.ClickSignUp) },
         onClickFindId = { viewModel.process(SignInUiAction.ClickFindId) },
         onClickFindPw = { viewModel.process(SignInUiAction.ClickFindPw) },
+        onClickKakaoLogin = { viewModel.process(SignInUiAction.ClickKakaoLogin) },
+        onClickGoogleLogin = { viewModel.process(SignInUiAction.ClickGoogleLogin) },
     )
 }
 
@@ -102,6 +160,8 @@ private fun SignInContent(
     onClickSignUp: () -> Unit,
     onClickFindId: () -> Unit,
     onClickFindPw: () -> Unit,
+    onClickKakaoLogin: () -> Unit,
+    onClickGoogleLogin: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -152,8 +212,7 @@ private fun SignInContent(
                     vertical = 19.dp,
                     horizontal = 16.dp,
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
 
             QrizTextFiled(
@@ -164,15 +223,13 @@ private fun SignInContent(
                     vertical = 19.dp,
                     horizontal = 16.dp,
                 ),
-                visualTransformation =
-                if (isVisiblePw) VisualTransformation.None
+                visualTransformation = if (isVisiblePw) VisualTransformation.None
                 else PasswordVisualTransformation(),
                 trailing = {
                     if (pw.isNotEmpty()) {
                         IconButton(onClick = { onClickPwVisibility(isVisiblePw.not()) }) {
                             Icon(
-                                painter =
-                                if (isVisiblePw) painterResource(DSR.drawable.ic_visible_password)
+                                painter = if (isVisiblePw) painterResource(DSR.drawable.ic_visible_password)
                                 else painterResource(DSR.drawable.ic_invisible_password),
                                 contentDescription = null
                             )
@@ -274,8 +331,91 @@ private fun SignInContent(
                     color = Gray200,
                 )
             }
+
+            Row(
+                modifier = Modifier.padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
+            ) {
+                Image(
+                    modifier = Modifier
+                        .clickable(onClick = onClickGoogleLogin)
+                        .size(48.dp),
+                    painter = painterResource(R.drawable.google_icon),
+                    contentDescription = null,
+                )
+
+                Image(
+                    modifier = Modifier
+                        .clickable(onClick = onClickKakaoLogin)
+                        .size(48.dp),
+                    painter = painterResource(R.drawable.kakao_icon),
+                    contentDescription = null,
+                )
+            }
         }
     }
+}
+
+private suspend fun kakaoLogin(context: Context) = suspendCancellableCoroutine{
+    val isAvailable = UserApiClient.instance.isKakaoTalkLoginAvailable(context)
+    if (isAvailable.not()) {
+        it.resume(SocialLoginResult.Failure("카카오톡을 설치해주세요"))
+    }
+
+    UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
+        if (token != null) {
+            it.resume(SocialLoginResult.Success(token.accessToken))
+        }
+
+        if (error != null) {
+            it.resume(SocialLoginResult.Failure(error.message ?: "카카오톡 로그인에 실패하였습니다."))
+        }
+    }
+}
+
+private suspend fun googleLogin(context: Context): SocialLoginResult {
+    return try {
+        val credentialManager = CredentialManager.create(context)
+
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setFilterByAuthorizedAccounts(false)
+            .setServerClientId(BuildConfig.GOOGLE_CLOUD_CONSOLE_CLIENT_ID)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        val result = credentialManager.getCredential(
+            request = request,
+            context = context,
+        )
+
+        val credential = result.credential
+
+        if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            try {
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                SocialLoginResult.Success(googleIdTokenCredential.idToken)
+            } catch (e: GoogleIdTokenParsingException) {
+                Log.e("SignInScreen", "Received an invalid google id token response", e)
+                SocialLoginResult.Failure("Google 로그인에 실패하였습니다.")
+            }
+        } else {
+            SocialLoginResult.Failure("Google 로그인에 실패하였습니다.")
+        }
+    } catch (e: GetCredentialException) {
+        Log.e("SignInScreen", "Error getting credential", e)
+        SocialLoginResult.Failure(e.message ?: "Google 로그인에 실패하였습니다.")
+    } catch (e: Exception) {
+        Log.e("SignInScreen", "Unexpected error during Google login", e)
+        SocialLoginResult.Failure("Google 로그인 중 오류가 발생하였습니다.")
+    }
+}
+
+private sealed interface SocialLoginResult {
+    data class Success(val token: String) : SocialLoginResult
+    data class Failure(val message: String) : SocialLoginResult
 }
 
 @Preview(showBackground = true)
@@ -296,6 +436,8 @@ private fun SignInScreenPreview() {
             onClickPwVisibility = {},
             onClickFindId = {},
             onClickFindPw = {},
+            onClickKakaoLogin = {},
+            onClickGoogleLogin = {},
         )
     }
 }
@@ -318,6 +460,8 @@ private fun SignInScreenDataEnteredPreview() {
             onClickPwVisibility = {},
             onClickFindId = {},
             onClickFindPw = {},
+            onClickKakaoLogin = {},
+            onClickGoogleLogin = {},
         )
     }
 }
@@ -340,6 +484,8 @@ private fun SignInScreenDataEnteredPwVisiblePreview() {
             onClickPwVisibility = {},
             onClickFindId = {},
             onClickFindPw = {},
+            onClickKakaoLogin = {},
+            onClickGoogleLogin = {},
         )
     }
 }

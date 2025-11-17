@@ -67,7 +67,7 @@ fun SettingScreen(
 @Composable
 fun SettingContent(
     userName: String,
-    email: String,
+    email: String?,
     showLogoutDialog: Boolean,
     onNavigateBack: () -> Unit,
     onClickResetPassword: () -> Unit,

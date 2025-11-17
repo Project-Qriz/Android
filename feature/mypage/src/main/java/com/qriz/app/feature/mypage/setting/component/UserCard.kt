@@ -25,7 +25,7 @@ import com.qriz.app.core.designsystem.theme.QrizTheme
 internal fun UserCard(
     modifier: Modifier = Modifier,
     userName: String,
-    email: String,
+    email: String?,
 ) {
     QrizCard(
         modifier = modifier,
@@ -50,7 +50,7 @@ internal fun UserCard(
             )
 
             Text(
-                text = email,
+                text = email ?: "-",
                 style = QrizTheme.typography.subhead.copy(color = Gray400)
             )
         }

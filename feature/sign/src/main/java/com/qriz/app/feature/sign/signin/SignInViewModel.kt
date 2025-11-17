@@ -4,6 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.sign.R
+import com.quiz.app.core.data.user.user_api.model.SocialLoginType
+import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -25,6 +27,16 @@ class SignInViewModel @Inject constructor(
             is SignInUiAction.ClickFindId -> onClickFindId()
             is SignInUiAction.ClickFindPw -> onClickFindPw()
             is SignInUiAction.ClickSignUp -> onClickSignUp()
+            is SignInUiAction.ClickGoogleLogin -> sendEffect(SignInUiEffect.GoogleLogin)
+            is SignInUiAction.ClickKakaoLogin -> sendEffect(SignInUiEffect.KakaoLogin)
+            is SignInUiAction.ProcessGoogleLogin -> googleLogin(action.token)
+            is SignInUiAction.ProcessKakaoLogin -> kakaoLogin(action.token)
+            is SignInUiAction.ShowSnackbar -> sendEffect(
+                SignInUiEffect.ShowSnackBar(
+                    defaultResId = R.string.empty,
+                    message = action.message
+                )
+            )
         }
     }
 
@@ -64,6 +76,55 @@ class SignInViewModel @Inject constructor(
 
     private fun onClickSignUp() {
         sendEffect(SignInUiEffect.MoveToSignUp)
+    }
+
+    private suspend fun kakaoLogin(token: String) =
+        processSocialLogin(SocialLoginType.KAKAO, token)
+
+    private suspend fun googleLogin(token: String) =
+        processSocialLogin(SocialLoginType.GOOGLE, token)
+
+    private suspend fun processSocialLogin(socialLoginType: SocialLoginType, token: String) {
+        if (uiState.value.isLoading) return
+        updateState { copy(isLoading = true) }
+
+        when (val result = userRepository.socialLogin(socialLoginType, token)) {
+            is ApiResult.Success<User> -> {
+                updateState { copy(isLoading = false) }
+                if (result.data.isSurveyNeeded) {
+                    sendEffect(SignInUiEffect.MoveToConceptCheckGuide)
+                } else {
+                    sendEffect(SignInUiEffect.MoveToHome)
+                }
+            }
+
+            is ApiResult.Failure -> {
+                updateState { copy(isLoading = false) }
+                sendEffect(
+                    SignInUiEffect.ShowSnackBar(
+                        defaultResId = R.string.user_not_registered,
+                    )
+                )
+            }
+
+            is ApiResult.NetworkError -> {
+                updateState { copy(isLoading = false) }
+                sendEffect(
+                    SignInUiEffect.ShowSnackBar(
+                        defaultResId = UCR.string.check_network_and_try_again,
+                    )
+                )
+            }
+
+            is ApiResult.UnknownError -> {
+                updateState { copy(isLoading = false) }
+                sendEffect(
+                    SignInUiEffect.ShowSnackBar(
+                        defaultResId = UCR.string.unknown_error_occurs,
+                    )
+                )
+            }
+        }
     }
 
     private fun login() = viewModelScope.launch {

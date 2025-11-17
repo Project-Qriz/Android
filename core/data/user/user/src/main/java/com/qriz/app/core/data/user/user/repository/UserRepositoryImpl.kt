@@ -14,6 +14,7 @@ import com.qriz.app.core.network.user.model.request.LoginRequest
 import com.qriz.app.core.network.user.model.request.ResetPwdRequest
 import com.qriz.app.core.network.user.model.request.SingleEmailRequest
 import com.qriz.app.core.network.user.model.request.VerifyPwdResetRequest
+import com.quiz.app.core.data.user.user_api.model.SocialLoginType
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
@@ -170,4 +171,22 @@ internal class UserRepositoryImpl @Inject constructor(
         }
         return result
     }
+
+    override suspend fun socialLogin(socialLoginType: SocialLoginType, token: String) = userApi
+        .socialLogin(
+            mapOf(
+                "provider" to socialLoginType.name.lowercase(),
+                when(socialLoginType) {
+                    SocialLoginType.KAKAO -> "authCode"
+                    SocialLoginType.GOOGLE -> "serverAuthCode"
+                } to token,
+                "platform" to "android"
+            )
+        ).map {
+            tokenDataStore.saveToken(
+                accessToken = it.accessToken,
+                refreshToken = it.refreshToken
+            )
+            it.user.toDataModel()
+        }
 }

@@ -16,7 +16,7 @@ import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus.SURVEY_COMPL
 data class User(
     val userId: String,
     val name: String,
-    val email: String,
+    val email: String?,
     val previewTestStatus: PreviewTestStatus
 ) {
     val isSurveyNeeded

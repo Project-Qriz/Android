@@ -1,11 +1,24 @@
+import com.qriz.app.getLocalProperty
 import com.qriz.app.setNamespace
 
 plugins {
     id("qriz.android.feature")
 }
 
+val kakaoNativeAppKey = "KAKAO_NATIVE_APP_KEY"
+
 android {
     setNamespace("feature.main")
+
+    buildTypes {
+        debug {
+            manifestPlaceholders[kakaoNativeAppKey] = getLocalProperty(kakaoNativeAppKey)
+        }
+        release {
+            isMinifyEnabled = true
+            manifestPlaceholders[kakaoNativeAppKey] = getLocalProperty(kakaoNativeAppKey)
+        }
+    }
 }
 
 dependencies {

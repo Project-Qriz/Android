@@ -72,4 +72,9 @@ interface UserApi {
 
     @DELETE("/api/v1/withdraw")
     suspend fun withdraw(): ApiResult<Unit>
+
+    @POST("/api/auth/social/login")
+    suspend fun socialLogin(
+        @Body request: Map<String, String>
+    ): ApiResult<LoginResponse>
 }

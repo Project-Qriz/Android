@@ -1,6 +1,10 @@
+import com.qriz.app.getLocalProperty
+
 plugins {
     id("qriz.android.application")
 }
+
+val kakaoNativeAppKey = "KAKAO_NATIVE_APP_KEY_PROPERTY"
 
 android {
     namespace = "com.qriz.app"
@@ -14,6 +18,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", kakaoNativeAppKey, getLocalProperty(kakaoNativeAppKey))
     }
 }
 
@@ -37,4 +43,5 @@ dependencies {
 
     implementation(libs.coil.compose)
     implementation(libs.coil.core)
+    implementation(libs.kakao.sdk.user)
 }

@@ -36,7 +36,6 @@ fun SurveyItemCard(
     onChecked: (Boolean) -> Unit,
     actionItems: @Composable (() -> Unit)? = null,
 ) {
-    Log.d("SurveyItemCard", text)
     Surface(
         modifier = modifier
             .fillMaxWidth()

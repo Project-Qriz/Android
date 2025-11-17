@@ -67,7 +67,8 @@ fun NavGraphBuilder.signNavGraph(
             moveToSignUp = moveToSignUp,
             moveToFindId = moveToFindId,
             moveToFindPw = moveToFindPw,
-            moveToHome = moveToHome
+            moveToHome = moveToHome,
+            moveToConceptCheckGuide = moveToConceptCheckGuide,
         )
     }
 
