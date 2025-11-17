@@ -37,11 +37,13 @@ internal class UserRepositoryImpl @Inject constructor(
                 password = password
             )
         ).map {
-            it.user
-                .toDataModel()
-                .also { user -> this.user.value = user }
+            tokenDataStore.saveToken(
+                accessToken = it.accessToken,
+                refreshToken = it.refreshToken
+            )
+            it.user.toDataModel().also { user -> this.user.value = user }
         }
-        
+
         return response
     }
 
@@ -126,7 +128,7 @@ internal class UserRepositoryImpl @Inject constructor(
 
     override suspend fun verifyPasswordAuthNumber(
         email: String,
-        authNumber: String
+        authNumber: String,
     ): ApiResult<String> {
         return userApi.verifyPwdReset(
             request = VerifyPwdResetRequest(

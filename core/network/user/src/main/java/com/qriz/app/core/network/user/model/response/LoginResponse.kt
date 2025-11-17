@@ -8,4 +8,5 @@ data class LoginResponse(
     @SerialName("refreshExpiry") val refreshExpiry: String,
     @SerialName("user") val user: UserProfileResponse,
     @SerialName("refreshToken") val refreshToken: String,
+    @SerialName("accessToken") val accessToken: String,
 )

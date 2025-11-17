@@ -1,46 +1,96 @@
 package com.qriz.app.core.network.core.interceptor
 
-import android.util.Log
+import com.qriz.app.core.network.core.auth.AuthManager
 import com.qriz.app.core.network.core.const.ACCESS_TOKEN_HEADER_KEY
-import com.qriz.core.data.token.token_api.TokenRepository
-import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
+import okhttp3.ResponseBody.Companion.toResponseBody
 import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
-    private val tokenRepository: TokenRepository
-): Interceptor {
+    private val json: Json,
+    private val authManager: AuthManager,
+) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val accessToken = runBlocking { tokenRepository.getAccessToken() }
+        val accessToken = authManager.getAccessToken()
 
-        val newRequest = chain.request().newBuilder().apply {
+        val authedRequest = chain.request().newBuilder().apply {
             if (accessToken != null) {
-                // TODO: API response json 형태 확인하기 위해 완성때까지 찍어놓을 것 
-                Log.d("AuthInterceptor", "AccessToken: $accessToken")
-                header(ACCESS_TOKEN_HEADER_KEY, "$TOKEN_PREFIX$accessToken")
+                header(
+                    ACCESS_TOKEN_HEADER_KEY,
+                    "$TOKEN_PREFIX$accessToken"
+                )
             }
         }.build()
 
-        val response = chain.proceed(newRequest)
-        val newAccessToken = response.header(ACCESS_TOKEN_HEADER_KEY)
+        val response = chain.proceed(authedRequest)
 
-        if (newAccessToken != null) {
-            runBlocking {
-                val value = newAccessToken.removePrefix(TOKEN_PREFIX)
-                tokenRepository.saveToken(value)
-            }
-        }
-
-        //AccessToken이 있지만 서버에서 갱신이 안되었을 경우 토큰 삭제
         if (accessToken != null && response.code == 401) {
-            runBlocking { tokenRepository.clearToken() }
+            synchronized(this) {
+                val responseBody = response.body
+                val bodyString = responseBody?.string() ?: ""
+                val contentType = responseBody?.contentType()
+
+                val newResponseBody = bodyString.toResponseBody(contentType)
+                val newResponse = response.newBuilder()
+                    .body(newResponseBody)
+                    .build()
+
+                val detailCode = getDetailCode(bodyString)
+                if (detailCode != ACCESS_EXPIRED_CODE) {
+                    //TODO: 로그아웃 로직
+                    authManager.clearToken()
+                    return newResponse
+                }
+                val stored = authManager.getAccessToken()
+                if (accessToken == stored) {
+                    try {
+                        val refreshToken = authManager.getRefreshToken()
+                            ?: run {
+                                authManager.clearToken()
+                                return newResponse
+                            }
+
+                        val result = authManager.renewToken(refreshToken)
+                        val newRequest = authedRequest.newRequest(result)
+                        return chain.proceed(newRequest)
+                    } catch (e: Exception) {
+                        authManager.clearToken()
+                        return newResponse
+                    }
+                } else {
+                    val newToken = authManager.getAccessToken()
+                        ?: throw IllegalStateException("토큰이 갱신되지 않았습니다.")
+                    val newRequest = authedRequest.newRequest(newToken)
+                    return chain.proceed(newRequest)
+                }
+            }
         }
 
         return response
     }
 
+    private fun Request.newRequest(accessToken: String): Request {
+        return newBuilder().apply {
+            header(ACCESS_TOKEN_HEADER_KEY, "$TOKEN_PREFIX$accessToken")
+        }.build()
+    }
+
+    private fun getDetailCode(bodyString: String): Int {
+        if (bodyString.isEmpty()) return 0
+        return try {
+            val response = json.parseToJsonElement(bodyString).jsonObject
+            response["detailCode"]?.toString()?.toInt() ?: 0
+        } catch (e: Exception) {
+            0
+        }
+    }
+
     companion object {
         const val TOKEN_PREFIX = "Bearer "
+        const val ACCESS_EXPIRED_CODE = 3
     }
 }

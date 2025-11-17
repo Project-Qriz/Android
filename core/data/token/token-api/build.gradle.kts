@@ -7,3 +7,7 @@ plugins {
 android {
     setNamespace("core.data.token.token_api")
 }
+
+dependencies {
+    api(projects.core.model)
+}
