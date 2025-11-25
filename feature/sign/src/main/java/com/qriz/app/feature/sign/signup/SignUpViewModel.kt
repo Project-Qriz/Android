@@ -71,7 +71,16 @@ open class SignUpViewModel @Inject constructor(
         when (uiState.value.emailAuthState) {
             AuthenticationState.TIME_EXPIRED, AuthenticationState.VERIFIED -> return
 
-            AuthenticationState.SEND_SUCCESS, AuthenticationState.SEND_FAILED, AuthenticationState.REJECTED -> updateState { copy(emailAuthNumber = authNum) }
+            AuthenticationState.SEND_SUCCESS, AuthenticationState.SEND_FAILED -> updateState { copy(emailAuthNumber = authNum) }
+
+            AuthenticationState.REJECTED -> {
+                updateState {
+                    copy(
+                        emailAuthNumber = authNum,
+                        authNumberSupportingTextResId = R.string.empty
+                    )
+                }
+            }
 
             AuthenticationState.NONE -> {
                 updateState {
