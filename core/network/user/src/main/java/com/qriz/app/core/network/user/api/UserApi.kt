@@ -15,6 +15,7 @@ import com.qriz.app.core.network.user.model.response.JoinResponse
 import com.qriz.app.core.network.user.model.response.LoginResponse
 import com.qriz.app.core.network.user.model.response.VerifyPwdResetRespoonse
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -69,6 +70,6 @@ interface UserApi {
         @Body request: ResetPwdRequest
     ): ApiResult<Unit>
 
-    @POST("/api/v1/withdraw")
+    @DELETE("/api/v1/withdraw")
     suspend fun withdraw(): ApiResult<Unit>
 }
