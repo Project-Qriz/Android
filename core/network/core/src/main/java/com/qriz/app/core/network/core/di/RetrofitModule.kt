@@ -48,8 +48,8 @@ object RetrofitModule {
 
         val logging = HttpLoggingInterceptor(PrettyLoggingInterceptor())
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
-        builder.addInterceptor(logging)
         builder.addInterceptor(authInterceptor)
+        builder.addInterceptor(logging)
         builder.addInterceptor(responseConvertInterceptor)
         return builder.build()
     }
