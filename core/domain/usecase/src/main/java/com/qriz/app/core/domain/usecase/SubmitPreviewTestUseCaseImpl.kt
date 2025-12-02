@@ -15,7 +15,6 @@ import javax.inject.Inject
 internal class SubmitPreviewTestUseCaseImpl @Inject constructor(
     private val onboardRepository: OnBoardRepository,
     private val userRepository: UserRepository,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : SubmitPreviewTestUseCase {
     override suspend fun invoke(answer: Map<Long, Option>): ApiResult<Unit> {
         val result = onboardRepository.submitPreviewTest(answer)
@@ -26,7 +25,7 @@ internal class SubmitPreviewTestUseCaseImpl @Inject constructor(
         return result
     }
 
-    private fun fetchUserWithRetry(maxRetries: Int = 3) = CoroutineScope(Job() + dispatcher).launch{
+    private fun fetchUserWithRetry(maxRetries: Int = 3) = CoroutineScope(Job() + Dispatchers.IO).launch{
         repeat(maxRetries) { attempt ->
             val result = userRepository.fetchUser()
             if (result is ApiResult.Success || attempt == maxRetries - 1) {
