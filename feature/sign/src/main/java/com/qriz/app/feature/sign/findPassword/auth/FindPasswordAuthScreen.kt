@@ -77,6 +77,7 @@ fun FindPasswordAuthScreen(
         showNetworkErrorDialog = uiState.showNetworkErrorDialog,
         showFailSendEmailDialog = uiState.showFailSendEmailDialog,
         showFailVerifyAuthNumberDialog = uiState.showFailVerifyAuthNumberDialog,
+        isValidEmailFormat = uiState.isValidEmailFormat,
         onBack = onBack,
         onEmailChanged = {
             viewModel.process(FindPasswordAuthUiAction.OnChangeEmail(email = it))
@@ -119,6 +120,7 @@ private fun FindPasswordAuthContent(
     showNetworkErrorDialog: Boolean,
     showFailSendEmailDialog: Boolean,
     showFailVerifyAuthNumberDialog: Boolean,
+    isValidEmailFormat: Boolean,
     onBack: () -> Unit,
     onEmailChanged: (String) -> Unit,
     onSendAuthNumberEmail: () -> Unit,
@@ -130,29 +132,36 @@ private fun FindPasswordAuthContent(
     onNavigateReset: () -> Unit,
 ) {
 
-    val authNumberSupportingTextColor = when(authNumberSupportingTextResId) {
+    val authNumberSupportingTextColor = when (authNumberSupportingTextResId) {
         R.string.success_send_email_auth_number,
         R.string.success_verify_auth_number -> Mint800
+
         else -> Red700
     }
 
-    val authNumberBorderColor = when(authNumberSupportingTextResId) {
+    val authNumberBorderColor = when (authNumberSupportingTextResId) {
         R.string.fail_verify_auth_number -> Red700
         else -> Gray200
     }
 
-    val emailButtonTextColor = if (showAuthNumberLayout) Gray800 else Gray300
+    val emailButtonTextColor = if (isValidEmailFormat) Gray800 else Gray300
 
     if (showNetworkErrorDialog) {
         NetworkErrorDialog(onConfirmClick = confirmNetworkDialog)
     }
 
     if (showFailSendEmailDialog) {
-        ErrorDialog(description = stringResource(R.string.sending_email_fail), onConfirmClick = confirmSendingFailEmailDialog)
+        ErrorDialog(
+            description = stringResource(R.string.sending_email_fail),
+            onConfirmClick = confirmSendingFailEmailDialog
+        )
     }
 
     if (showFailVerifyAuthNumberDialog) {
-        ErrorDialog(description = stringResource(R.string.verifying_auth_number_fail), onConfirmClick = confirmVerifyingAuthNumberDialog)
+        ErrorDialog(
+            description = stringResource(R.string.verifying_auth_number_fail),
+            onConfirmClick = confirmVerifyingAuthNumberDialog
+        )
     }
 
     Column(
@@ -233,7 +242,8 @@ private fun FindPasswordAuthContent(
                         .fillMaxWidth()
                         .padding(top = 10.dp)
                 ) {
-                    QrizTextFiled(value = authNumber,
+                    QrizTextFiled(
+                        value = authNumber,
                         onValueChange = onAuthNumberChanged,
                         supportingText = if (authNumberSupportingTextResId != R.string.empty) {
                             SupportingText(
@@ -300,7 +310,7 @@ private fun FindPasswordAuthContent(
                         onClick = onVerifyAuthNumber,
                         border = BorderStroke(
                             width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary
+                            color = if (authNumber.length == AUTH_NUMBER_MAX_LENGTH) MaterialTheme.colorScheme.primary else Gray200
                         ),
                         shape = RoundedCornerShape(10.dp),
                         contentPadding = PaddingValues(vertical = 14.dp),
@@ -310,7 +320,7 @@ private fun FindPasswordAuthContent(
                     ) {
                         Text(
                             stringResource(R.string.verify),
-                            color = MaterialTheme.colorScheme.primary,
+                            color = if (authNumber.length == AUTH_NUMBER_MAX_LENGTH) MaterialTheme.colorScheme.primary else Gray300,
                             style = QrizTheme.typography.subhead,
                         )
                     }
@@ -334,6 +344,7 @@ private fun FindPasswordAuthContentPreview() {
             showNetworkErrorDialog = false,
             showFailSendEmailDialog = false,
             showFailVerifyAuthNumberDialog = false,
+            isValidEmailFormat = false,
             emailSupportingTextResId = R.string.empty,
             authNumberSupportingTextResId = R.string.empty,
             onEmailChanged = {},
