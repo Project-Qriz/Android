@@ -66,45 +66,14 @@ fun SplashContent(
     Box(
         modifier = Modifier
             .background(color = Blue600)
-            .fillMaxSize()
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 225.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                modifier = Modifier
-                    .size(88.dp),
-                contentDescription = null,
-                painter = painterResource(dsR.drawable.qriz_app_logo)
-            )
-            Text(
-                modifier = Modifier
-                    .padding(top = 12.dp),
-                text = stringResource(id = R.string.splash_title),
-                color = White,
-                style = QrizTheme.typography.splash,
-            )
-        }
-
         Image(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .height(233.dp)
-                .fillMaxWidth(),
+                .size(88.dp),
             contentDescription = null,
-            contentScale = ContentScale.FillBounds,
-            painter = painterResource(R.drawable.splash_background_pattern)
-        )
-
-        Image(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 55.dp),
-            contentDescription = null,
-            painter = painterResource(dsR.drawable.qriz_text_logo_white)
+            painter = painterResource(dsR.drawable.qriz_app_logo)
         )
     }
 }
