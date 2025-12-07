@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -16,8 +18,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
+import com.qriz.app.core.designsystem.theme.Gray100
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.core.navigation.route.SplashRoute
 import com.qriz.app.core.ui.common.provider.LocalPadding
@@ -83,6 +87,13 @@ internal fun QrizApp(
                 modifier = Modifier
                     .navigationBarsPadding()
                     .imePadding(),
+                snackbar = {
+                    Snackbar(
+                        snackbarData = it,
+                        modifier = Modifier.width(339.dp),
+                        contentColor = Color(0xFFFAFAFA)
+                    )
+                }
             )
         },
         contentWindowInsets = WindowInsets(0.dp),
