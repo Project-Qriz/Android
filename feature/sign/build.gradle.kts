@@ -5,6 +5,8 @@ plugins {
     id("qriz.android.feature")
 }
 
+val kakaoNativeAppKey = "KAKAO_NATIVE_APP_KEY"
+
 android {
     setNamespace("feature.sign")
 
@@ -20,6 +22,16 @@ android {
             getLocalProperty("GOOGLE_CLOUD_CONSOLE_CLIENT_ID")
         )
     }
+
+    buildTypes {
+        debug {
+            manifestPlaceholders[kakaoNativeAppKey] = getLocalProperty(kakaoNativeAppKey)
+        }
+        release {
+            isMinifyEnabled = true
+            manifestPlaceholders[kakaoNativeAppKey] = getLocalProperty(kakaoNativeAppKey)
+        }
+    }
 }
 
 dependencies {
@@ -27,6 +39,7 @@ dependencies {
     implementation(projects.core.ui.common)
 
     implementation(libs.kakao.sdk.user)
+
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.google.android.libraries.identity.googleid)
