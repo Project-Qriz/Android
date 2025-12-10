@@ -45,5 +45,5 @@ enum class PreviewTestStatus {
     SURVEY_COMPLETED,
     PREVIEW_COMPLETED;
 
-    fun isNeedPreviewTest() = this != PREVIEW_COMPLETED
+    fun isNeedPreviewTest() = this == NOT_STARTED || this == SURVEY_COMPLETED
 }

@@ -6,10 +6,9 @@ import com.qriz.app.core.data.application.application_api.model.Schedule
 import com.qriz.app.core.data.application.application_api.model.UserExam
 import com.qriz.app.core.data.application.application_api.repository.ExamRepository
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
-import com.qriz.app.core.data.daily_study.daily_study_api.model.ImportanceLevel
-import com.qriz.app.core.data.daily_study.daily_study_api.model.PlannedSkill
-import com.qriz.app.core.data.daily_study.daily_study_api.model.WeeklyRecommendation
 import com.qriz.app.core.data.daily_study.daily_study_api.repository.DailyStudyRepository
+import com.qriz.app.core.domain.usecase_api.daily_study.GetDailyStudyPlanUseCase
+import com.qriz.app.core.domain.usecase_api.daily_study.GetWeeklyRecommendationUseCase
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.model.requireValue
 import com.qriz.app.core.ui.common.const.ExamScheduleState
@@ -17,7 +16,6 @@ import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
 import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.feature.base.BaseViewModel
 import com.qriz.app.feature.home.component.UserExamUiState
-import com.quiz.app.core.data.user.user_api.model.PreviewTestStatus
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -29,7 +27,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -41,6 +38,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     userRepository: UserRepository,
+    private val getDailyStudyPlanUseCase: GetDailyStudyPlanUseCase,
+    private val getWeeklyRecommendationUseCase: GetWeeklyRecommendationUseCase,
     private val examRepository: ExamRepository,
     private val dailyStudyRepository: DailyStudyRepository,
 ) : BaseViewModel<HomeUiState, HomeUiEffect, HomeUiAction>(HomeUiState.Default) {
@@ -48,20 +47,18 @@ class HomeViewModel @Inject constructor(
     private var isInitialized = false
     private val homeDataLoad = MutableStateFlow(true)
 
-    private val dataFlow = homeDataLoad.filter { it }.flatMapLatest { userRepository.getUserFlow() }
-        .flatMapLatest { user ->
-            val dailyStudyPlanFlow =
-                if (user.previewTestStatus == PreviewTestStatus.PREVIEW_COMPLETED) dailyStudyRepository.getDailyStudyPlanFlow()
-                else flowOf(fakeDailyStudyPlanResult)
-            val weeklyRecommendationFlow =
-                if (user.previewTestStatus == PreviewTestStatus.PREVIEW_COMPLETED) dailyStudyRepository.getWeeklyRecommendation()
-                else flowOf(fakeWeeklyRecommendationResult)
+    private val dataFlow = homeDataLoad
+        .filter { it }
+        .flatMapLatest {
+            val dailyStudyPlanFlow = getDailyStudyPlanUseCase()
+            val weeklyRecommendationFlow = getWeeklyRecommendationUseCase()
 
             combine(
                 dailyStudyPlanFlow,
                 weeklyRecommendationFlow,
                 examRepository.getUserExams(),
-            ) { dailyStudyPlan, weeklyRecommendation, exam ->
+                userRepository.getUserFlow(),
+            ) { dailyStudyPlan, weeklyRecommendation, exam, user ->
                 val isAllSuccess = handleError(
                     dailyStudyPlan,
                     weeklyRecommendation,
@@ -327,55 +324,5 @@ class HomeViewModel @Inject constructor(
 
     private fun List<Schedule>.findUaid(): Long? {
         return this.firstOrNull { it.userApplyId != null }?.userApplyId
-    }
-
-    companion object {
-        private val fakeDailyStudyPlanResult = ApiResult.Success(
-            listOf(
-                DailyStudyPlan(
-                    id = 0,
-                    completed = false,
-                    planDate = LocalDate.now(),
-                    completionDate = null,
-                    plannedSkills = listOf(
-                        PlannedSkill(
-                            id = 0,
-                            type = "SQL 기본",
-                            keyConcept = "WHERE 절",
-                            description = ""
-                        ),
-                        PlannedSkill(
-                            id = 0,
-                            type = "SQL 기본",
-                            keyConcept = "WHERE 절",
-                            description = ""
-                        )
-                    ),
-                    reviewDay = false,
-                    comprehensiveReviewDay = false
-                )
-            ),
-        )
-
-        private val fakeWeeklyRecommendationResult = ApiResult.Success(
-            listOf(
-                WeeklyRecommendation(
-                    skillId = 1,
-                    keyConcepts = "데이터 모델의 이해",
-                    description = "",
-                    frequency = 1,
-                    incorrectRate = null,
-                    importanceLevel = ImportanceLevel.HIGH,
-                ),
-                WeeklyRecommendation(
-                    skillId = 1,
-                    keyConcepts = "SELECT 문",
-                    description = "",
-                    frequency = 1,
-                    incorrectRate = null,
-                    importanceLevel = ImportanceLevel.LOW,
-                )
-            )
-        )
     }
 }

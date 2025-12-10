@@ -16,4 +16,8 @@ kotlin {
 
 dependencies {
     api(projects.core.data.test.testApi)
+    api(projects.core.data.dailyStudy.dailyStudyApi)
+    api(projects.core.data.user.userApi)
+
+    api(libs.coroutines.core)
 }

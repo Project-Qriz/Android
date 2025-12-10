@@ -1,11 +1,10 @@
-package com.qriz.app.core.domain.usecase
+package com.qriz.app.core.domain.usecase.onboard
 
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.domain.usecase_api.onboard.SubmitPreviewTestUseCase
 import com.qriz.app.core.model.ApiResult
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
