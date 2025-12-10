@@ -398,17 +398,14 @@ private suspend fun googleLogin(context: Context): SocialLoginResult {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 SocialLoginResult.Success(googleIdTokenCredential.idToken)
             } catch (e: GoogleIdTokenParsingException) {
-                Log.e("SignInScreen", "Received an invalid google id token response", e)
                 SocialLoginResult.Failure("Google 로그인에 실패하였습니다.")
             }
         } else {
             SocialLoginResult.Failure("Google 로그인에 실패하였습니다.")
         }
     } catch (e: GetCredentialException) {
-        Log.e("SignInScreen", "Error getting credential", e)
         SocialLoginResult.Failure(e.message ?: "Google 로그인에 실패하였습니다.")
     } catch (e: Exception) {
-        Log.e("SignInScreen", "Unexpected error during Google login", e)
         SocialLoginResult.Failure("Google 로그인 중 오류가 발생하였습니다.")
     }
 }
