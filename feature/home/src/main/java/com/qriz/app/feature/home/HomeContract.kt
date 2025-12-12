@@ -91,6 +91,7 @@ sealed interface HomeUiAction : UiAction {
     data object DismissResetPlanErrorDialog : HomeUiAction
     data object ClickMoveToDailyStudy : HomeUiAction
     data object ClickMockTestCard : HomeUiAction
+    data class ClickRecommendationCard(val id: Long) : HomeUiAction
 }
 
 sealed interface HomeUiEffect : UiEffect {
@@ -101,6 +102,7 @@ sealed interface HomeUiEffect : UiEffect {
         val isComprehensiveReview: Boolean,
     ) : HomeUiEffect
     data object MoveToMockTestSessions: HomeUiEffect
+    data class MoveToConceptBook(val id: Long) : HomeUiEffect
     data class ShowSnackBar(
         @StringRes val defaultResId: Int = DSR.string.empty,
         val message: String? = null

@@ -154,6 +154,7 @@ private fun QrizNavHost(
                 moveToPreviewTest = navController::navigatePreviewGuide,
                 moveToDailyStudy = navController::navigateToDailyStudyPlanStatus,
                 moveToMockTestSessions = navController::navigateToMockTestSessions,
+                moveToConceptBook = navController::navigateToConceptBookDetail,
                 onShowSnackbar = onShowSnackbar,
             )
 

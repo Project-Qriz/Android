@@ -115,6 +115,7 @@ class HomeViewModel @Inject constructor(
             is HomeUiAction.DismissResetPlanErrorDialog -> { updateState { copy(resetPlanErrorMessage = null) } }
             is HomeUiAction.ClickMoveToDailyStudy -> moveToDailyStudy()
             is HomeUiAction.ClickMockTestCard -> sendEffect(HomeUiEffect.MoveToMockTestSessions)
+            is HomeUiAction.ClickRecommendationCard -> sendEffect(HomeUiEffect.MoveToConceptBook(action.id))
         }
     }
 
