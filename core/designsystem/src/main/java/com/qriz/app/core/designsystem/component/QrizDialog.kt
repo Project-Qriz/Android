@@ -50,10 +50,12 @@ fun QrizDialog(
 
             Text(
                 text = description,
-                style = QrizTheme.typography.body2Long,
+                style = QrizTheme.typography.body2Long.copy(
+                    lineHeight = QrizTheme.typography.body2Long.fontSize * 1.4f
+                ),
                 color = Gray500,
                 modifier = Modifier.padding(
-                    top = 4.dp,
+                    top = 8.dp,
                     bottom = 16.dp
                 )
             )
@@ -101,7 +103,7 @@ private fun QrizDialogPreview() {
     QrizTheme {
         QrizDialog(
             title = "제출하시겠습니까?",
-            description = "확인 버튼을 누르면 다시 돌아올 수 없어요.",
+            description = "확인 버튼을 누르면 다시 돌아올 수 없어요.\n신중하게 생각해주세요",
             cancelText = "취소",
             confirmText = "확인",
             onCancelClick = { },
