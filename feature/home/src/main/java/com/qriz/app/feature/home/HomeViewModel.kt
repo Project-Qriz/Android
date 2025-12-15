@@ -155,7 +155,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             dataFlow.collect {
                 updateState { it }
-                homeDataLoad.update { false }
             }
         }
         applyExamFlow.launchIn(viewModelScope)
