@@ -35,7 +35,10 @@ data class SignUpUiState(
     val emailAuthTime: Long,
     val isVisiblePassword: Boolean,
     val isVisiblePasswordCheck: Boolean,
-    val failureDialogState: FailureDialogState?
+    val failureDialogState: FailureDialogState?,
+    val showTermsAgreementBottomSheet: Boolean,
+    val agreeToTermsOfService: Boolean,
+    val agreeToPrivacyPolicy: Boolean,
 ) : UiState {
     val timerText: String = "${(emailAuthTime / 60000)}:${
         (emailAuthTime % 60000 / 1000).toString().padStart(
@@ -138,6 +141,9 @@ data class SignUpUiState(
             emailAuthTime = AUTHENTICATION_LIMIT_MILS,
             focusState = FocusState.NONE,
             failureDialogState = null,
+            showTermsAgreementBottomSheet = false,
+            agreeToTermsOfService = false,
+            agreeToPrivacyPolicy = false,
         )
     }
 }
@@ -160,6 +166,11 @@ sealed interface SignUpUiAction : UiAction {
     data object DismissFailureDialog : SignUpUiAction
     data class ChangePasswordVisibility(val isVisible: Boolean) : SignUpUiAction
     data class ChangePasswordCheckVisibility(val isVisible: Boolean) : SignUpUiAction
+    data object DismissTermsAgreementBottomSheet : SignUpUiAction
+    data object ToggleAllTerms : SignUpUiAction
+    data object ToggleTermsOfService : SignUpUiAction
+    data object TogglePrivacyPolicy : SignUpUiAction
+    data object ConfirmTermsAgreement : SignUpUiAction
 }
 
 sealed interface SignUpUiEffect : UiEffect {
@@ -168,4 +179,5 @@ sealed interface SignUpUiEffect : UiEffect {
     data class ShowSnackBer(
         @StringRes val defaultResId: Int, val message: String? = null
     ) : SignUpUiEffect
+    data class NavigateToTermsWebView(val url: String) : SignUpUiEffect
 }

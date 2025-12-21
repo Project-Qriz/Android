@@ -59,6 +59,7 @@ import com.qriz.app.feature.sign.navigation.navigateFindPasswordAuth
 import com.qriz.app.feature.sign.navigation.navigateResetPassword
 import com.qriz.app.feature.sign.navigation.navigateSignIn
 import com.qriz.app.feature.sign.navigation.navigateSignUp
+import com.qriz.app.feature.sign.navigation.navigateTermsWebView
 import com.qriz.app.feature.sign.navigation.signNavGraph
 import com.qriz.app.feature.splash.navigation.splashNavGraph
 import kotlinx.collections.immutable.toImmutableList
@@ -156,7 +157,8 @@ private fun QrizNavHost(
                 moveToHome = { mainNavigator.navigateMainTabClearingStack(MainTab.HOME) },
                 moveToConceptCheckGuide = navController::navigateConceptCheckGuide,
                 moveToResetPw = navController::navigateResetPassword,
-                moveToSignIn = navController::navigateSignIn
+                moveToSignIn = navController::navigateSignIn,
+                moveToTermsWebView = navController::navigateTermsWebView
             )
 
             onboardNavGraph(

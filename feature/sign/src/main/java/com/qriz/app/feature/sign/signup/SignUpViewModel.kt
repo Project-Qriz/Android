@@ -49,6 +49,11 @@ open class SignUpViewModel @Inject constructor(
             is SignUpUiAction.ChangePasswordVisibility -> updateState { copy(isVisiblePassword = action.isVisible) }
             is SignUpUiAction.ChangePasswordCheckVisibility -> updateState { copy(isVisiblePasswordCheck = action.isVisible) }
             is SignUpUiAction.DismissFailureDialog -> updateState { copy(failureDialogState = null) }
+            is SignUpUiAction.DismissTermsAgreementBottomSheet -> updateState { copy(showTermsAgreementBottomSheet = false) }
+            is SignUpUiAction.ToggleAllTerms -> toggleAllTerms()
+            is SignUpUiAction.ToggleTermsOfService -> updateState { copy(agreeToTermsOfService = !agreeToTermsOfService) }
+            is SignUpUiAction.TogglePrivacyPolicy -> updateState { copy(agreeToPrivacyPolicy = !agreeToPrivacyPolicy) }
+            is SignUpUiAction.ConfirmTermsAgreement -> confirmTermsAgreement()
         }
     }
 
@@ -384,8 +389,12 @@ open class SignUpViewModel @Inject constructor(
     }
 
     private fun onClickSignUp() {
-        updateState { copy(failureDialogState = null) }
-        signUp()
+        updateState {
+            copy(
+                failureDialogState = null,
+                showTermsAgreementBottomSheet = true
+            )
+        }
     }
 
     private fun onClickIdDuplicateCheck() {
@@ -394,6 +403,41 @@ open class SignUpViewModel @Inject constructor(
 
     private fun changeFocus(focusState: SignUpUiState.FocusState) {
         updateState { copy(focusState = focusState) }
+    }
+
+    /*
+    * ******************************************
+    * TERMS AGREEMENT
+    * ******************************************
+    */
+    private fun toggleAllTerms() {
+        val currentState = uiState.value
+        val shouldAgreeAll = !currentState.agreeToTermsOfService || !currentState.agreeToPrivacyPolicy
+
+        updateState {
+            copy(
+                agreeToTermsOfService = shouldAgreeAll,
+                agreeToPrivacyPolicy = shouldAgreeAll
+            )
+        }
+    }
+
+    private fun confirmTermsAgreement() {
+        val currentState = uiState.value
+        if (!currentState.agreeToTermsOfService || !currentState.agreeToPrivacyPolicy) {
+            return
+        }
+
+        updateState { copy(showTermsAgreementBottomSheet = false) }
+        signUp()
+    }
+
+    fun navigateToTermsOfServiceWebView() {
+        sendEffect(SignUpUiEffect.NavigateToTermsWebView(TERMS_OF_SERVICE_URL))
+    }
+
+    fun navigateToPrivacyPolicyWebView() {
+        sendEffect(SignUpUiEffect.NavigateToTermsWebView(PRIVACY_POLICY_URL))
     }
 
     private fun signUp() = viewModelScope.launch {
@@ -462,5 +506,7 @@ open class SignUpViewModel @Inject constructor(
 
     companion object {
         val AUTHENTICATION_LIMIT_MILS = 3.minutes.inWholeMilliseconds
+        private const val PRIVACY_POLICY_URL = "https://docs.google.com/gview?embedded=true&url=https://qriz-c34bb.web.app/privacy.docx"
+        private const val TERMS_OF_SERVICE_URL = "https://docs.google.com/gview?embedded=true&url=https://qriz-c34bb.web.app/term.docx"
     }
 }

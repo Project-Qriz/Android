@@ -22,6 +22,9 @@ sealed interface SignRoute : Route {
 
     @Serializable
     data class ResetPassword(val resetToken: String) : SignRoute
+
+    @Serializable
+    data class TermsWebView(val url: String) : SignRoute
 }
 
 sealed interface OnBoardRoute : Route {

@@ -12,6 +12,11 @@ import com.qriz.app.feature.sign.findPassword.auth.FindPasswordAuthScreen
 import com.qriz.app.feature.sign.findPassword.reset.ResetPasswordScreen
 import com.qriz.app.feature.sign.signin.SignInScreen
 import com.qriz.app.feature.sign.signup.SignUpScreen
+import com.qriz.app.feature.sign.termswebview.TermsWebViewScreen
+
+fun NavHostController.navigateTermsWebView(url: String) {
+    navigate(SignRoute.TermsWebView(url))
+}
 
 fun NavHostController.navigateSignIn(navOptions: NavOptions? = null) {
     navigate(
@@ -54,6 +59,7 @@ fun NavGraphBuilder.signNavGraph(
     onShowSnackbar: (String) -> Unit,
     moveToResetPw: (String) -> Unit,
     moveToSignIn: () -> Unit,
+    moveToTermsWebView: (String) -> Unit,
 ) {
     composable<SignRoute.SignIn> {
         SignInScreen(
@@ -70,6 +76,7 @@ fun NavGraphBuilder.signNavGraph(
             onBack = onBack,
             moveToConceptCheckGuide = moveToConceptCheckGuide,
             onShowSnackbar = onShowSnackbar,
+            moveToTermsWebView = moveToTermsWebView,
         )
     }
 
@@ -90,6 +97,14 @@ fun NavGraphBuilder.signNavGraph(
             onBack = onBack,
             onShowSnackbar = onShowSnackbar,
             moveToSignIn = moveToSignIn
+        )
+    }
+
+    composable<SignRoute.TermsWebView> {
+        val url = it.toRoute<SignRoute.TermsWebView>().url
+        TermsWebViewScreen(
+            url = url,
+            onBack = onBack
         )
     }
 }
