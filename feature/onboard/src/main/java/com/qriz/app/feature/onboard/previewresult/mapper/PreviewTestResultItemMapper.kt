@@ -74,6 +74,8 @@ fun PreviewTestResult.toPreviewTestResultItem(): PreviewTestResultItem {
                 )
             }
             .toImmutableList(),
-        topConceptsToImprove = topConceptsToImprove.toImmutableList(),
+        topConceptsToImprove = topConceptsToImprove
+            .subList(0, 2)
+            .toImmutableList(),
     )
 }
