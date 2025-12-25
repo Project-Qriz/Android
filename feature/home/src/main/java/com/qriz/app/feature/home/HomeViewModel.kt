@@ -65,11 +65,10 @@ class HomeViewModel @Inject constructor(
                     exam
                 )
 
-                val dailyStudyPlans = dailyStudyPlan.requireValue.toImmutableList()
-
-                initializePlanDate(dailyStudyPlans)
-
                 if (isAllSuccess) {
+                    val dailyStudyPlans = dailyStudyPlan.requireValue.toImmutableList()
+                    initializePlanDate(dailyStudyPlans)
+
                     uiState.value.copy(
                         user = user,
                         userExamState = exam.requireValue.toUiState(),

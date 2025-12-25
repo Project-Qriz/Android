@@ -20,10 +20,10 @@ internal class GetDailyStudyPlanUseCaseImpl @Inject constructor(
 ): GetDailyStudyPlanUseCase {
     override fun invoke(): Flow<ApiResult<List<DailyStudyPlan>>> =
         userRepository.getUserFlow()
-            .map { it.isSurveyNeeded }
+            .map { it.previewTestStatus.isNeedPreviewTest() }
             .distinctUntilChanged()
-            .flatMapLatest { isSurveyNeeded ->
-                if (isSurveyNeeded) {
+            .flatMapLatest { isNeedPreviewTest ->
+                if (isNeedPreviewTest) {
                     flowOf(fakeDailyStudyPlan)
                 } else {
                     dailyStudyRepository.getDailyStudyPlanFlow()

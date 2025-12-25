@@ -3,6 +3,7 @@ package com.qriz.app
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.LibraryExtension
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.gradle.api.Project
 import org.gradle.api.artifacts.MinimalExternalModuleDependency
 import org.gradle.api.artifacts.VersionCatalog
@@ -31,3 +32,6 @@ internal val Project.libs: VersionCatalog
 
 internal fun Project.findLibrary(name: String): Provider<MinimalExternalModuleDependency> =
 	libs.findLibrary(name).get()
+
+fun Project.getLocalProperty(key: String): String =
+	gradleLocalProperties(rootDir, providers).getProperty(key)

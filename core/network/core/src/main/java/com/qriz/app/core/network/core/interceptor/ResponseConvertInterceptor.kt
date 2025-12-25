@@ -25,7 +25,7 @@ class ResponseConvertInterceptor @Inject constructor(
             val path = request.url.pathSegments.joinToString("/")
             val prunedBody = pruneField(bodyString).toResponseBody(responseContentType)
 
-            if (path == LOGIN_API_PATH) {
+            if (path == LOGIN_API_PATH || path == SOCIAL_LOGIN_API_PATH) {
                 val accessToken = response.headers["Authorization"]?.removePrefix("Bearer ") ?: ""
                 convertAuthResponse(
                     accessToken = accessToken,
@@ -77,5 +77,6 @@ class ResponseConvertInterceptor @Inject constructor(
 
     companion object {
         private const val LOGIN_API_PATH = "api/login"
+        private const val SOCIAL_LOGIN_API_PATH = "api/auth/social/login"
     }
 }

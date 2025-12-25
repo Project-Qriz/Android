@@ -19,10 +19,10 @@ internal class GetWeeklyRecommendationUseCaseImpl @Inject constructor(
 ): GetWeeklyRecommendationUseCase {
     override fun invoke(): Flow<ApiResult<List<WeeklyRecommendation>>> =
         userRepository.getUserFlow()
-            .map { it.isSurveyNeeded }
+            .map { it.previewTestStatus.isNeedPreviewTest() }
             .distinctUntilChanged()
-            .flatMapLatest { isSurveyNeeded ->
-                if (isSurveyNeeded) {
+            .flatMapLatest { isNeedPreviewTest ->
+                if (isNeedPreviewTest) {
                     flowOf(fakeWeeklyRecommendation)
                 } else {
                     dailyStudyRepository.getWeeklyRecommendation()

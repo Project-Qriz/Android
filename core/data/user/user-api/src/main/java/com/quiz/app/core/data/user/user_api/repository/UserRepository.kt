@@ -1,6 +1,7 @@
 package com.quiz.app.core.data.user.user_api.repository
 
 import com.qriz.app.core.model.ApiResult
+import com.quiz.app.core.data.user.user_api.model.SocialLoginType
 import com.quiz.app.core.data.user.user_api.model.User
 import kotlinx.coroutines.flow.Flow
 
@@ -40,4 +41,9 @@ interface UserRepository {
     suspend fun logout()
 
     suspend fun withdraw(): ApiResult<Unit>
+
+    suspend fun socialLogin(
+        socialLoginType: SocialLoginType,
+        token: String,
+    ): ApiResult<User>
 }

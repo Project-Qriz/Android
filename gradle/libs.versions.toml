@@ -66,6 +66,18 @@ jetbrainsKotlinJvm = "1.9.24"
 # https://github.com/patrykandpatrick/vico/releases
 vico = "2.1.3"
 
+# https://developers.kakao.com/docs/latest/ko/android/download
+kakaoSdk = "2.22.0"
+
+# https://developers.kakao.com/docs/latest/ko/android/download\
+googleAuth = "21.4.0"
+
+# https://developer.android.com/identity/sign-in/credential-manager
+credentials = "1.6.0-beta03"
+
+# https://developers.google.com/identity/android-credential-manager
+googleid = "1.1.1"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -132,6 +144,18 @@ coil-core = { group = "io.coil-kt.coil3", name = "coil-core", version.ref = "coi
 
 # chart
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
+
+# kakao
+kakao-sdk-user = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakaoSdk" }
+
+#google-login
+google-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "googleAuth" }
+
+# credentials
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
+google-android-libraries-identity-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.qriz.app.core.designsystem.component.NavigationType
@@ -23,6 +26,7 @@ import com.qriz.app.feature.mypage.R
 import com.qriz.app.feature.mypage.setting.component.LogoutDialog
 import com.qriz.app.feature.mypage.setting.component.SettingItemCard
 import com.qriz.app.feature.mypage.setting.component.UserCard
+import kotlinx.coroutines.launch
 
 @Composable
 fun SettingScreen(
@@ -35,6 +39,7 @@ fun SettingScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     viewModel.collectSideEffect {
         when (it) {
@@ -44,6 +49,12 @@ fun SettingScreen(
             is SettingUiEffect.NavigateToResetPassword -> moveToResetPassword()
             is SettingUiEffect.NavigateToLogin -> moveToLogin()
             is SettingUiEffect.NavigateToWithdraw -> moveToWithDraw()
+            is SettingUiEffect.ClearGoogleCredentials -> {
+                coroutineScope.launch {
+                    val credentialManager = CredentialManager.create(context)
+                    credentialManager.clearCredentialState(ClearCredentialStateRequest())
+                }
+            }
         }
     }
 
@@ -67,7 +78,7 @@ fun SettingScreen(
 @Composable
 fun SettingContent(
     userName: String,
-    email: String,
+    email: String?,
     showLogoutDialog: Boolean,
     onNavigateBack: () -> Unit,
     onClickResetPassword: () -> Unit,
