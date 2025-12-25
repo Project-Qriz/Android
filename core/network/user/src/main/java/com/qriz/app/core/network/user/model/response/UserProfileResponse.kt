@@ -9,4 +9,5 @@ data class UserProfileResponse(
     @SerialName("email") val email: String?,
     @SerialName("name") val name: String,
     @SerialName("previewTestStatus") val previewStatus: String,
+    @SerialName("provider") val provider: String?
 )

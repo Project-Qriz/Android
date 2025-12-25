@@ -2,6 +2,10 @@ package com.qriz.app.feature.sign.signin
 
 import android.content.Context
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,14 +39,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.google.android.gms.auth.api.identity.AuthorizationRequest
+import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
+import com.google.android.gms.common.api.Scope
 import com.kakao.sdk.user.UserApiClient
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.component.QrizLoading
@@ -53,7 +59,7 @@ import com.qriz.app.core.designsystem.theme.Gray500
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.Red700
 import com.qriz.app.feature.base.extention.collectSideEffect
-import com.qriz.app.feature.sign.BuildConfig
+import com.qriz.app.feature.sign.BuildConfig.GOOGLE_CLOUD_CONSOLE_CLIENT_ID
 import com.qriz.app.feature.sign.R
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -74,6 +80,20 @@ fun SignInScreen(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
+    val onResultOnGoogleLogin: (String) -> Unit = remember {
+        { authCode -> viewModel.process(SignInUiAction.ProcessGoogleLogin(authCode)) }
+    }
+
+    val onFailureOnGoogleLogin: (String) -> Unit = remember {
+        { errorMessage -> viewModel.process(SignInUiAction.ShowSnackbar(errorMessage)) }
+    }
+
+    val googleLoginLauncher = rememberGoogleLoginLauncher(
+        context = context,
+        onResult = onResultOnGoogleLogin,
+        onFailure = onFailureOnGoogleLogin
+    )
+
     viewModel.collectSideEffect {
         when (it) {
             is SignInUiEffect.ShowSnackBar -> onShowSnackbar(
@@ -90,12 +110,13 @@ fun SignInScreen(
 
             SignInUiEffect.KakaoLogin -> {
                 coroutineScope.launch {
-                    when(val result = kakaoLogin(context)) {
+                    when (val result = kakaoLogin(context)) {
                         is SocialLoginResult.Failure -> viewModel.process(
                             SignInUiAction.ShowSnackbar(
                                 result.message
                             )
                         )
+
                         is SocialLoginResult.Success -> viewModel.process(
                             SignInUiAction.ProcessKakaoLogin(
                                 result.token
@@ -106,20 +127,12 @@ fun SignInScreen(
             }
 
             SignInUiEffect.GoogleLogin -> {
-                coroutineScope.launch {
-                    when(val result = googleLogin(context)) {
-                        is SocialLoginResult.Failure -> viewModel.process(
-                            SignInUiAction.ShowSnackbar(
-                                result.message
-                            )
-                        )
-                        is SocialLoginResult.Success -> viewModel.process(
-                            SignInUiAction.ProcessGoogleLogin(
-                                result.token
-                            )
-                        )
-                    }
-                }
+                googleLogin(
+                    launcher = googleLoginLauncher,
+                    context = context,
+                    onResult = onResultOnGoogleLogin,
+                    onFailure = onFailureOnGoogleLogin,
+                )
             }
 
             SignInUiEffect.MoveToConceptCheckGuide -> moveToConceptCheckGuide()
@@ -356,7 +369,7 @@ private fun SignInContent(
     }
 }
 
-private suspend fun kakaoLogin(context: Context) = suspendCancellableCoroutine{
+private suspend fun kakaoLogin(context: Context) = suspendCancellableCoroutine {
     val isAvailable = UserApiClient.instance.isKakaoTalkLoginAvailable(context)
     if (isAvailable.not()) {
         it.resume(SocialLoginResult.Failure("카카오톡을 설치해주세요"))
@@ -373,41 +386,89 @@ private suspend fun kakaoLogin(context: Context) = suspendCancellableCoroutine{
     }
 }
 
-private suspend fun googleLogin(context: Context): SocialLoginResult {
-    return try {
-        val credentialManager = CredentialManager.create(context)
-
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(BuildConfig.GOOGLE_CLOUD_CONSOLE_CLIENT_ID)
-            .build()
-
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
-
-        val result = credentialManager.getCredential(
-            request = request,
-            context = context,
-        )
-
-        val credential = result.credential
-
-        if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-            try {
-                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                SocialLoginResult.Success(googleIdTokenCredential.idToken)
-            } catch (e: GoogleIdTokenParsingException) {
-                SocialLoginResult.Failure("Google 로그인에 실패하였습니다.")
+@Composable
+private fun rememberGoogleLoginLauncher(
+    context: Context,
+    onResult: (String) -> Unit,
+    onFailure: (String) -> Unit,
+) = rememberLauncherForActivityResult(
+    ActivityResultContracts.StartIntentSenderForResult()
+) { result ->
+    try {
+        val authorizationResult =
+            Identity.getAuthorizationClient(context).getAuthorizationResultFromIntent(result.data)
+        val authCode: String = authorizationResult.serverAuthCode ?: ""
+        onResult(authCode)
+    } catch (e: ApiException) {
+        Log.e("GoogleLogin", "Google login launcher failed", e)
+        val errorMessage = when (e.statusCode) {
+            CommonStatusCodes.CANCELED -> {
+                // 사용자가 로그인을 취소한 경우 - 조용히 처리
+                return@rememberLauncherForActivityResult
             }
-        } else {
-            SocialLoginResult.Failure("Google 로그인에 실패하였습니다.")
+            CommonStatusCodes.NETWORK_ERROR -> {
+                "네트워크 연결을 확인해주세요"
+            }
+            else -> {
+                "구글 로그인에 실패하였습니다"
+            }
         }
-    } catch (e: GetCredentialException) {
-        SocialLoginResult.Failure(e.message ?: "Google 로그인에 실패하였습니다.")
-    } catch (e: Exception) {
-        SocialLoginResult.Failure("Google 로그인 중 오류가 발생하였습니다.")
+        onFailure(errorMessage)
     }
+}
+
+//TODO: 로그아웃 시 기본 계정 clear 시키기
+private fun googleLogin(
+    context: Context,
+    launcher: ActivityResultLauncher<IntentSenderRequest>,
+    onResult: (String) -> Unit,
+    onFailure: (String) -> Unit,
+) {
+    val authorizationRequest =
+        AuthorizationRequest.builder()
+            .setRequestedScopes(
+                listOf(
+                    Scope("email"),
+                    Scope("profile")
+                )
+            )
+            .requestOfflineAccess(GOOGLE_CLOUD_CONSOLE_CLIENT_ID)
+            .build()
+
+
+    Identity.getAuthorizationClient(context).authorize(authorizationRequest)
+        .addOnSuccessListener { authorizationResult ->
+            if (authorizationResult.serverAuthCode != null) {
+                onResult(authorizationResult.serverAuthCode!!)
+            } else {
+                if (authorizationResult.pendingIntent != null) {
+                    launcher.launch(
+                        IntentSenderRequest.Builder(
+                            authorizationResult.pendingIntent!!.intentSender
+                        ).build()
+                    )
+                }
+            }
+        }.addOnFailureListener { e ->
+            Log.e("GoogleLogin", "Google login failed", e)
+            val errorMessage = when {
+                e is ApiException -> {
+                    when (e.statusCode) {
+                        CommonStatusCodes.CANCELED -> {
+                            return@addOnFailureListener
+                        }
+                        CommonStatusCodes.NETWORK_ERROR -> {
+                            "네트워크 연결을 확인해주세요"
+                        }
+                        else -> {
+                            "구글 로그인에 실패하였습니다"
+                        }
+                    }
+                }
+                else -> "구글 로그인에 실패하였습니다"
+            }
+            onFailure(errorMessage)
+        }
 }
 
 private sealed interface SocialLoginResult {

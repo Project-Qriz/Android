@@ -42,4 +42,5 @@ sealed interface SettingUiEffect : UiEffect {
     data object NavigateToResetPassword : SettingUiEffect
     data object NavigateToLogin : SettingUiEffect
     data object NavigateToWithdraw : SettingUiEffect
+    data object ClearGoogleCredentials : SettingUiEffect
 }

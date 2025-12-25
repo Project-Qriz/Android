@@ -43,4 +43,5 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.google.android.libraries.identity.googleid)
+    implementation(libs.google.auth)
 }

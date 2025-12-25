@@ -14,6 +14,7 @@ import com.qriz.app.core.network.user.model.request.LoginRequest
 import com.qriz.app.core.network.user.model.request.ResetPwdRequest
 import com.qriz.app.core.network.user.model.request.SingleEmailRequest
 import com.qriz.app.core.network.user.model.request.VerifyPwdResetRequest
+import com.quiz.app.core.data.user.user_api.model.LoginType
 import com.quiz.app.core.data.user.user_api.model.SocialLoginType
 import com.quiz.app.core.data.user.user_api.model.User
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
@@ -42,7 +43,8 @@ internal class UserRepositoryImpl @Inject constructor(
                 accessToken = it.accessToken,
                 refreshToken = it.refreshToken
             )
-            it.user.toDataModel().also { user -> this.user.value = user }
+            it.user.toDataModel(loginType = LoginType.EMAIL)
+                .also { user -> this.user.value = user }
         }
 
         return response
@@ -80,7 +82,9 @@ internal class UserRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getUserProfileFromServer(): ApiResult<User> {
-        return userApi.getUserProfile().map { it.toDataModel() }
+        return userApi.getUserProfile().map {
+            it.toDataModel(loginType = LoginType.from(it.provider))
+        }
     }
 
     override suspend fun requestEmailAuthNumber(email: String): ApiResult<Unit> =
@@ -172,11 +176,11 @@ internal class UserRepositoryImpl @Inject constructor(
         return result
     }
 
-    override suspend fun socialLogin(socialLoginType: SocialLoginType, token: String) = userApi
-        .socialLogin(
+    override suspend fun socialLogin(socialLoginType: SocialLoginType, token: String) =
+        userApi.socialLogin(
             mapOf(
                 "provider" to socialLoginType.name.lowercase(),
-                when(socialLoginType) {
+                when (socialLoginType) {
                     SocialLoginType.KAKAO -> "authCode"
                     SocialLoginType.GOOGLE -> "serverAuthCode"
                 } to token,
@@ -187,6 +191,11 @@ internal class UserRepositoryImpl @Inject constructor(
                 accessToken = it.accessToken,
                 refreshToken = it.refreshToken
             )
-            it.user.toDataModel()
+            it.user.toDataModel(
+                loginType = when (socialLoginType) {
+                    SocialLoginType.KAKAO -> LoginType.KAKAO
+                    SocialLoginType.GOOGLE -> LoginType.GOOGLE
+                }
+            )
         }
 }

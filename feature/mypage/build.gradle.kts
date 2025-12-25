@@ -30,4 +30,7 @@ dependencies {
     implementation(projects.core.data.application.applicationApi)
     implementation(projects.core.data.dailyStudy.dailyStudyApi)
     implementation(projects.core.ui.common)
+
+    // credentials for clearing Google login state
+    implementation(libs.androidx.credentials)
 }

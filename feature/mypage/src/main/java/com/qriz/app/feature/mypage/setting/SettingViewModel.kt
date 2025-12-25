@@ -1,8 +1,10 @@
 package com.qriz.app.feature.mypage.setting
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.model.requireValue
 import com.qriz.app.feature.base.BaseViewModel
+import com.quiz.app.core.data.user.user_api.model.LoginType
 import com.quiz.app.core.data.user.user_api.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -30,6 +32,13 @@ class SettingViewModel @Inject constructor(
 
     private suspend fun logout() {
         updateState { copy(showLogoutDialog = false) }
+
+        val user = userRepository.getUser().requireValue
+        Log.d("SettingViewModel", "logout: ${user.loginType}")
+        if (user.loginType == LoginType.GOOGLE) {
+            sendEffect(SettingUiEffect.ClearGoogleCredentials)
+        }
+
         userRepository.logout()
         sendEffect(SettingUiEffect.NavigateToLogin)
     }

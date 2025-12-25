@@ -17,7 +17,8 @@ data class User(
     val userId: String,
     val name: String,
     val email: String?,
-    val previewTestStatus: PreviewTestStatus
+    val previewTestStatus: PreviewTestStatus,
+    val loginType: LoginType
 ) {
     val isSurveyNeeded
         get() = previewTestStatus == NOT_STARTED
@@ -27,7 +28,8 @@ data class User(
             userId = "",
             name = "",
             email = "",
-            previewTestStatus = NOT_STARTED
+            previewTestStatus = NOT_STARTED,
+            loginType = LoginType.EMAIL,
         )
     }
 }
@@ -46,4 +48,21 @@ enum class PreviewTestStatus {
     PREVIEW_COMPLETED;
 
     fun isNeedPreviewTest() = this == NOT_STARTED || this == SURVEY_COMPLETED
+}
+
+/**
+ * 유저 로그인 타입
+ */
+enum class LoginType {
+    KAKAO,
+    GOOGLE,
+    EMAIL;
+
+    companion object {
+        fun from(value: String?): LoginType = when(value) {
+            "KAKAO" -> KAKAO
+            "GOOGLE" -> GOOGLE
+            else -> EMAIL
+        }
+    }
 }
