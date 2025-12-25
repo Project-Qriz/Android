@@ -23,6 +23,8 @@ class PreviewResultViewModel @Inject constructor(
             is PreviewResultUiAction.LoadPreviewResult -> loadPreviewResult()
             is PreviewResultUiAction.ObserveClient -> observeClient()
             is PreviewResultUiAction.ClickClose -> onClickClose()
+            is PreviewResultUiAction.DismissTooltip -> updateState { copy(showTooltip = false) }
+            is PreviewResultUiAction.ShowTooltip -> updateState { copy(showTooltip = true) }
         }
     }
 

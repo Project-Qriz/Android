@@ -37,12 +37,17 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.round
 import com.qriz.app.core.designsystem.component.QrizCard
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Gray100
@@ -70,7 +75,10 @@ fun TestResultDonutChartCard(
     chartTitle: String? = null,
     isLessScore: Boolean = false,
     estimatedScore: Float? = null,
+    showEstimatedScoreTooltip: Boolean = false,
     onClickDetail: (() -> Unit)? = null,
+    onEstimatedScoreTooltipClick: (() -> Unit)? = null,
+    onEstimatedScoreTooltipDismissRequest: (() -> Unit)? = null,
 ) {
     TestResultBaseCard(
         modifier = modifier,
@@ -123,8 +131,22 @@ fun TestResultDonutChartCard(
             )
 
             if (estimatedScore != null) {
+                var expectedScoreOffset by remember { mutableStateOf(IntOffset.Zero) }
+                var expectedScoreSize by remember { mutableStateOf(IntSize.Zero) }
+
+                if (showEstimatedScoreTooltip) {
+                    ExpectedScoreTooltip(
+                        targetOffset = expectedScoreOffset,
+                        targetSize = expectedScoreSize,
+                        onDismissRequest = onEstimatedScoreTooltipDismissRequest!!,
+                    )
+                }
                 Row(
                     modifier = Modifier
+                        .onGloballyPositioned {
+                            expectedScoreOffset = it.positionInParent().round()
+                            expectedScoreSize = it.size
+                        }
                         .align(Alignment.CenterHorizontally)
                         .padding(top = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -138,7 +160,7 @@ fun TestResultDonutChartCard(
                     )
                     IconButton(
                         modifier = Modifier.size(13.dp),
-                        onClick = {}, //TODO: 다이얼로그 노출 디자인 추가 예정
+                        onClick = onEstimatedScoreTooltipClick!!,
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.exclamation_mark_icon),

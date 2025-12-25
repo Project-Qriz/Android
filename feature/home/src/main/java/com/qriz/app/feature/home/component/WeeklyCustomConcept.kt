@@ -46,7 +46,7 @@ fun WeeklyCustomConcept(
     isNeedPreviewTest: Boolean,
     modifier: Modifier = Modifier,
     horizontalPadding: Dp = 18.dp,
-    onClick: () -> Unit,
+    onClick: (Long) -> Unit,
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
@@ -91,7 +91,7 @@ fun WeeklyCustomConcept(
                     modifier = Modifier
                         .padding(bottom = 8.dp)
                         .padding(horizontal = horizontalPadding),
-                    onClick = if (isNeedPreviewTest) null else onClick
+                    onClick = { onClick(it.skillId) }.takeIf { !isNeedPreviewTest }
                 )
             }
         }
@@ -106,14 +106,15 @@ fun WeeklyCustomConceptCard(
     onClick: (() -> Unit)? = null
 ) {
     QrizCard(
-        modifier = modifier.clickable(enabled = onClick != null,
-                onClick = { onClick?.invoke() }),
+        modifier = modifier.clickable(
+            enabled = onClick != null,
+            onClick = { onClick?.invoke() }),
     ) {
         Column(
             modifier = Modifier.padding(
-                    vertical = 12.dp,
-                    horizontal = 18.dp
-                )
+                vertical = 12.dp,
+                horizontal = 18.dp
+            )
         ) {
             Text(
                 text = keyConcept,
@@ -156,12 +157,15 @@ fun WeeklyCustomConceptCard(
             ) {
                 Box(
                     modifier = Modifier.padding(
-                            vertical = 4.dp,
-                            horizontal = 8.dp
-                        )
+                        vertical = 4.dp,
+                        horizontal = 8.dp
+                    )
                 ) {
                     Text(
-                        text = stringResource(R.string.importance_level, importanceLevel.displayName),
+                        text = stringResource(
+                            R.string.importance_level,
+                            importanceLevel.displayName
+                        ),
                         style = QrizTheme.typography.label2,
                         color = when (importanceLevel) {
                             ImportanceLevel.HIGH -> Red800

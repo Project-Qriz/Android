@@ -67,3 +67,6 @@ include(":feature:incorrect-answers-note")
 include(":feature:mypage")
 include(":feature:daily-study")
 include(":feature:mock-test")
+
+include(":core:domain:usecase-api")
+include(":core:domain:usecase")

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.qriz.app.core.data.onboard.onboard_api.repository.OnBoardRepository
 import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Test
+import com.qriz.app.core.domain.usecase_api.onboard.SubmitPreviewTestUseCase
 import com.qriz.app.core.model.ApiResult
 import com.qriz.app.core.ui.common.resource.NETWORK_IS_UNSTABLE
 import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
@@ -31,6 +32,7 @@ import com.qriz.app.core.designsystem.R as DSR
 open class PreviewViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val onBoardRepository: OnBoardRepository,
+    private val submitTestUseCase: SubmitPreviewTestUseCase,
 ) : BaseViewModel<PreviewUiState, PreviewUiEffect, PreviewUiAction>(PreviewUiState.Default) {
     private val isTest = savedStateHandle.get<Boolean>(IS_TEST_FLAG) ?: false
 
@@ -164,7 +166,7 @@ open class PreviewViewModel @Inject constructor(
             return@launch
         }
         updateState { copy(loadStatus = Loading) }
-        when(val result = onBoardRepository.submitPreviewTest(selectedOptions)) {
+        when(val result = submitTestUseCase(selectedOptions)) {
             is ApiResult.Success -> {
                 sendEffect(PreviewUiEffect.MoveToResult)
             }

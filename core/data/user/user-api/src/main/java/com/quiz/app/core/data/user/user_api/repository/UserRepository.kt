@@ -14,6 +14,8 @@ interface UserRepository {
 
     suspend fun getUser(): ApiResult<User>
 
+    suspend fun fetchUser(): ApiResult<Unit>
+
     suspend fun requestEmailAuthNumber(email: String): ApiResult<Unit>
 
     suspend fun verifyEmailAuthNumber(email: String, authenticationNumber: String): ApiResult<Unit>

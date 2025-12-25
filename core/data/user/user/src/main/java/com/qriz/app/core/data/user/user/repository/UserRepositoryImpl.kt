@@ -66,6 +66,18 @@ internal class UserRepositoryImpl @Inject constructor(
         return result
     }
 
+    override suspend fun fetchUser(): ApiResult<Unit> {
+        return when (val result = getUserProfileFromServer()) {
+            is ApiResult.Success -> {
+                user.update { result.data }
+                ApiResult.Success(Unit)
+            }
+            is ApiResult.Failure -> result
+            is ApiResult.NetworkError -> result
+            is ApiResult.UnknownError -> result
+        }
+    }
+
     private suspend fun getUserProfileFromServer(): ApiResult<User> {
         return userApi.getUserProfile().map { it.toDataModel() }
     }

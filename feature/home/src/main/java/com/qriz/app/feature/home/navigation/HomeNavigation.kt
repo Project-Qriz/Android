@@ -15,6 +15,7 @@ fun NavGraphBuilder.homeNavGraph(
     moveToPreviewTest: () -> Unit,
     moveToDailyStudy: (Int, Boolean, Boolean) -> Unit,
     moveToMockTestSessions: () -> Unit,
+    moveToConceptBook: (Long) -> Unit,
     onShowSnackbar: (String) -> Unit,
 ) {
     composable<MainTabRoute.Home> {
@@ -22,6 +23,7 @@ fun NavGraphBuilder.homeNavGraph(
             moveToPreviewTest = moveToPreviewTest,
             moveToDailyStudy = moveToDailyStudy,
             moveToMockTestSessions = moveToMockTestSessions,
+            moveToConceptBook = moveToConceptBook,
             onShowSnackBar = onShowSnackbar,
         )
     }

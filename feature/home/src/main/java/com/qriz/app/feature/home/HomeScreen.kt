@@ -59,6 +59,7 @@ fun HomeScreen(
     moveToPreviewTest: () -> Unit,
     moveToDailyStudy: (Int, Boolean, Boolean) -> Unit,
     moveToMockTestSessions: () -> Unit,
+    moveToConceptBook: (Long) -> Unit,
     onShowSnackBar: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -77,6 +78,7 @@ fun HomeScreen(
             )
 
             is HomeUiEffect.MoveToMockTestSessions -> moveToMockTestSessions()
+            is HomeUiEffect.MoveToConceptBook -> moveToConceptBook(it.id)
         }
     }
 
@@ -164,11 +166,11 @@ fun HomeScreen(
         onClickMockTest = { viewModel.process(HomeUiAction.ClickMockTestCard) },
         onClickPreviewTest = { viewModel.process(HomeUiAction.MoveToPreviewTest) },
         onChangeTodayStudyCard = { viewModel.process(HomeUiAction.ChangeStudyPlanDate(it)) },
-        onClickWeeklyCustomConcept = {},
+        onClickWeeklyCustomConcept = { viewModel.process(HomeUiAction.ClickRecommendationCard(it)) },
         onClickPlanDayFilter = { viewModel.process(HomeUiAction.ShowPlanDayFilterBottomSheet) },
         onClickRetryLoadHomeData = {},
         onClickResetDailyStudyPlan = { viewModel.process(HomeUiAction.ShowResetPlanConfirmationDialog) },
-        onClickGoToStudy = { viewModel.process(HomeUiAction.ClickMoveToDailyStudy) }
+        onClickGoToStudy = { viewModel.process(HomeUiAction.ClickMoveToDailyStudy) },
     )
 }
 
@@ -187,7 +189,7 @@ fun HomeContent(
     onClickMockTest: () -> Unit,
     onClickPreviewTest: () -> Unit,
     onChangeTodayStudyCard: (Int) -> Unit,
-    onClickWeeklyCustomConcept: () -> Unit,
+    onClickWeeklyCustomConcept: (Long) -> Unit,
     onClickRetryLoadHomeData: () -> Unit,
     onClickResetDailyStudyPlan: () -> Unit,
     onClickGoToStudy: () -> Unit,

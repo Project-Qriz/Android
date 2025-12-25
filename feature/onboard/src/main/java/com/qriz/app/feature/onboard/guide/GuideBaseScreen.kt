@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.theme.Gray500
 import com.qriz.app.core.designsystem.theme.Gray800
@@ -39,18 +40,22 @@ fun GuideBaseScreen(
     ) {
         Text(
             text = title,
-            style = QrizTheme.typography.title1,
+            style = QrizTheme.typography.title1.copy(
+                lineHeight = QrizTheme.typography.title1.fontSize * 1.3f
+            ),
             color = Gray800,
             modifier = Modifier.padding(
                 top = 132.dp,
-                bottom = 8.dp,
+                bottom = 12.dp,
                 start = 24.dp,
             ),
         )
 
         Text(
             text = subTitle,
-            style = QrizTheme.typography.body1Long,
+            style = QrizTheme.typography.body1Long.copy(
+                lineHeight = QrizTheme.typography.body1Long.fontSize * 1.3f
+            ),
             color = Gray500,
             modifier = Modifier.padding(
                 bottom = 40.dp,

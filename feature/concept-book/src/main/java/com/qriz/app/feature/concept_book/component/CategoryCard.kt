@@ -40,6 +40,7 @@ internal fun CategoryCard(
         color = cardStyle.backgroundColor,
         modifier = modifier.aspectRatio(105.0f / 156.0f),
         shape = RoundedCornerShape(8.dp),
+        shadowElevation = 3.dp,
     ) {
         QrizBox {
             Icon(

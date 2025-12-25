@@ -34,6 +34,8 @@ import com.qriz.app.feature.sign.signup.component.SignUpAuthPage
 import com.qriz.app.feature.sign.signup.component.SignUpIdPage
 import com.qriz.app.feature.sign.signup.component.SignUpNamePage
 import com.qriz.app.feature.sign.signup.component.SignUpPasswordPage
+import com.qriz.app.feature.sign.signup.component.TermsAgreementBottomSheet
+import com.qriz.app.feature.sign.signup.component.TermsAgreementState
 import com.qriz.app.core.ui.common.R as UCR
 
 @Composable
@@ -42,6 +44,7 @@ fun SignUpScreen(
     moveToConceptCheckGuide: () -> Unit,
     onBack: () -> Unit,
     onShowSnackbar: (String) -> Unit,
+    moveToTermsWebView: (String) -> Unit,
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -50,6 +53,7 @@ fun SignUpScreen(
             is SignUpUiEffect.SignUpUiComplete -> moveToConceptCheckGuide()
             is SignUpUiEffect.ShowSnackBer -> onShowSnackbar(it.message ?: context.getString(it.defaultResId))
             is SignUpUiEffect.MoveToBack -> onBack()
+            is SignUpUiEffect.NavigateToTermsWebView -> moveToTermsWebView(it.url)
         }
     }
 
@@ -89,6 +93,22 @@ fun SignUpScreen(
         onChangePasswordVisibility = { viewModel.process(SignUpUiAction.ChangePasswordVisibility(it)) },
         onChangePasswordCheckVisibility = { viewModel.process(SignUpUiAction.ChangePasswordCheckVisibility(it)) },
     )
+
+    if (state.showTermsAgreementBottomSheet) {
+        TermsAgreementBottomSheet(
+            termsState = TermsAgreementState(
+                agreeToTermsOfService = state.agreeToTermsOfService,
+                agreeToPrivacyPolicy = state.agreeToPrivacyPolicy
+            ),
+            onDismiss = { viewModel.process(SignUpUiAction.DismissTermsAgreementBottomSheet) },
+            onAgreeAll = { viewModel.process(SignUpUiAction.ToggleAllTerms) },
+            onToggleTermsOfService = { viewModel.process(SignUpUiAction.ToggleTermsOfService) },
+            onTogglePrivacyPolicy = { viewModel.process(SignUpUiAction.TogglePrivacyPolicy) },
+            onViewTermsOfService = { viewModel.navigateToTermsOfServiceWebView() },
+            onViewPrivacyPolicy = { viewModel.navigateToPrivacyPolicyWebView() },
+            onConfirm = { viewModel.process(SignUpUiAction.ConfirmTermsAgreement) }
+        )
+    }
 }
 
 @Composable

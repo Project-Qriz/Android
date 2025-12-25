@@ -10,6 +10,7 @@ android {
 
 dependencies {
     implementation(projects.core.data.onboard.onboardApi)
+    implementation(projects.core.domain.usecaseApi)
     implementation(projects.core.ui.test)
     implementation(projects.core.data.user.userApi)
 }

@@ -62,12 +62,15 @@ fun PreviewResultScreen(
         userName = uiState.userName,
         previewTestResultItem = uiState.previewTestResultItem,
         state = uiState.state,
+        showTooltip = uiState.showTooltip,
         onInit = {
             viewModel.process(PreviewResultUiAction.ObserveClient)
             viewModel.process(PreviewResultUiAction.LoadPreviewResult)
         },
         onClickClose = { viewModel.process(PreviewResultUiAction.ClickClose) },
         onClickRetry = { viewModel.process(PreviewResultUiAction.LoadPreviewResult) },
+        onEstimatedScoreTooltipClick = { viewModel.process(PreviewResultUiAction.ShowTooltip) },
+        onEstimatedScoreTooltipDismissRequest = { viewModel.process(PreviewResultUiAction.DismissTooltip) }
     )
 }
 
@@ -76,13 +79,17 @@ private fun PreviewResultContent(
     userName: String,
     previewTestResultItem: PreviewTestResultItem,
     state: PreviewResultUiState.State,
+    showTooltip: Boolean,
     onInit: () -> Unit,
     onClickClose: () -> Unit,
-    onClickRetry: () -> Unit
+    onClickRetry: () -> Unit,
+    onEstimatedScoreTooltipClick: () -> Unit,
+    onEstimatedScoreTooltipDismissRequest: () -> Unit,
 ) {
     val isInitialized = rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
+    state.name
     LaunchedEffect(Unit) {
         if (isInitialized.value.not()) {
             onInit()
@@ -128,7 +135,10 @@ private fun PreviewResultContent(
                         userName = userName,
                         totalScore = previewTestResultItem.totalScore,
                         estimatedScore = previewTestResultItem.estimatedScore,
-                        testResultItems = previewTestResultItem.testResultItems
+                        testResultItems = previewTestResultItem.testResultItems,
+                        showEstimatedScoreTooltip = showTooltip,
+                        onEstimatedScoreTooltipClick = onEstimatedScoreTooltipClick,
+                        onEstimatedScoreTooltipDismissRequest = onEstimatedScoreTooltipDismissRequest,
                     )
 
                     if (previewTestResultItem.weakAreas.isNotEmpty()) {
@@ -195,9 +205,12 @@ private fun PreviewResultContentPreview() {
                 ),
                 totalQuestionsCount = 20,
             ),
+            showTooltip = false,
             onInit = {},
             onClickClose = {},
             onClickRetry = {},
+            onEstimatedScoreTooltipClick = {},
+            onEstimatedScoreTooltipDismissRequest = {},
         )
     }
 }

@@ -1,13 +1,20 @@
-import com.qriz.app.setNamespace
-
 plugins {
-    id("qriz.android.library")
+    id("kotlin")
+    alias(libs.plugins.jetbrains.kotlin.jvm)
 }
 
-android {
-    setNamespace("data.user.user_api")
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
 }
 
 dependencies {
     implementation(projects.core.model)
+    implementation(libs.coroutines.core)
 }

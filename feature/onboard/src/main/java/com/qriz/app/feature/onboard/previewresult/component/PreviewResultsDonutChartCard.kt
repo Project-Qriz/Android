@@ -36,7 +36,10 @@ fun PreviewResultDonutChartCard(
     userName: String,
     totalScore: Int,
     estimatedScore: Float,
-    testResultItems: ImmutableList<TestResultItem>
+    testResultItems: ImmutableList<TestResultItem>,
+    showEstimatedScoreTooltip: Boolean,
+    onEstimatedScoreTooltipClick: () -> Unit,
+    onEstimatedScoreTooltipDismissRequest: () -> Unit,
 ) {
     TestResultDonutChartCard(
         modifier = modifier,
@@ -61,7 +64,10 @@ fun PreviewResultDonutChartCard(
         totalScore = totalScore,
         estimatedScore = estimatedScore,
         testResultItems = testResultItems,
-        getTestResultColor = ::getTestResultColor
+        getTestResultColor = ::getTestResultColor,
+        showEstimatedScoreTooltip = showEstimatedScoreTooltip,
+        onEstimatedScoreTooltipClick = onEstimatedScoreTooltipClick,
+        onEstimatedScoreTooltipDismissRequest = onEstimatedScoreTooltipDismissRequest,
     )
 }
 
@@ -73,6 +79,7 @@ private fun PreviewResultDonutChartCardPreview() {
             userName = "Qriz",
             totalScore = 100,
             estimatedScore = 50.0F,
+            showEstimatedScoreTooltip = false,
             testResultItems = persistentListOf(
                 TestResultItem(
                     scoreName = "1과목",
@@ -83,6 +90,8 @@ private fun PreviewResultDonutChartCardPreview() {
                     score = 50,
                 )
             ),
+            onEstimatedScoreTooltipClick = {},
+            onEstimatedScoreTooltipDismissRequest = {},
         )
     }
 }
