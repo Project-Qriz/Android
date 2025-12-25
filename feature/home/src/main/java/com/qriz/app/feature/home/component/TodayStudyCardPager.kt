@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
@@ -32,12 +34,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.data.daily_study.daily_study_api.model.DailyStudyPlan
 import com.qriz.app.core.data.daily_study.daily_study_api.model.PlannedSkill
+import com.qriz.app.core.data.daily_study.daily_study_api.model.getRequiredCompletionDay
+import com.qriz.app.core.data.daily_study.daily_study_api.model.isLocked
 import com.qriz.app.core.designsystem.component.QrizButton
 import com.qriz.app.core.designsystem.component.QrizCard
 import com.qriz.app.core.designsystem.theme.Black
@@ -189,6 +194,8 @@ fun TodayStudyCardPager(
             TodayStudyCard(
                 modifier = Modifier.fillMaxWidth(),
                 plan = dailyStudyPlans[page],
+                allPlans = dailyStudyPlans,
+                dayNumber = page + 1, // 0-based index를 1-based day number로 변환
             )
         }
 
@@ -238,76 +245,119 @@ private fun DayFilter(
 @Composable
 private fun TodayStudyCard(
     plan: DailyStudyPlan,
+    allPlans: ImmutableList<DailyStudyPlan>,
+    dayNumber: Int,
     modifier: Modifier = Modifier,
 ) {
-    QrizCard(
-        modifier = modifier
-    ) {
-        Column(
-            modifier = Modifier.padding(
-                vertical = 24.dp,
-                horizontal = 26.dp
-            )
+    val isLocked = plan.isLocked(allPlans.toList(), dayNumber)
+    val requiredCompletionDay = plan.getRequiredCompletionDay(allPlans.toList(), dayNumber)
+
+    Box(modifier = modifier) {
+        QrizCard(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            if (plan.comprehensiveReviewDay) Text(
-                text = stringResource(R.string.comprehensive_review),
-                style = QrizTheme.typography.headline1.copy(color = Gray800),
-            )
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(
-                        QrizTheme.typography.headline1.toSpanStyle().copy(
-                            color = Gray800,
-                            fontWeight = FontWeight.Medium
-                        )
-                    ) {
-                        append(
-                            if (plan.reviewDay) stringResource(R.string.review_concept)
-                            else stringResource(R.string.study_concept)
-                        )
-                    }
-                    withStyle(
-                        QrizTheme.typography.headline1.toSpanStyle().copy(color = Gray800)
-                    ) {
-                        append("${plan.plannedSkills.size}가지")
-                    }
-                },
-                modifier = Modifier.padding(bottom = 1.5.dp)
-            )
-
-            DashedDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 17.5.dp),
-                color = Blue100,
-                interval = floatArrayOf(20f, 10f)
-            )
-
-            if (plan.comprehensiveReviewDay) {
-                Text(
-                    text = stringResource(R.string.comprehensive_review_description),
-                    style = QrizTheme.typography.body2.copy(color = Gray500),
-                    modifier = Modifier.padding(bottom = 17.5.dp)
+            Column(
+                modifier = Modifier.padding(
+                    vertical = 24.dp,
+                    horizontal = 26.dp
                 )
-            }
+            ) {
+                if (plan.comprehensiveReviewDay) Text(
+                    text = stringResource(R.string.comprehensive_review),
+                    style = QrizTheme.typography.headline1.copy(color = Gray800),
+                )
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            QrizTheme.typography.headline1.toSpanStyle().copy(
+                                color = Gray800,
+                                fontWeight = FontWeight.Medium
+                            )
+                        ) {
+                            append(
+                                if (plan.reviewDay) stringResource(R.string.review_concept)
+                                else stringResource(R.string.study_concept)
+                            )
+                        }
+                        withStyle(
+                            QrizTheme.typography.headline1.toSpanStyle().copy(color = Gray800)
+                        ) {
+                            append("${plan.plannedSkills.size}가지")
+                        }
+                    },
+                    modifier = Modifier.padding(bottom = 1.5.dp)
+                )
 
-            plan.plannedSkills.take(2).forEach {
-                ConceptCard(
-                    type = it.type,
-                    keyConcept = it.keyConcept,
+                DashedDivider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp)
+                        .padding(vertical = 17.5.dp),
+                    color = Blue100,
+                    interval = floatArrayOf(20f, 10f)
                 )
-            }
 
-            if (plan.plannedSkills.size > 2) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_ellipsis),
-                    contentDescription = null,
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    tint = Gray200,
-                )
+                if (plan.comprehensiveReviewDay) {
+                    Text(
+                        text = stringResource(R.string.comprehensive_review_description),
+                        style = QrizTheme.typography.body2.copy(color = Gray500),
+                        modifier = Modifier.padding(bottom = 17.5.dp)
+                    )
+                }
+
+                if (plan.isNotAvailable()) {
+                    // 빈 카드일 때 다른 카드들과 높이를 맞추기 위한 Spacer
+                    Spacer(modifier = Modifier.height(120.dp))
+                } else {
+                    plan.plannedSkills.take(2).forEach {
+                        ConceptCard(
+                            type = it.type,
+                            keyConcept = it.keyConcept,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                        )
+                    }
+
+                    if (plan.plannedSkills.size > 2) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_ellipsis),
+                            contentDescription = null,
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            tint = Gray200,
+                        )
+                    }
+                }
+            }
+        }
+
+        // 잠긴 카드에 커버 표시
+        if (isLocked || plan.isNotAvailable()) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(White.copy(alpha = 0.9f), shape = RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Image(
+                        modifier = Modifier.size(48.dp),
+                        imageVector = ImageVector.vectorResource(R.drawable.lock_icon),
+                        contentDescription = null,
+                    )
+                    Text(
+                        text = if (requiredCompletionDay != null) {
+                            "Day${requiredCompletionDay}까지\n완료해주세요!"
+                        } else {
+                            "학습 준비 중입니다"
+                        },
+                        textAlign = TextAlign.Center,
+                        color = Gray500,
+                        style = QrizTheme.typography.body1
+                    )
+                }
             }
         }
     }
@@ -407,17 +457,11 @@ private fun TodayStudyCardPreview() {
             dailyStudyPlans = persistentListOf(
                 DailyStudyPlan(
                     id = 1,
-                    comprehensiveReviewDay = true,
+                    comprehensiveReviewDay = false,
                     reviewDay = true,
                     completionDate = null,
                     completed = true,
                     plannedSkills = listOf(
-                        PlannedSkill(
-                            id = 1,
-                            keyConcept = "WHERE절",
-                            type = "SQL기본",
-                            description = "",
-                        )
                     ),
                     planDate = LocalDate.now(),
                 )
