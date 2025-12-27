@@ -28,7 +28,6 @@ android {
             manifestPlaceholders[kakaoNativeAppKey] = getLocalProperty(kakaoNativeAppKey)
         }
         release {
-            isMinifyEnabled = true
             manifestPlaceholders[kakaoNativeAppKey] = getLocalProperty(kakaoNativeAppKey)
         }
     }
