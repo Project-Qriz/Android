@@ -373,14 +373,13 @@ private suspend fun kakaoLogin(context: Context) = suspendCancellableCoroutine {
     val isAvailable = UserApiClient.instance.isKakaoTalkLoginAvailable(context)
     if (isAvailable.not()) {
         it.resume(SocialLoginResult.Failure("카카오톡을 설치해주세요"))
+        return@suspendCancellableCoroutine
     }
 
     UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
         if (token != null) {
             it.resume(SocialLoginResult.Success(token.accessToken))
-        }
-
-        if (error != null) {
+        } else if (error != null) {
             it.resume(SocialLoginResult.Failure(error.message ?: "카카오톡 로그인에 실패하였습니다."))
         }
     }
