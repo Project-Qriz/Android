@@ -73,6 +73,7 @@ fun HomeScreen(
                 it.isReview,
                 it.isComprehensiveReview
             )
+
             is HomeUiEffect.ShowSnackBar -> onShowSnackBar(
                 it.message ?: context.getString(it.defaultResId)
             )
@@ -149,8 +150,7 @@ fun HomeScreen(
             },
             onDismissRequest = {
                 viewModel.process(HomeUiAction.DismissResetPlanErrorDialog)
-            }
-        )
+            })
     }
 
     HomeContent(
@@ -237,65 +237,64 @@ fun HomeContent(
             )
         }
 
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState()),
-        ) {
-            when (dataLoadState) {
-                is HomeDataLoadState.Loading -> {
-                    QrizLoading()
-                }
+        when (dataLoadState) {
+            is HomeDataLoadState.Loading -> {
+                QrizLoading(modifier = Modifier.fillMaxSize())
+            }
 
-                is HomeDataLoadState.Failure -> {
-                    ErrorScreen(
-                        title = stringResource(R.string.error_occurred),
-                        description = dataLoadState.message,
-                        onClickRetry = onClickRetryLoadHomeData,
-                    )
-                }
+            is HomeDataLoadState.Failure -> {
+                ErrorScreen(
+                    title = stringResource(R.string.error_occurred),
+                    description = dataLoadState.message,
+                    onClickRetry = onClickRetryLoadHomeData,
+                )
+            }
 
-                is HomeDataLoadState.Success -> {
-                    ExamScheduleCard(
-                        modifier = Modifier
-                            .padding(horizontal = horizontalPadding)
-                            .padding(
-                                top = 24.dp,
-                                bottom = 32.dp
-                            ),
-                        userName = userName,
-                        scheduleState = scheduleState,
-                        onClickApply = onClickExamApply,
-                    )
+            is HomeDataLoadState.Success -> Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                ExamScheduleCard(
+                    modifier = Modifier
+                        .padding(horizontal = horizontalPadding)
+                        .padding(
+                            top = 24.dp,
+                            bottom = 32.dp
+                        ),
+                    userName = userName,
+                    scheduleState = scheduleState,
+                    onClickApply = onClickExamApply,
+                )
 
-                    TestStartCard(
-                        modifier = Modifier
-                            .padding(horizontal = horizontalPadding)
-                            .padding(bottom = 32.dp),
-                        isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
-                        onClickMockTest = onClickMockTest,
-                        onClickPreviewTest = onClickPreviewTest
-                    )
+                TestStartCard(
+                    modifier = Modifier
+                        .padding(horizontal = horizontalPadding)
+                        .padding(bottom = 32.dp),
+                    isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
+                    onClickMockTest = onClickMockTest,
+                    onClickPreviewTest = onClickPreviewTest
+                )
 
-                    TodayStudyCardPager(
-                        horizontalPadding = horizontalPadding,
-                        isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
-                        selectedPlanDay = selectedPlanDay,
-                        dailyStudyPlans = dailyStudyPlans,
-                        onChangeTodayStudyCard = onChangeTodayStudyCard,
-                        onClickDayFilter = onClickPlanDayFilter,
-                        onClickResetDailyStudyPlan = onClickResetDailyStudyPlan,
-                        onClickGoToStudy = onClickGoToStudy
-                    )
+                TodayStudyCardPager(
+                    horizontalPadding = horizontalPadding,
+                    isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
+                    selectedPlanDay = selectedPlanDay,
+                    dailyStudyPlans = dailyStudyPlans,
+                    onChangeTodayStudyCard = onChangeTodayStudyCard,
+                    onClickDayFilter = onClickPlanDayFilter,
+                    onClickResetDailyStudyPlan = onClickResetDailyStudyPlan,
+                    onClickGoToStudy = onClickGoToStudy
+                )
 
-                    WeeklyCustomConcept(
-                        isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
-                        recommendations = weeklyRecommendation,
-                        onClick = onClickWeeklyCustomConcept,
-                    )
-                }
+                WeeklyCustomConcept(
+                    isNeedPreviewTest = previewTestStatus.isNeedPreviewTest(),
+                    recommendations = weeklyRecommendation,
+                    onClick = onClickWeeklyCustomConcept,
+                )
             }
         }
+
     }
 }
 
