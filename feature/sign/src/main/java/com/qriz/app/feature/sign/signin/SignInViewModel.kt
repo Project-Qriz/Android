@@ -37,6 +37,8 @@ class SignInViewModel @Inject constructor(
                     message = action.message
                 )
             )
+
+            is SignInUiAction.ClearCredentialState -> sendEffect(SignInUiEffect.ClearCredentialState)
         }
     }
 
@@ -105,6 +107,7 @@ class SignInViewModel @Inject constructor(
                         defaultResId = R.string.user_not_registered,
                     )
                 )
+                sendEffect(SignInUiEffect.ClearCredentialState)
             }
 
             is ApiResult.NetworkError -> {
@@ -114,6 +117,7 @@ class SignInViewModel @Inject constructor(
                         defaultResId = UCR.string.check_network_and_try_again,
                     )
                 )
+                sendEffect(SignInUiEffect.ClearCredentialState)
             }
 
             is ApiResult.UnknownError -> {
@@ -123,6 +127,7 @@ class SignInViewModel @Inject constructor(
                         defaultResId = UCR.string.unknown_error_occurs,
                     )
                 )
+                sendEffect(SignInUiEffect.ClearCredentialState)
             }
         }
     }

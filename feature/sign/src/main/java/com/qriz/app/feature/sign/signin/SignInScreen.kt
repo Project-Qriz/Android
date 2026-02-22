@@ -1,7 +1,6 @@
 package com.qriz.app.feature.sign.signin
 
 import android.content.Context
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -85,7 +84,10 @@ fun SignInScreen(
     }
 
     val onFailureOnGoogleLogin: (String) -> Unit = remember {
-        { errorMessage -> viewModel.process(SignInUiAction.ShowSnackbar(errorMessage)) }
+        { errorMessage ->
+            viewModel.process(SignInUiAction.ShowSnackbar(errorMessage))
+            viewModel.process(SignInUiAction.ClearCredentialState)
+        }
     }
 
     val googleLoginLauncher = rememberGoogleLoginLauncher(
@@ -136,6 +138,10 @@ fun SignInScreen(
             }
 
             SignInUiEffect.MoveToConceptCheckGuide -> moveToConceptCheckGuide()
+
+            SignInUiEffect.ClearCredentialState -> coroutineScope.launch {
+                CredentialManager.create(context).clearCredentialState(ClearCredentialStateRequest())
+            }
         }
     }
 
@@ -179,7 +185,9 @@ private fun SignInContent(
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-        if (isLoading) QrizLoading()
+        if (isLoading) QrizLoading(
+            modifier = Modifier.fillMaxSize()
+        )
 
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -373,14 +381,13 @@ private suspend fun kakaoLogin(context: Context) = suspendCancellableCoroutine {
     val isAvailable = UserApiClient.instance.isKakaoTalkLoginAvailable(context)
     if (isAvailable.not()) {
         it.resume(SocialLoginResult.Failure("카카오톡을 설치해주세요"))
+        return@suspendCancellableCoroutine
     }
 
     UserApiClient.instance.loginWithKakaoTalk(context) { token, error ->
         if (token != null) {
             it.resume(SocialLoginResult.Success(token.accessToken))
-        }
-
-        if (error != null) {
+        } else if (error != null) {
             it.resume(SocialLoginResult.Failure(error.message ?: "카카오톡 로그인에 실패하였습니다."))
         }
     }
@@ -400,7 +407,6 @@ private fun rememberGoogleLoginLauncher(
         val authCode: String = authorizationResult.serverAuthCode ?: ""
         onResult(authCode)
     } catch (e: ApiException) {
-        Log.e("GoogleLogin", "Google login launcher failed", e)
         val errorMessage = when (e.statusCode) {
             CommonStatusCodes.CANCELED -> {
                 // 사용자가 로그인을 취소한 경우 - 조용히 처리
@@ -450,7 +456,6 @@ private fun googleLogin(
                 }
             }
         }.addOnFailureListener { e ->
-            Log.e("GoogleLogin", "Google login failed", e)
             val errorMessage = when {
                 e is ApiException -> {
                     when (e.statusCode) {

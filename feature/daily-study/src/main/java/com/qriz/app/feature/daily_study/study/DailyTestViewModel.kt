@@ -53,7 +53,10 @@ class DailyTestViewModel @Inject constructor(
             is DailyTestUiAction.ShowSubmitConfirmationDialog -> updateState { copy(showSubmitConfirmationDialog = true) }
             is DailyTestUiAction.DismissSubmitConfirmationDialog -> updateState { copy(showSubmitConfirmationDialog = false) }
             is DailyTestUiAction.SubmitTest -> submitTest()
-            is DailyTestUiAction.CancelTest -> sendEffect(DailyStudyUiEffect.Cancel)
+            is DailyTestUiAction.CancelTest -> {
+                updateState { copy(showCancelConfirmationDialog = false) }
+                sendEffect(DailyStudyUiEffect.Cancel)
+            }
             is DailyTestUiAction.ShowCancelConfirmationDialog -> updateState { copy(showCancelConfirmationDialog = true) }
             is DailyTestUiAction.DismissCancelConfirmationDialog -> updateState { copy(showCancelConfirmationDialog = false) }
             is DailyTestUiAction.DismissErrorDialog -> updateState { copy(errorMessage = null) }

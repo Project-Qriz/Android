@@ -22,12 +22,18 @@ import com.qriz.app.core.network.daily_study.model.request.DailyTestSubmitActivi
 import com.qriz.app.core.network.daily_study.model.request.DailyTestSubmitQuestion
 import com.qriz.app.core.network.daily_study.model.request.DailyTestSubmitRequest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 internal class DailyStudyRepositoryImpl @Inject constructor(
-    private val dailyStudyApi: DailyStudyApi
+    private val dailyStudyApi: DailyStudyApi,
 ): DailyStudyRepository {
+    private val _planUpdateFlow: MutableSharedFlow<Unit> = MutableSharedFlow()
+    override val planUpdateFlow: SharedFlow<Unit> = _planUpdateFlow.asSharedFlow()
+
     override fun getDailyStudyPlanFlow(): Flow<ApiResult<List<DailyStudyPlan>>> = flow {
         emit(dailyStudyApi.getDailyStudyPlan().map { it.toDailyStudyPlan() })
     }
@@ -65,10 +71,16 @@ internal class DailyStudyRepositoryImpl @Inject constructor(
             }
         )
 
-        return dailyStudyApi.submitDailyTest(
+        val result = dailyStudyApi.submitDailyTest(
             dayNumber = day,
             request = request
         )
+
+        if (result is ApiResult.Success) {
+            _planUpdateFlow.emit(Unit)
+        }
+
+        return result
     }
 
     override suspend fun getDailyTestResult(day: Int): ApiResult<DailyTestResult> {

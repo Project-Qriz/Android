@@ -10,7 +10,7 @@ internal sealed interface ConceptBookData {
         override val conceptName: String,
         override val fileName: String,
     ) : ConceptBookData {
-        DATA_MODEL(1, "데이터 모델의 이해", "data_model.pdf"),
+        DATA_MODEL(1, "데이터모델의 이해", "data_model.pdf"),
         ENTITY(2, "엔터티", "entity.pdf"),
         ATTRIBUTE(3, "속성", "attribute.pdf"),
         RELATIONSHIP(4, "관계", "relationship.pdf"),
@@ -37,7 +37,7 @@ internal sealed interface ConceptBookData {
         RELATIONAL_DB_INTRO(11, "관계형 데이터베이스 개요", "relational_db_intro.pdf"),
         SELECT(12, "SELECT문", "select.pdf"),
         FUNCTION(13, "함수", "function.pdf"),
-        WHERE_CLAUSE(14, "WHERE절", "where_clause.pdf"),
+        WHERE_CLAUSE(14, "WHERE 절", "where_clause.pdf"),
         GROUP_BY_HAVING(15, "GROUP BY, HAVING 절", "group_by_having.pdf"),
         ORDER_BY_CLAUSE(16, "ORDER BY절", "order_by_clause.pdf"),
         JOIN(17, "조인", "join.pdf"),

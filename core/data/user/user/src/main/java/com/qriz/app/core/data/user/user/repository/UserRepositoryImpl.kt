@@ -196,6 +196,6 @@ internal class UserRepositoryImpl @Inject constructor(
                     SocialLoginType.KAKAO -> LoginType.KAKAO
                     SocialLoginType.GOOGLE -> LoginType.GOOGLE
                 }
-            )
+            ).also { user -> this.user.value = user }
         }
 }

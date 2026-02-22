@@ -69,7 +69,7 @@ sealed interface MainTabRoute : Route {
     data object ConceptBook : MainTabRoute
 
     @Serializable
-    data object IncorrectAnswersNote : MainTabRoute
+    data object Clip : MainTabRoute
 
     @Serializable
     data object MyPage : MainTabRoute
@@ -110,4 +110,9 @@ sealed interface MyPageRoute : Route {
 
     @Serializable
     data object Withdraw : MyPageRoute
+}
+
+sealed interface ClipRoute : Route {
+    @Serializable
+    data class ClipDetail(val id: Long) : ClipRoute
 }

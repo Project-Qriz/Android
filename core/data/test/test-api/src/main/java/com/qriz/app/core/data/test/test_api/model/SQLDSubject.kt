@@ -109,7 +109,7 @@ enum class SQLDConcept(val title: String) {
     SET_OPERATOR("집합 연산자"),
     GROUP_FUNCTION("그룹 함수"),
     WINDOW_FUNCTION("윈도우 함수"),
-    TOP_N_QUERIES("TOP N 쿼리"),
+    TOP_N_QUERIES("Top N 쿼리"),
     HIERARCHICAL_QUERIES_AND_SELF_JOINS("계층형 질의와 셀프 조인"),
     PIVOT_AND_UNPIVOT("PIVOT절과 UNPIVOT절"),
     REGULAR_EXPRESSION("정규 표현식"),

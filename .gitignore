@@ -6,6 +6,10 @@
 .gradle/
 build/
 
+# Build output directories
+app/debug/
+app/release/
+
 # Local configuration file (sdk path, etc)
 local.properties
 

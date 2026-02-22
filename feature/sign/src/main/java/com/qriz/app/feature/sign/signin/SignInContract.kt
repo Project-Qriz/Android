@@ -42,6 +42,7 @@ sealed interface SignInUiAction : UiAction {
     data object ClickFindPw : SignInUiAction
     data object ClickKakaoLogin : SignInUiAction
     data object ClickGoogleLogin : SignInUiAction
+    data object ClearCredentialState: SignInUiAction
     data class ProcessKakaoLogin(val token: String): SignInUiAction
     data class ProcessGoogleLogin(val token: String): SignInUiAction
 }
@@ -52,6 +53,7 @@ sealed interface SignInUiEffect : UiEffect {
     data object MoveToFindPw : SignInUiEffect
     data object MoveToHome : SignInUiEffect
     data object MoveToConceptCheckGuide : SignInUiEffect
+    data object ClearCredentialState : SignInUiEffect
     data class ShowSnackBar(
         @StringRes val defaultResId: Int,
         val message: String? = null

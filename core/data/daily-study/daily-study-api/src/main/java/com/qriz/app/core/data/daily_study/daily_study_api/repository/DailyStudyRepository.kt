@@ -9,8 +9,11 @@ import com.qriz.app.core.data.test.test_api.model.Option
 import com.qriz.app.core.data.test.test_api.model.Test
 import com.qriz.app.core.model.ApiResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 interface DailyStudyRepository {
+    val planUpdateFlow: SharedFlow<Unit>
+
     fun getDailyStudyPlanFlow(): Flow<ApiResult<List<DailyStudyPlan>>>
 
     fun getWeeklyRecommendation(): Flow<ApiResult<List<WeeklyRecommendation>>>
