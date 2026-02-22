@@ -44,6 +44,7 @@ fun ClipScreen(
     onShowSnackBar: (String) -> Unit,
     moveToDailyStudy: (Int, Boolean, Boolean) -> Unit,
     moveToMockTestSessions: () -> Unit,
+    moveToClipDetail: (Long) -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -65,6 +66,8 @@ fun ClipScreen(
             )
 
             is ClipUiEffect.MoveToMockTestSessions -> moveToMockTestSessions()
+
+            is ClipUiEffect.MoveToClipDetail -> moveToClipDetail(it.clipId)
         }
     }
 
@@ -173,7 +176,8 @@ fun ClipContent(
                     onClickFirstSubjectFilter = { onAction(ClipUiAction.ClickFirstSubjectFilter(ClipUiState.DAILY_STUDY)) },
                     onClickSecondSubjectFilter = { onAction(ClipUiAction.ClickSecondSubjectFilter(ClipUiState.DAILY_STUDY)) },
                     onDismissFilterBottomSheet = { onAction(ClipUiAction.DismissFilterBottomSheet(ClipUiState.DAILY_STUDY)) },
-                    onClickMoveToStudy = { onAction(ClipUiAction.MoveToDailyStudy) }
+                    onClickMoveToStudy = { onAction(ClipUiAction.MoveToDailyStudy) },
+                    onClickCard = { onAction(ClipUiAction.MoveToClipDetail(it)) },
                 )
 
                 ClipUiState.MOCK_TEST -> ClipPageContainer(
@@ -197,7 +201,8 @@ fun ClipContent(
                     onClickFirstSubjectFilter = { onAction(ClipUiAction.ClickFirstSubjectFilter(ClipUiState.MOCK_TEST)) },
                     onClickSecondSubjectFilter = { onAction(ClipUiAction.ClickSecondSubjectFilter(ClipUiState.MOCK_TEST)) },
                     onDismissFilterBottomSheet = { onAction(ClipUiAction.DismissFilterBottomSheet(ClipUiState.MOCK_TEST)) },
-                    onClickMoveToStudy = { onAction(ClipUiAction.MoveToMockTestSessions) }
+                    onClickMoveToStudy = { onAction(ClipUiAction.MoveToMockTestSessions) },
+                    onClickCard = { onAction(ClipUiAction.MoveToClipDetail(it)) },
                 )
             }
         }
@@ -220,6 +225,7 @@ private fun ClipPageContainer(
     onClickSecondSubjectFilter: () -> Unit,
     onDismissFilterBottomSheet: () -> Unit,
     onClickMoveToStudy: () -> Unit,
+    onClickCard: (Long) -> Unit,
 ) {
     when (clipDataUiState) {
         is ClipDataUiState.Success -> if (clipDataUiState.clips.isNotEmpty()) {
@@ -237,6 +243,7 @@ private fun ClipPageContainer(
                 onClickFirstSubjectFilter = onClickFirstSubjectFilter,
                 onClickSecondSubjectFilter = onClickSecondSubjectFilter,
                 onDismissFilterBottomSheet = onDismissFilterBottomSheet,
+                onClickCard = onClickCard,
             )
         } else {
             EmptyClips(onClickToStudy = onClickMoveToStudy)

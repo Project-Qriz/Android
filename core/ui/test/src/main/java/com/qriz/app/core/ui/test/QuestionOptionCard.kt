@@ -17,6 +17,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.theme.Black
@@ -33,6 +35,8 @@ fun QuestionOptionCard(
     state: TestOptionState,
     number: Int,
     optionDescription: String,
+    enableBorder: Boolean = true,
+    shape: Shape? = RoundedCornerShape(10.dp),
     modifier: Modifier = Modifier,
 ) {
     val numberBackground = when (state) {
@@ -79,8 +83,8 @@ fun QuestionOptionCard(
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = backgroundColor,
-        shape = RoundedCornerShape(10.dp),
-        border = if (state == TestOptionState.None) {
+        shape = shape ?: RectangleShape,
+        border = if (state == TestOptionState.None && enableBorder) {
             BorderStroke(
                 color = Blue100,
                 width = 1.dp,

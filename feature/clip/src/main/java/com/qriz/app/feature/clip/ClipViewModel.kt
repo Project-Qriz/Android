@@ -279,6 +279,8 @@ class ClipViewModel @Inject constructor(
             is ClipUiAction.MoveToDailyStudy -> moveToDailyStudy()
 
             is ClipUiAction.MoveToMockTestSessions -> moveToMockTest()
+
+            is ClipUiAction.MoveToClipDetail -> sendEffect(ClipUiEffect.MoveToClipDetail(action.clipId))
         }
     }
 

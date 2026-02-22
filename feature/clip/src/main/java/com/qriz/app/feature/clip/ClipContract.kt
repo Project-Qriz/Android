@@ -62,6 +62,7 @@ sealed interface ClipUiAction : UiAction {
     data class ToggleOnlyIncorrect(val tab: Int, val onlyIncorrect: Boolean) : ClipUiAction
     data object MoveToDailyStudy: ClipUiAction
     data object MoveToMockTestSessions: ClipUiAction
+    data class MoveToClipDetail(val clipId: Long) : ClipUiAction
 }
 
 sealed interface ClipUiEffect : UiEffect {
@@ -77,4 +78,5 @@ sealed interface ClipUiEffect : UiEffect {
     ): ClipUiEffect
 
     data object MoveToMockTestSessions: ClipUiEffect
+    data class MoveToClipDetail(val clipId: Long) : ClipUiEffect
 }

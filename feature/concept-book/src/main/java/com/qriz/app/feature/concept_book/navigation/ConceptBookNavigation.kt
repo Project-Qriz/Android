@@ -11,7 +11,7 @@ import com.qriz.app.feature.concept_book.ConceptBookScreen
 import com.qriz.app.feature.concept_book.detail.ConceptBookDetailScreen
 import com.qriz.app.feature.concept_book.list.ConceptBookListScreen
 
-fun NavController.navigateToConceptBook(navOptions: NavOptions) {
+fun NavController.navigateToConceptBook(navOptions: NavOptions? = null) {
     navigate(
         MainTabRoute.ConceptBook,
         navOptions

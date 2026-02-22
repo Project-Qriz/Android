@@ -62,6 +62,7 @@ internal fun ClipPage(
     onClickFirstSubjectFilter: () -> Unit,
     onClickSecondSubjectFilter: () -> Unit,
     onDismissFilterBottomSheet: () -> Unit,
+    onClickCard: (Long) -> Unit,
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     var isOnlyIncorrectExpanded by remember { mutableStateOf(false) }
@@ -150,8 +151,9 @@ internal fun ClipPage(
                 QuestionResultCard(
                     question = clip.question,
                     isCorrect = clip.correction,
-                    number = clip.questionNum,
+                    title = stringResource(R.string.question_number, clip.questionNum),
                     tag = clip.keyConcepts,
+                    onClick = { onClickCard(clip.id) },
                 )
             }
         }

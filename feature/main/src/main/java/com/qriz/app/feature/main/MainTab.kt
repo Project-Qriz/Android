@@ -31,7 +31,7 @@ enum class MainTab(
         contentDescriptionResId = R.string.incorrect_answer_note,
         iconResId = R.drawable.incorrect_answer_note_icon,
         selectedIconResId = R.drawable.incorrect_answer_note_selected_icon,
-        route = MainTabRoute.IncorrectAnswersNote,
+        route = MainTabRoute.Clip,
     ),
 
     MY_PAGE(

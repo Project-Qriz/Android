@@ -1,6 +1,7 @@
 package com.qriz.app.feature.clip.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,14 +32,16 @@ import com.qriz.app.core.designsystem.R as DSR
 @Composable
 internal fun QuestionResultCard(
     isCorrect: Boolean,
-    number: Int,
+    title: String,
     question: String,
     tag: List<String>,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
     Surface(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         shadowElevation = 1.dp,
         shape = RoundedCornerShape(10.dp)
     ) {
@@ -64,7 +67,7 @@ internal fun QuestionResultCard(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = "문제 $number",
+                    text = title,
                     style = QrizTheme.typography.headline2,
                 )
             }
@@ -114,7 +117,7 @@ private fun QuestionResultCardPreview() {
     QrizTheme {
         QuestionResultCard(
             isCorrect = true,
-            number = 1,
+            title = "문제 1",
             question = "문제",
             tag = listOf(
                 "tag1",

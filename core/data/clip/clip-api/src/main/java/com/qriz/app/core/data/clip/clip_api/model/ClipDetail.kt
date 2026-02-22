@@ -24,7 +24,7 @@ data class ClipDetail(
     val skillName: String,
     val questionText: String,
     val questionNum: Int,
-    val description: String,
+    val description: String?,
     val option1: String,
     val option2: String,
     val option3: String,

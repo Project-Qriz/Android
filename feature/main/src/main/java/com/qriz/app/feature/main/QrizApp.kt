@@ -12,11 +12,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -25,6 +22,7 @@ import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.core.navigation.route.SplashRoute
 import com.qriz.app.core.ui.common.provider.LocalPadding
 import com.qriz.app.feature.clip.navigation.clipNavGraph
+import com.qriz.app.feature.clip.navigation.navigateToClipDetail
 import com.qriz.app.feature.concept_book.navigation.conceptBookNavGraph
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookDetail
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookList
@@ -33,7 +31,6 @@ import com.qriz.app.feature.daily_study.navigation.navigateToDailyStudyPlanStatu
 import com.qriz.app.feature.daily_study.navigation.navigateToDailyTest
 import com.qriz.app.feature.daily_study.navigation.navigateToDailyTestResult
 import com.qriz.app.feature.home.navigation.homeNavGraph
-import com.qriz.app.feature.main.component.ComingSoonBottomSheet
 import com.qriz.app.feature.main.component.MainBottomBar
 import com.qriz.app.feature.main.navigation.MainNavigator
 import com.qriz.app.feature.main.navigation.rememberMainNavigator
@@ -168,9 +165,13 @@ private fun QrizNavHost(
             )
 
             clipNavGraph(
+                onBack = navController::popBackStack,
                 onShowSnackbar = onShowSnackbar,
                 moveToDailyStudy = navController::navigateToDailyStudyPlanStatus,
-                moveToMockTestSessions = navController::navigateToMockTestSessions
+                moveToMockTestSessions = navController::navigateToMockTestSessions,
+                moveToClipDetail = navController::navigateToClipDetail,
+                moveToConceptBook = { mainNavigator.navigate(MainTab.CONCEPT_BOOK) },
+                moveToConceptBookDetail = navController::navigateToConceptBookDetail
             )
 
             myPageNavGraph(
