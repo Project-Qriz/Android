@@ -28,7 +28,7 @@ dependencies {
     implementation(projects.feature.onboard)
     implementation(projects.feature.home)
     implementation(projects.feature.conceptBook)
-    implementation(projects.feature.incorrectAnswersNote)
+    implementation(projects.feature.clip)
     implementation(projects.feature.mypage)
     implementation(projects.feature.dailyStudy)
     implementation(projects.feature.mockTest)

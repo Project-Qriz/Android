@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="select_round">회차 선택</string>
+    <string name="clip_note">오답노트</string>
+    <string name="daily">데일리</string>
+    <string name="mock_test">모의고사</string>
+    <string name="all">모두</string>
+    <string name="only_incorrect">오답만</string>
+    <string name="subject_1">1과목</string>
+    <string name="subject_2">2과목</string>
+    <string name="select_all">전체 선택</string>
+    <string name="deselect_all">전체 해제</string>
+    <string name="reset">초기화</string>
+    <string name="apply">적용하기</string>
+    <string name="question">질문</string>
+    <string name="tag_1">태그1</string>
+    <string name="tag_2">태그2</string>
+    <string name="error_load_clip_days">날짜 목록을 불러오는데 실패했습니다.</string>
+    <string name="error_load_clip_sessions">세션 목록을 불러오는데 실패했습니다.</string>
+    <string name="error_load_daily_clips">오답노트를 불러오는데 실패했습니다.</string>
+
+    <string name="unavailable_daily_study">현재 오늘의 공부를 할 수 없는 상태입니다.</string>
+    <string name="unavailable_mock_test">현재 모의고사를 볼 수 없는 상태입니다.</string>
+
+    <string name="data_load_fail">데이터를 불러오는 데 실패하였습니다.</string>
+    <string name="empty_clip_title">시험을 본 기록이 없습니다.</string>
+    <string name="empty_clip_description">오답노트를 만들고 싶다면 테스트를 해봐요!</string>
+    <string name="empty_clip">기록된 시험 없음</string>
+    <string name="go_to_study">시험 보러가기</string>
+</resources>

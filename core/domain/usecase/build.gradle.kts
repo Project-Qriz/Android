@@ -11,4 +11,5 @@ dependencies {
 
     implementation(projects.core.data.onboard.onboardApi)
     implementation(projects.core.data.user.userApi)
+    implementation(projects.core.data.mockTest.mockTestApi)
 }

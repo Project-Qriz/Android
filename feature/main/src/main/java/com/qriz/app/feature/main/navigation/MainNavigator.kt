@@ -13,7 +13,7 @@ import com.qriz.app.core.navigation.route.MainTabRoute
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBook
 import com.qriz.app.feature.home.navigation.navigateToHome
-import com.qriz.app.feature.incorrect_answers_note.navigation.navigateToIncorrectAnswersNote
+import com.qriz.app.feature.clip.navigation.navigateToClip
 import com.qriz.app.feature.main.MainTab
 import com.qriz.app.feature.mypage.navigation.navigateToMyPage
 
@@ -45,7 +45,7 @@ class MainNavigator(
         when (tab) {
             MainTab.HOME -> navController.navigateToHome(selectedNavOptions)
             MainTab.CONCEPT_BOOK -> navController.navigateToConceptBook(selectedNavOptions)
-            MainTab.INCORRECT_ANSWERS_NOTE -> navController.navigateToIncorrectAnswersNote(
+            MainTab.INCORRECT_ANSWERS_NOTE -> navController.navigateToClip(
                 selectedNavOptions
             )
 

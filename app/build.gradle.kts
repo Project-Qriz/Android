@@ -59,6 +59,7 @@ dependencies {
     implementation(projects.core.data.application.application)
     implementation(projects.core.data.dailyStudy.dailyStudy)
     implementation(projects.core.data.mockTest.mockTest)
+    implementation(projects.core.data.clip.clip)
 
     implementation(projects.feature.main)
     implementation(projects.feature.splash)

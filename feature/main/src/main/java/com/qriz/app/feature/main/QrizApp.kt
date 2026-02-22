@@ -1,13 +1,10 @@
 package com.qriz.app.feature.main
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
@@ -24,10 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
-import com.qriz.app.core.designsystem.theme.Gray100
 import com.qriz.app.core.navigation.route.Route
 import com.qriz.app.core.navigation.route.SplashRoute
 import com.qriz.app.core.ui.common.provider.LocalPadding
+import com.qriz.app.feature.clip.navigation.clipNavGraph
 import com.qriz.app.feature.concept_book.navigation.conceptBookNavGraph
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookDetail
 import com.qriz.app.feature.concept_book.navigation.navigateToConceptBookList
@@ -36,7 +33,6 @@ import com.qriz.app.feature.daily_study.navigation.navigateToDailyStudyPlanStatu
 import com.qriz.app.feature.daily_study.navigation.navigateToDailyTest
 import com.qriz.app.feature.daily_study.navigation.navigateToDailyTestResult
 import com.qriz.app.feature.home.navigation.homeNavGraph
-import com.qriz.app.feature.incorrect_answers_note.navigation.incorrectAnswersNoteNavGraph
 import com.qriz.app.feature.main.component.ComingSoonBottomSheet
 import com.qriz.app.feature.main.component.MainBottomBar
 import com.qriz.app.feature.main.navigation.MainNavigator
@@ -69,7 +65,6 @@ import kotlinx.coroutines.launch
 internal fun QrizApp(
     mainNavigator: MainNavigator = rememberMainNavigator(),
 ) {
-    var showComingSoonBottomSheet by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val onShowSnackbar: (String) -> Unit = { message ->
@@ -84,14 +79,7 @@ internal fun QrizApp(
                 isVisible = mainNavigator.shouldShowBottomBar(),
                 tabs = MainTab.entries.toImmutableList(),
                 currentTab = mainNavigator.currentTab,
-                onClickTab = { tab ->
-                    when (tab) {
-                        MainTab.INCORRECT_ANSWERS_NOTE -> {
-                            showComingSoonBottomSheet = true
-                        }
-                        else -> mainNavigator.navigate(tab)
-                    }
-                },
+                onClickTab = mainNavigator::navigate,
             )
         },
         snackbarHost = {
@@ -116,13 +104,6 @@ internal fun QrizApp(
             mainNavigator = mainNavigator,
             padding = innerPadding,
             onShowSnackbar = onShowSnackbar,
-        )
-    }
-
-    //FIXME: MVP용 -> 출시 후 삭제
-    if (showComingSoonBottomSheet) {
-        ComingSoonBottomSheet(
-            onDismiss = { showComingSoonBottomSheet = false }
         )
     }
 }
@@ -186,8 +167,10 @@ private fun QrizNavHost(
                 moveToConceptBookDetail = navController::navigateToConceptBookDetail,
             )
 
-            incorrectAnswersNoteNavGraph(
+            clipNavGraph(
                 onShowSnackbar = onShowSnackbar,
+                moveToDailyStudy = navController::navigateToDailyStudyPlanStatus,
+                moveToMockTestSessions = navController::navigateToMockTestSessions
             )
 
             myPageNavGraph(
