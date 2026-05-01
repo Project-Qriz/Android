@@ -87,6 +87,9 @@ firebaseCrashlyticsPlugin = "3.0.2"
 # https://developers.google.com/android/guides/google-services-plugin
 googleServicesPlugin = "4.4.2"
 
+#https://developers.google.com/admob/android/rel-notes?hl=ko
+google-ads = "23.0.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -169,6 +172,7 @@ google-android-libraries-identity-googleid = { group = "com.google.android.libra
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+google-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "google-ads" }
 
 
 [plugins]

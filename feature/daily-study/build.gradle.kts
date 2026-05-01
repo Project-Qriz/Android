@@ -1,3 +1,4 @@
+import com.qriz.app.getLocalProperty
 import com.qriz.app.setNamespace
 
 plugins {
@@ -13,4 +14,6 @@ dependencies {
     implementation(projects.core.data.dailyStudy.dailyStudyApi)
     implementation(projects.core.data.conceptbook.conceptbookApi)
     implementation(projects.core.ui.test)
+
+    implementation(projects.core.ui.common)
 }

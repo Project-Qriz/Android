@@ -13,4 +13,7 @@ dependencies {
     implementation(projects.core.designsystem)
     implementation(projects.core.data.application.applicationApi)
     implementation(libs.coil.core)
+
+    // Google-ads
+    api(libs.google.ads)
 }

@@ -73,6 +73,7 @@ sealed interface DailyTestUiAction : UiAction {
 
 sealed interface DailyStudyUiEffect : UiEffect {
     data class MoveToResult(val day: Int) : DailyStudyUiEffect
+    data class ShowInterstitialAd(val day: Int) : DailyStudyUiEffect
     data object Cancel : DailyStudyUiEffect
     data class ShowSnackbar(val message: String) : DailyStudyUiEffect
 }
