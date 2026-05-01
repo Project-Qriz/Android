@@ -164,7 +164,7 @@ fun SignUpAuthPage(
                         id = if (showAuthNumberLayout) R.string.resend else R.string.send
                     ),
                     color = emailButtonTextColor,
-                    style = QrizTheme.typography.subhead,
+                    style = QrizTheme.typography.subhead1,
                 )
             }
         }
@@ -260,7 +260,7 @@ fun SignUpAuthPage(
                     Text(
                         stringResource(R.string.verify),
                         color = if (enableAuthNumVerifyButton) Blue600 else Gray300,
-                        style = QrizTheme.typography.subhead,
+                        style = QrizTheme.typography.subhead1,
                     )
                 }
             }

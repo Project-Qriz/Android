@@ -37,7 +37,7 @@ fun NetworkErrorScreen(
             )
             Text(
                 text = stringResource(R.string.check_network_and_try_again),
-                style = QrizTheme.typography.subhead,
+                style = QrizTheme.typography.subhead1,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
             QrizButton(

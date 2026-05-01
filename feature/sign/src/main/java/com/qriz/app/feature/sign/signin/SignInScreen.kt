@@ -288,7 +288,7 @@ private fun SignInContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
-                val textStyle = QrizTheme.typography.subhead
+                val textStyle = QrizTheme.typography.subhead1
                 Text(
                     stringResource(R.string.find_id),
                     style = textStyle,

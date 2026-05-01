@@ -88,7 +88,7 @@ private fun ConceptBookDetailContent(
                     R.string.subject,
                     subjectNumber
                 ),
-                style = QrizTheme.typography.subhead,
+                style = QrizTheme.typography.subhead1,
                 color = Gray800,
             )
 

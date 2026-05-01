@@ -63,7 +63,7 @@ fun QrizButton(
             text = text,
             style = textStyle,
             color = selectedTextColor,
-            modifier = textModifier
+            modifier = textModifier,
         )
     }
 }

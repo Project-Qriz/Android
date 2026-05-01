@@ -51,7 +51,7 @@ internal fun UserCard(
 
             Text(
                 text = email ?: "-",
-                style = QrizTheme.typography.subhead.copy(color = Gray400)
+                style = QrizTheme.typography.subhead1.copy(color = Gray400)
             )
         }
     }

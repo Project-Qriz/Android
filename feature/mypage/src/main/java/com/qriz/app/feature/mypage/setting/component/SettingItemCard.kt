@@ -47,7 +47,7 @@ internal fun SettingItemCard(
         ) {
             Text(
                 text = title,
-                style = QrizTheme.typography.subhead.copy(color = Gray800)
+                style = QrizTheme.typography.subhead1.copy(color = Gray800)
             )
 
             Icon(
