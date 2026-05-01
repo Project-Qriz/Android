@@ -231,7 +231,7 @@ private fun FindPasswordAuthContent(
                             id = if (showAuthNumberLayout) R.string.resend else R.string.send
                         ),
                         color = emailButtonTextColor,
-                        style = QrizTheme.typography.subhead,
+                        style = QrizTheme.typography.subhead1,
                     )
                 }
             }
@@ -321,7 +321,7 @@ private fun FindPasswordAuthContent(
                         Text(
                             stringResource(R.string.verify),
                             color = if (authNumber.length == AUTH_NUMBER_MAX_LENGTH) MaterialTheme.colorScheme.primary else Gray300,
-                            style = QrizTheme.typography.subhead,
+                            style = QrizTheme.typography.subhead1,
                         )
                     }
                 }

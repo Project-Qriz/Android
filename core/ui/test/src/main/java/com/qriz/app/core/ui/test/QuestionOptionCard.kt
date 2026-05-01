@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import com.qriz.app.core.designsystem.theme.Black
 import com.qriz.app.core.designsystem.theme.Blue100
 import com.qriz.app.core.designsystem.theme.Blue500
+import com.qriz.app.core.designsystem.theme.Gray100
+import com.qriz.app.core.designsystem.theme.Gray400
 import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.designsystem.theme.Red700Opacity14
@@ -41,43 +43,42 @@ fun QuestionOptionCard(
 ) {
     val numberBackground = when (state) {
         TestOptionState.None -> {
-            Modifier.border(
-                width = 1.dp,
-                color = Black,
-                shape = CircleShape,
-            )
+            Modifier.background(
+                    color = Gray100,
+                    shape = RoundedCornerShape(4.dp)
+                )
         }
 
         TestOptionState.SelectedOrCorrect -> {
             Modifier.background(
                 color = Blue500,
-                shape = CircleShape,
+                shape = RoundedCornerShape(4.dp),
             )
         }
 
         TestOptionState.SelectedAndIncorrect -> {
             Modifier.background(
                 color = Red700,
-                shape = CircleShape,
+                shape = RoundedCornerShape(4.dp),
             )
         }
     }
 
     val backgroundColor = when (state) {
         TestOptionState.None -> White
-        TestOptionState.SelectedOrCorrect -> Blue100
+        TestOptionState.SelectedOrCorrect -> Blue500.copy(alpha = 0.14f)
         TestOptionState.SelectedAndIncorrect -> Red700Opacity14
     }
 
     val numTextColor = when (state) {
-        TestOptionState.None -> Gray800
+        TestOptionState.None -> Gray400
         TestOptionState.SelectedOrCorrect,
         TestOptionState.SelectedAndIncorrect -> White
     }
 
     val optionDescriptionColor = when (state) {
         TestOptionState.None -> Gray800
-        TestOptionState.SelectedOrCorrect -> Blue500
+        TestOptionState.SelectedOrCorrect -> Gray800
         TestOptionState.SelectedAndIncorrect -> Gray800
     }
     Surface(
@@ -87,6 +88,11 @@ fun QuestionOptionCard(
         border = if (state == TestOptionState.None && enableBorder) {
             BorderStroke(
                 color = Blue100,
+                width = 1.dp,
+            )
+        } else if (state == TestOptionState.SelectedOrCorrect) {
+            BorderStroke(
+                color = Blue500,
                 width = 1.dp,
             )
         } else {

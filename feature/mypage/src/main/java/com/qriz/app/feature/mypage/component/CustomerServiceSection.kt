@@ -102,7 +102,7 @@ private fun CustomerServiceItem(
         Text(
             modifier = Modifier.weight(1f),
             text = title,
-            style = QrizTheme.typography.subhead.copy(
+            style = QrizTheme.typography.subhead1.copy(
                 fontWeight = FontWeight.Bold,
                 color = Gray800,
             )

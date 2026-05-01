@@ -87,7 +87,7 @@ internal fun EmptyClips(
                 )
                 Text(
                     text = stringResource(R.string.empty_clip_title),
-                    style = QrizTheme.typography.subhead.copy(fontWeight = FontWeight.ExtraBold),
+                    style = QrizTheme.typography.subhead1.copy(fontWeight = FontWeight.ExtraBold),
                     color = Gray800,
                 )
                 Text(

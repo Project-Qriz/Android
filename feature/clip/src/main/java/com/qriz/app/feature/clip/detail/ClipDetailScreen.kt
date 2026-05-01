@@ -199,7 +199,7 @@ private fun ConceptCard(clipDetail: ClipDetailUiModel, onClick: () -> Unit) {
             ) {
                 Text(
                     text = clipDetail.keyConcepts,
-                    style = QrizTheme.typography.subhead,
+                    style = QrizTheme.typography.subhead1,
                     color = Gray700,
                     modifier = Modifier.padding(bottom = 2.dp)
                 )
@@ -334,7 +334,7 @@ private fun MyCheckOptionCard(
                 R.string.answer_number,
                 clipDetail.answer
             ),
-            style = QrizTheme.typography.subhead.copy(color = Gray800)
+            style = QrizTheme.typography.subhead1.copy(color = Gray800)
         )
 
         Text(
@@ -342,7 +342,7 @@ private fun MyCheckOptionCard(
                 R.string.my_checked_option,
                 clipDetail.checked
             ),
-            style = QrizTheme.typography.subhead.copy(color = Gray500)
+            style = QrizTheme.typography.subhead1.copy(color = Gray500)
         )
     }
 }
@@ -365,14 +365,14 @@ private fun ExplanationCard(clipDetail: ClipDetailUiModel) {
     ) {
         Text(
             stringResource(R.string.solution),
-            style = QrizTheme.typography.subhead.copy(color = Gray700)
+            style = QrizTheme.typography.subhead1.copy(color = Gray700)
         )
 
         HorizontalDivider(color = Blue100)
 
         Text(
             clipDetail.solution,
-            style = QrizTheme.typography.subhead.copy(color = Gray500)
+            style = QrizTheme.typography.subhead1.copy(color = Gray500)
         )
     }
 }

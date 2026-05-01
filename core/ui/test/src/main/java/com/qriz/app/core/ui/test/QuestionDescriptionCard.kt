@@ -22,7 +22,7 @@ fun QuestionDescriptionCard(
     ) {
         Text(
             text = description,
-            style = QrizTheme.typography.body1,
+            style = QrizTheme.typography.subhead2,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp),

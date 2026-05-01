@@ -53,7 +53,7 @@ fun TestTopBar(
                             append(timeNoticeTitle)
                         }
                         withStyle(
-                            QrizTheme.typography.subhead.toSpanStyle()
+                            QrizTheme.typography.subhead1.toSpanStyle()
                                 .copy(color = Red700)
                         ) {
                             append("  $remainTimeText")

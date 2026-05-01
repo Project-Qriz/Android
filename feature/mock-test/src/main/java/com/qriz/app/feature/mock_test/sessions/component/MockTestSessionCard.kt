@@ -62,7 +62,7 @@ fun MockTestSessionCard(
                         if (completed) R.string.session_completed
                         else R.string.session_not_completed
                     ),
-                    style = QrizTheme.typography.subhead,
+                    style = QrizTheme.typography.subhead1,
                     color = Gray600
                 )
 

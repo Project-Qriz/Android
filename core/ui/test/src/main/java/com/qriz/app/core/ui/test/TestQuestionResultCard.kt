@@ -73,7 +73,7 @@ fun TestQuestionResultCard(
                         R.string.question_number,
                         number
                     ),
-                    style = QrizTheme.typography.subhead.copy(
+                    style = QrizTheme.typography.subhead1.copy(
                         color = Gray800,
                         fontWeight = FontWeight.Bold,
                     )

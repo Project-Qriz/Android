@@ -122,7 +122,7 @@ fun WithdrawContent(
                 top = 20.dp
             ),
             text = stringResource(R.string.withdraw_confirm_message),
-            style = QrizTheme.typography.subhead.copy(color = Gray500)
+            style = QrizTheme.typography.subhead1.copy(color = Gray500)
         )
 
         QrizButton(

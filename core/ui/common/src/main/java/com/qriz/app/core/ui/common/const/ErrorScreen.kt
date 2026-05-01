@@ -39,7 +39,7 @@ fun ErrorScreen(
             )
             Text(
                 text = description,
-                style = QrizTheme.typography.subhead,
+                style = QrizTheme.typography.subhead1,
                 modifier = Modifier.padding(bottom = 24.dp)
             )
             QrizButton(

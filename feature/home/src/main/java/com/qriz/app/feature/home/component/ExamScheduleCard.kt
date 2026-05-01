@@ -75,13 +75,13 @@ fun ExamScheduleCard(
 
                         Text(
                             text = scheduleState.examName,
-                            style = QrizTheme.typography.subhead,
+                            style = QrizTheme.typography.subhead1,
                             color = Gray500,
                         )
 
                         Text(
                             text = stringResource(R.string.exam_application_period, scheduleState.examPeriod),
-                            style = QrizTheme.typography.subhead,
+                            style = QrizTheme.typography.subhead1,
                             color = Gray500,
                         )
                     }
@@ -127,7 +127,7 @@ fun ExamScheduleCard(
                     is UserExamUiState.Scheduled -> {
                         Text(
                             text = stringResource(R.string.change_schedule_prompt),
-                            style = QrizTheme.typography.subhead,
+                            style = QrizTheme.typography.subhead1,
                             color = Gray500,
                             modifier = Modifier.padding(top = 8.dp)
                         )

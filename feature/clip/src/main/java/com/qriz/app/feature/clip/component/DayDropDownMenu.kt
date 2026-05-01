@@ -85,7 +85,7 @@ fun DayDropDownMenu(
         ) {
             Text(
                 text = selectedDay.ifEmpty { HEADER_TEXT },
-                style = QrizTheme.typography.subhead,
+                style = QrizTheme.typography.subhead1,
                 modifier = Modifier.weight(1f),
             )
             Icon(
@@ -204,7 +204,7 @@ private fun DayDropDownItem(
     ) {
         Text(
             text = text,
-            style = QrizTheme.typography.subhead,
+            style = QrizTheme.typography.subhead1,
         )
     }
 }

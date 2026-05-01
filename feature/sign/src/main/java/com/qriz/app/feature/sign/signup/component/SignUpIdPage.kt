@@ -127,7 +127,7 @@ fun SignUpIdPage(
                 Text(
                     stringResource(R.string.sign_up_id_page_check_duplicate),
                     color = if (id.isNotBlank()) Gray800 else Gray200,
-                    style = QrizTheme.typography.subhead,
+                    style = QrizTheme.typography.subhead1,
                 )
             }
         }

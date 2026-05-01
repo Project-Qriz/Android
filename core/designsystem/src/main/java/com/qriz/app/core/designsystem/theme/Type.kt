@@ -59,10 +59,18 @@ val Typography = QrizTypography(
         fontSize = 16.sp,
         lineHeight = 23.sp,
     ),
+    headline4 = BoldStyle.copy(
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+    ),
 
-    subhead = MediumStyle.copy(
+    subhead1 = MediumStyle.copy(
         fontSize = 14.sp,
         lineHeight = 22.sp,
+    ),
+    subhead2 = MediumStyle.copy(
+        fontSize = 12.sp,
+        lineHeight = 20.sp,
     ),
 
     /** Body */
@@ -120,8 +128,10 @@ data class QrizTypography(
     val headline1: TextStyle,
     val headline2: TextStyle,
     val headline3: TextStyle,
+    val headline4: TextStyle,
 
-    val subhead: TextStyle,
+    val subhead1: TextStyle,
+    val subhead2: TextStyle,
 
     /** Body */
     val body1: TextStyle,
@@ -148,7 +158,9 @@ data class QrizTypography(
             headline1 = BoldStyle,
             headline2 = BoldStyle,
             headline3 = MediumStyle,
-            subhead = MediumStyle,
+            headline4 = BoldStyle,
+            subhead1 = MediumStyle,
+            subhead2 = MediumStyle,
             body1 = NormalStyle,
             body1Long = NormalStyle,
             body2 = NormalStyle,

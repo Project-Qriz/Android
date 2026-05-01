@@ -1,11 +1,16 @@
 package com.qriz.app.core.ui.test
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -14,9 +19,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.qriz.app.core.designsystem.component.QrizLoading
+import com.qriz.app.core.designsystem.theme.Gray800
 import com.qriz.app.core.designsystem.theme.QrizTheme
 import com.qriz.app.core.ui.test.model.GeneralOptionItem
 import com.qriz.app.core.ui.test.model.OptionItem
@@ -93,6 +102,21 @@ fun TestScreen(
             }
         }
 
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(16.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Gray800.copy(alpha = 0.1f)
+                        )
+                    )
+                )
+                .wrapContentWidth(Alignment.CenterHorizontally)
+        )
+
         TestPageBottomNavigator(
             currentIndex = currentIndex,
             lastIndex = questions.lastIndex,
@@ -163,7 +187,7 @@ private fun TestScreenPreview() {
         TestScreen(
             questions = testData,
             testTimeType = TestTimeType.TOTAL,
-            currentIndex = 0,
+            currentIndex = 1,
             remainTimeText = "25:00",
             progressPercent = 0.5f,
             isLoading = true,
