@@ -11,6 +11,10 @@ val kakaoNativeAppKey = "KAKAO_NATIVE_APP_KEY_PROPERTY"
 android {
     namespace = "com.qriz.app"
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.qriz.app"
         versionCode = libs.versions.version.code.get().toInt()
@@ -22,7 +26,16 @@ android {
             useSupportLibrary = true
         }
 
+        val baseUrl = getLocalProperty("BASE_URL")
+        buildConfigField("String", "BASE_URL", "\"${baseUrl.replace("\"", "")}\"")
+
         buildConfigField("String", kakaoNativeAppKey, getLocalProperty(kakaoNativeAppKey))
+
+        val googleAdsSDKId = getLocalProperty("GOOGLE_ADS_SDK_ID")
+        buildConfigField("String", "GOOGLE_ADS_SDK_ID", "\"${googleAdsSDKId.replace("\"", "")}\"")
+
+        val googleAdsAppId = getLocalProperty("GOOGLE_ADS_APP_ID")
+        manifestPlaceholders["GOOGLE_ADS_APP_ID"] = googleAdsAppId.replace("\"", "")
     }
 
     signingConfigs {

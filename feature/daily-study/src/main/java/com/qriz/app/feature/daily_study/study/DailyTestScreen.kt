@@ -1,14 +1,29 @@
 package com.qriz.app.feature.daily_study.study
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.qriz.app.core.designsystem.component.QrizDialog
 import com.qriz.app.core.designsystem.component.QrizLoading
 import com.qriz.app.core.ui.common.const.ErrorScreen
+import com.qriz.app.core.ui.common.resource.AdConfig
 import com.qriz.app.core.ui.common.resource.UNKNOWN_ERROR
 import com.qriz.app.core.ui.test.TestScreen
 import com.qriz.app.core.ui.test.TestTimeType
@@ -26,10 +41,51 @@ fun DailyTestScreen(
     onShowSnackBar: (String) -> Unit,
     moveToBack: () -> Unit,
 ) {
+    val context = LocalContext.current
+    var interstitialAd by remember { mutableStateOf<InterstitialAd?>(null) }
+
+    LaunchedEffect(Unit) {
+        val adRequest = AdRequest.Builder().build()
+        InterstitialAd.load(
+            context,
+            AdConfig.GOOGLE_ADS_SDK_ID,
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdLoaded(ad: InterstitialAd) {
+                    interstitialAd = ad
+                    Log.d("DailyTestScreen/AdMob", "광고 로드")
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    interstitialAd = null
+                    Log.e("DailyTestScreen/AdMob", "광고 로드 실패: ${adError.message}")
+                }
+            }
+        )
+    }
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     viewModel.collectSideEffect {
         when (it) {
+            is DailyStudyUiEffect.ShowInterstitialAd -> {
+                context.findActivity()?.let { activity ->
+                    if (interstitialAd != null) {
+                        interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                            override fun onAdDismissedFullScreenContent() {
+                                moveToResult(it.day)
+                            }
+
+                            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+                                moveToResult(it.day)
+                            }
+                        }
+                        interstitialAd?.show(activity)
+                    } else {
+                        moveToResult(it.day)
+                    }
+                }
+            }
             is DailyStudyUiEffect.MoveToResult -> moveToResult(it.day)
             is DailyStudyUiEffect.Cancel -> moveToBack()
             is DailyStudyUiEffect.ShowSnackbar -> onShowSnackBar(it.message)
@@ -125,4 +181,13 @@ private fun StudyContent(
         onClickSubmit = onClickSubmit,
         onClickPreviousPage = onClickCancel,
     )
+}
+
+fun Context.findActivity() : Activity? {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    return null
 }
