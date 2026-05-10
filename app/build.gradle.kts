@@ -26,6 +26,9 @@ android {
             useSupportLibrary = true
         }
 
+        val baseUrl = getLocalProperty("BASE_URL")
+        buildConfigField("String", "BASE_URL", "\"${baseUrl.replace("\"", "")}\"")
+
         buildConfigField("String", kakaoNativeAppKey, getLocalProperty(kakaoNativeAppKey))
 
         val googleAdsSDKId = getLocalProperty("GOOGLE_ADS_SDK_ID")
