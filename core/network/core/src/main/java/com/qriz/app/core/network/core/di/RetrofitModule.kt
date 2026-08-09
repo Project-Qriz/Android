@@ -1,5 +1,6 @@
 package com.qriz.app.core.network.core.di
 
+import android.util.Log
 import com.qriz.app.core.network.core.BuildConfig
 import com.qriz.app.core.network.core.adapter.QrizCallAdapterFactory
 import com.qriz.app.core.network.core.interceptor.AuthInterceptor
@@ -30,6 +31,11 @@ object RetrofitModule {
         okHttpClient: OkHttpClient,
         callAdapterFactory: QrizCallAdapterFactory,
     ): Retrofit {
+        Log.d("CHECK_URL", "BuildConfig.BASE_URL: ${BuildConfig.BASE_URL}")
+
+        val myUrl = "https://qriz.org/"
+        Log.d("CHECK_URL", "실제 적용 중인 URL: $myUrl")
+
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)

@@ -1,6 +1,7 @@
 package com.qriz.app.feature.sign.signin
 
 import android.content.Context
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -420,6 +421,7 @@ private fun rememberGoogleLoginLauncher(
             }
         }
         onFailure(errorMessage)
+        Log.e("GOOGLE_SIGNIN", "StatusCode: ${e.statusCode}, Message: ${e.message}")
     }
 }
 
@@ -430,6 +432,8 @@ private fun googleLogin(
     onResult: (String) -> Unit,
     onFailure: (String) -> Unit,
 ) {
+    Log.d("GOOGLE_ID_CHECK", "ID: $GOOGLE_CLOUD_CONSOLE_CLIENT_ID")
+
     val authorizationRequest =
         AuthorizationRequest.builder()
             .setRequestedScopes(

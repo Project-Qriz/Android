@@ -8,6 +8,11 @@ plugins {
 
 android {
     setNamespace("core.network.core")
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         buildConfigField("String", "BASE_URL", getProperty("BASE_URL"))
     }
